@@ -1,9 +1,5 @@
 ---
-title: "About"
+title: "About Me"
 ---
 
-About this site
-
-```{r}
-1 + 1
-```
+I'm Ailys. I'm a Year 3 SMU Information Systems student, with tracks in Business Analytics and Digitalisation & Cloud Solutions.

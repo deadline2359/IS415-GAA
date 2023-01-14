@@ -1,16 +1,16 @@
 [
   {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About Me",
+    "section": "",
+    "text": "I’m Ailys. I’m a Year 3 SMU Information Systems student, with tracks in Business Analytics and Digitalisation & Cloud Solutions."
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "IS415-GAA",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
-  },
-  {
-    "objectID": "about.html",
-    "href": "about.html",
-    "title": "About",
-    "section": "",
-    "text": "About this site\n\n1 + 1\n\n[1] 2"
+    "text": "Welcome to IS415 Geospatial Analytics and Applications!\nThis is the course website of IS415 I’m studying this term. You will find my coursework on this website."
   }
 ]
