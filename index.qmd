@@ -1,7 +1,7 @@
 ---
-title: "IS415-GAA"
+title: "My Coursework in IS415"
 ---
 
-Welcome to **IS415 Geospatial Analytics and Applications**!
+Welcome to my profile for **IS415 Geospatial Analytics and Applications**!
 
-This is the course website of IS415 I'm studying this term. You will find my coursework on this website.
+You can find my coursework on this website.
