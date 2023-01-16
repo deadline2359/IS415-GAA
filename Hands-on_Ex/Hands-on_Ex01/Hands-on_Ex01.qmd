@@ -267,6 +267,7 @@ mpsz3414 <- mpsz3414 %>%
 Note: The unit of measurement of SVY21 is in [metre]{.underline}. When calculating the density, the result will be in numbers of population per square metres. Multiplying by 1000000 is to convert the density to numbers of population per square km.
 
 # EDA
+
 ## Histogram
 
 ### `hist()` from base R
@@ -276,6 +277,7 @@ hist(mpsz3414$`PreSch Density`)
 ```
 
 ### ggplot2 Library
+
 ```{r}
 ggplot(data = mpsz3414,
        aes(x = as.numeric(`PreSch Density`))) +
@@ -289,6 +291,7 @@ ggplot(data = mpsz3414,
 ```
 
 ## Scatterplot
+
 ```{r}
 ggplot(data = mpsz3414,
        aes(y = `PreSch Count`,

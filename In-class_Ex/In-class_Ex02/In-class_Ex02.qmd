@@ -1,0 +1,99 @@
+---
+title: "In-class Exercise 2: Geospatial Data Wrangling"
+format: 
+  html:
+    code-line-numbers: true
+    highlight-style: github
+execute:
+  warning: false
+date: "`r Sys.Date()`"
+---
+
+# Background
+
+To study the accessibility of water points in Nigeria.
+
+# Data Handling
+
+## Datasets
+
+The following data will be utilised in this exercise:
+
+### Apstial Data
+
+[WPdx+ Dataset from WPdx Global Data Repositories](https://data.waterpointdata.org/dataset/Water-Point-Data-Exchange-Plus-WPdx-/eqje-vguj/data)
+
+### Geospatial Data
+
+[Nigeria Level-2 Administrative Boundary](https://www.geoboundaries.org/index.html#getdata) (also known as Local Government Area)
+
+## Download R Packages
+
+```{r}
+pacman::p_load(sf, tidyverse)
+```
+
+## Import Datasets
+
+### WPdx+ Dataset
+
+```{r}
+wpdx <- read_csv("data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv") %>%
+  filter(`#clean_country_name` == "Nigeria")
+```
+
+### Nigeria Level-2 Administrative Boundary
+
+```{r}
+nigeria_boundary <- st_read(dsn = "data/geospatial",
+                            layer = "geoBoundaries-NGA-ADM2")
+```
+
+## Data Understanding and Handling
+
+### WPdx+ Dataset
+
+There are 70 columns and 406,566 rows in our WPDX+ dataset. The columns I will be exploring are *lat_deg* and *lon_deg*, which hold the geographic locations of the waterpoints in Nigeria. Since the columns are in decimal degree format, it is safe to assume that the data uses **WGS84** Geographic Coordinate System.
+
+```{r}
+list(wpdx)
+```
+
+#### Create Simple Feature DataFrame
+
+While creating a simple feature DataFrame from the aspatial DataFrame, we will also transform the project to **Projected Coordinate Systems of Nigeria** (EPSG codes: 26391, 26392, and 26303).
+
+```{r}
+wpdx$Geometry <- st_as_sfc(wpdx$`New Georeferenced Column`,
+                 crs=4326) %>%
+ st_transform(crs = 26391)
+```
+
+### Nigeria Level-2 Administrative Boundary
+
+Whereas the geospatial data consists of 6 columns and 774 rows.
+
+```{r}
+glimpse(nigeria_boundary)
+```
+
+It can also be seen that the dataset's coordinate system is WGS84.
+
+```{r}
+st_geometry(nigeria_boundary)
+```
+
+#### Transforming Projection
+
+Being that WGS84 is not appropriate for distance calculations that will be needed, the boundary's projection will be transformed from WGS84 to **Projected Coordinate Systems of Nigeria**.
+
+```{r}
+nigeria_boundary26391 <- st_transform(nigeria_boundary,
+                                      crs = 26391)
+```
+
+We can see now the `nigeria_boundary26391` correctly projects in **Projected Coordinate Systems of Nigeria**, noted by `"Minna / Nigeria West Belt"`, and the EPSG code is [26391]{.underline}.
+
+```{r}
+st_crs(nigeria_boundary26391)
+```

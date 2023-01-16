@@ -98,6 +98,41 @@
     "text": "Scatterplot\n\nggplot(data = mpsz3414,\n       aes(y = `PreSch Count`,\n            x = as.numeric(`PreSch Density`))) +\n    geom_point(color = \"black\",\n               fill = \"light blue\") +\n    xlim(0, 40) +\n    ylim(0, 40) +\n    labs(title = \"Are pre-school even distributed in Singapore?\",\n         x = \"Pre-school density (per km sq)\",\n         y = \"Pre-school count\")"
   },
   {
+    "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html",
+    "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html",
+    "title": "In-class Exercise 2: Geospatial Data Wrangling",
+    "section": "",
+    "text": "To study the accessibility of water points in Nigeria."
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#datasets",
+    "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#datasets",
+    "title": "In-class Exercise 2: Geospatial Data Wrangling",
+    "section": "Datasets",
+    "text": "Datasets\nThe following data will be utilised in this exercise:\n\nApstial Data\nWPdx+ Dataset from WPdx Global Data Repositories\n\n\nGeospatial Data\nNigeria Level-2 Administrative Boundary (also known as Local Government Area)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#download-r-packages",
+    "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#download-r-packages",
+    "title": "In-class Exercise 2: Geospatial Data Wrangling",
+    "section": "Download R Packages",
+    "text": "Download R Packages\n\npacman::p_load(sf, tidyverse)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#import-datasets",
+    "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#import-datasets",
+    "title": "In-class Exercise 2: Geospatial Data Wrangling",
+    "section": "Import Datasets",
+    "text": "Import Datasets\n\nWPdx+ Dataset\n\nwpdx <- read_csv(\"data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv\") %>%\n  filter(`#clean_country_name` == \"Nigeria\")\n\n\n\nNigeria Level-2 Administrative Boundary\n\nnigeria_boundary <- st_read(dsn = \"data/geospatial\",\n                            layer = \"geoBoundaries-NGA-ADM2\")\n\nReading layer `geoBoundaries-NGA-ADM2' from data source \n  `C:\\deadline2359\\IS415-GAA\\In-class_Ex\\In-class_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 774 features and 5 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442\nGeodetic CRS:  WGS 84"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#data-understanding-and-handling",
+    "href": "In-class_Ex/In-class_Ex02/In-class_Ex02.html#data-understanding-and-handling",
+    "title": "In-class Exercise 2: Geospatial Data Wrangling",
+    "section": "Data Understanding and Handling",
+    "text": "Data Understanding and Handling\n\nWPdx+ Dataset\nThere are 70 columns and 406,566 rows in our WPDX+ dataset. The columns I will be exploring are lat_deg and lon_deg, which hold the geographic locations of the waterpoints in Nigeria. Since the columns are in decimal degree format, it is safe to assume that the data uses WGS84 Geographic Coordinate System.\n\nlist(wpdx)\n\n[[1]]\n# A tibble: 95,008 × 70\n   row_id `#source`      #lat_…¹ #lon_…² #repo…³ #stat…⁴ #wate…⁵ #wate…⁶ #wate…⁷\n    <dbl> <chr>            <dbl>   <dbl> <chr>   <chr>   <chr>   <chr>   <chr>  \n 1 429068 GRID3             7.98    5.12 08/29/… Unknown <NA>    <NA>    Tapsta…\n 2 222071 Federal Minis…    6.96    3.60 08/16/… Yes     Boreho… Well    Mechan…\n 3 160612 WaterAid          6.49    7.93 12/04/… Yes     Boreho… Well    Hand P…\n 4 160669 WaterAid          6.73    7.65 12/04/… Yes     Boreho… Well    <NA>   \n 5 160642 WaterAid          6.78    7.66 12/04/… Yes     Boreho… Well    Hand P…\n 6 160628 WaterAid          6.96    7.78 12/04/… Yes     Boreho… Well    Hand P…\n 7 160632 WaterAid          7.02    7.84 12/04/… Yes     Boreho… Well    Hand P…\n 8 642747 Living Water …    7.33    8.98 10/03/… Yes     Boreho… Well    Mechan…\n 9 642456 Living Water …    7.17    9.11 10/03/… Yes     Boreho… Well    Hand P…\n10 641347 Living Water …    7.20    9.22 03/28/… Yes     Boreho… Well    Hand P…\n# … with 94,998 more rows, 61 more variables: `#water_tech_category` <chr>,\n#   `#facility_type` <chr>, `#clean_country_name` <chr>, `#clean_adm1` <chr>,\n#   `#clean_adm2` <chr>, `#clean_adm3` <chr>, `#clean_adm4` <chr>,\n#   `#install_year` <dbl>, `#installer` <chr>, `#rehab_year` <lgl>,\n#   `#rehabilitator` <lgl>, `#management_clean` <chr>, `#status_clean` <chr>,\n#   `#pay` <chr>, `#fecal_coliform_presence` <chr>,\n#   `#fecal_coliform_value` <dbl>, `#subjective_quality` <chr>, …\n\n\n\nCreate Simple Feature DataFrame\nWhile creating a simple feature DataFrame from the aspatial DataFrame, we will also transform the project to Projected Coordinate Systems of Nigeria (EPSG codes: 26391, 26392, and 26303).\n\nwpdx$Geometry <- st_as_sfc(wpdx$`New Georeferenced Column`,\n                 crs=4326) %>%\n st_transform(crs = 26391)\n\n\n\n\nNigeria Level-2 Administrative Boundary\nWhereas the geospatial data consists of 6 columns and 774 rows.\n\nglimpse(nigeria_boundary)\n\nRows: 774\nColumns: 6\n$ shapeName  <chr> \"Aba North\", \"Aba South\", \"Abadam\", \"Abaji\", \"Abak\", \"Abaka…\n$ Level      <chr> \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"AD…\n$ shapeID    <chr> \"NGA-ADM2-72505758B79815894\", \"NGA-ADM2-72505758B67905963\",…\n$ shapeGroup <chr> \"NGA\", \"NGA\", \"NGA\", \"NGA\", \"NGA\", \"NGA\", \"NGA\", \"NGA\", \"NG…\n$ shapeType  <chr> \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"ADM2\", \"AD…\n$ geometry   <MULTIPOLYGON [°]> MULTIPOLYGON (((7.401109 5...., MULTIPOLYGON (…\n\n\nIt can also be seen that the dataset’s coordinate system is WGS84.\n\nst_geometry(nigeria_boundary)\n\nGeometry set for 774 features \nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442\nGeodetic CRS:  WGS 84\nFirst 5 geometries:\n\n\n\nTransforming Projection\nBeing that WGS84 is not appropriate for distance calculations that will be needed, the boundary’s projection will be transformed from WGS84 to Projected Coordinate Systems of Nigeria.\n\nnigeria_boundary26391 <- st_transform(nigeria_boundary,\n                                      crs = 26391)\n\nWe can see now the nigeria_boundary26391 correctly projects in Projected Coordinate Systems of Nigeria, noted by \"Minna / Nigeria West Belt\", and the EPSG code is 26391.\n\nst_crs(nigeria_boundary26391)\n\nCoordinate Reference System:\n  User input: EPSG:26391 \n  wkt:\nPROJCRS[\"Minna / Nigeria West Belt\",\n    BASEGEOGCRS[\"Minna\",\n        DATUM[\"Minna\",\n            ELLIPSOID[\"Clarke 1880 (RGS)\",6378249.145,293.465,\n                LENGTHUNIT[\"metre\",1]]],\n        PRIMEM[\"Greenwich\",0,\n            ANGLEUNIT[\"degree\",0.0174532925199433]],\n        ID[\"EPSG\",4263]],\n    CONVERSION[\"Nigeria West Belt\",\n        METHOD[\"Transverse Mercator\",\n            ID[\"EPSG\",9807]],\n        PARAMETER[\"Latitude of natural origin\",4,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8801]],\n        PARAMETER[\"Longitude of natural origin\",4.5,\n            ANGLEUNIT[\"degree\",0.0174532925199433],\n            ID[\"EPSG\",8802]],\n        PARAMETER[\"Scale factor at natural origin\",0.99975,\n            SCALEUNIT[\"unity\",1],\n            ID[\"EPSG\",8805]],\n        PARAMETER[\"False easting\",230738.26,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8806]],\n        PARAMETER[\"False northing\",0,\n            LENGTHUNIT[\"metre\",1],\n            ID[\"EPSG\",8807]]],\n    CS[Cartesian,2],\n        AXIS[\"(E)\",east,\n            ORDER[1],\n            LENGTHUNIT[\"metre\",1]],\n        AXIS[\"(N)\",north,\n            ORDER[2],\n            LENGTHUNIT[\"metre\",1]],\n    USAGE[\n        SCOPE[\"Engineering survey, topographic mapping.\"],\n        AREA[\"Nigeria - onshore west of 6°30'E, onshore and offshore shelf.\"],\n        BBOX[3.57,2.69,13.9,6.5]],\n    ID[\"EPSG\",26391]]"
+  },
+  {
     "objectID": "index.html",
     "href": "index.html",
     "title": "My Coursework in IS415",

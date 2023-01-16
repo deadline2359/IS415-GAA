@@ -12,7 +12,10 @@ website:
         menu: 
           - text: "Hands-on Exercise 1"
             href: "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01.html"
-
+      - text: "In-class Exercises"
+        menu: 
+          - text: "In-class Exercise 2"
+            href: "In-class_Ex/In-class_Ex02/In-class_Ex02.html"
 format:
   html:
     theme: lumen
