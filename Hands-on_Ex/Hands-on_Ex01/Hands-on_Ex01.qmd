@@ -52,7 +52,7 @@ mpsz <- st_read(dsn = "data/geospatial",
 
 The simple feature DataFrame is in Singapore **svy21** projected coordinates systems.
 
-### Pre-Schools Location
+### Cycling Path
 
 ```{r}
 
@@ -62,7 +62,7 @@ cyclingpath = st_read(dsn="data/geospatial",
 
 The simple feature DataFrame is in Singapore **svy21** projected coordinates systems.
 
-### Cycling Path
+### Pre-Schools Location
 
 ```{r}
 preschool = st_read(dsn = "data/geospatial/preschools-location.kml")

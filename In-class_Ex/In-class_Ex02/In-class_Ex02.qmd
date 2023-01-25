@@ -27,73 +27,184 @@ The following data will be utilised in this exercise:
 
 [Nigeria Level-2 Administrative Boundary](https://www.geoboundaries.org/index.html#getdata) (also known as Local Government Area)
 
+or
+[Nigeria - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-nga) from Humanitarian Data Exchange
+
 ## Download R Packages
 
 ```{r}
-pacman::p_load(sf, tidyverse)
+pacman::p_load(sf, tidyverse, funModeling)
 ```
 
 ## Import Datasets
 
-### WPdx+ Dataset
+### Aspatial Dataset
+
+#### WPdx+ Dataset
 
 ```{r}
-wpdx <- read_csv("data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv") %>%
+wp_nga <- read_csv("data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv") %>%
   filter(`#clean_country_name` == "Nigeria")
 ```
 
-### Nigeria Level-2 Administrative Boundary
+### Geospatial Dataset
+
+#### Nigeria Level-2 Administrative Boundary
+
+##### Humanitarian Data Exchange
 
 ```{r}
-nigeria_boundary <- st_read(dsn = "data/geospatial",
-                            layer = "geoBoundaries-NGA-ADM2")
+NGA <- st_read(dsn = "data/geospatial/nga_adm_osgof_20190417",
+               layer = "nga_admbnda_adm2_osgof_20190417") %>%
+  st_transform(crs = 26392)
 ```
 
-## Data Understanding and Handling
+##### Nigeria Level-2 Administrative Boundary
+
+```{r}
+geoNGA <- st_read(dsn = "data/geospatial",
+                            layer = "geoBoundaries-NGA-ADM2") %>%
+ st_transform(crs = 26391)
+```
+
+## Data Handling
 
 ### WPdx+ Dataset
 
-There are 70 columns and 406,566 rows in our WPDX+ dataset. The columns I will be exploring are *lat_deg* and *lon_deg*, which hold the geographic locations of the waterpoints in Nigeria. Since the columns are in decimal degree format, it is safe to assume that the data uses **WGS84** Geographic Coordinate System.
-
 ```{r}
-list(wpdx)
+wp_nga$Geometry = st_as_sfc(wp_nga$`New Georeferenced Column`) # convert only this field into a sf dataframe
+wp_nga
 ```
 
 #### Create Simple Feature DataFrame
 
-While creating a simple feature DataFrame from the aspatial DataFrame, we will also transform the project to **Projected Coordinate Systems of Nigeria** (EPSG codes: 26391, 26392, and 26303).
-
 ```{r}
-wpdx$Geometry <- st_as_sfc(wpdx$`New Georeferenced Column`,
-                 crs=4326) %>%
- st_transform(crs = 26391)
+wp_sf <- st_sf(wp_nga, crs=4326)
+wp_sf
 ```
 
-### Nigeria Level-2 Administrative Boundary
-
-Whereas the geospatial data consists of 6 columns and 774 rows.
+### Projection Transformation
 
 ```{r}
-glimpse(nigeria_boundary)
+wp_sf <- wp_sf %>%
+  st_transform(crs = 26392)
 ```
 
-It can also be seen that the dataset's coordinate system is WGS84.
+# Geospatial Data Cleaning
+
+### Excluding Redundant Fields
 
 ```{r}
-st_geometry(nigeria_boundary)
+NGA <- NGA %>%
+  select(c(3:4, 8:9))
 ```
 
-#### Transforming Projection
+## Checking for Duplicate Name
 
-Being that WGS84 is not appropriate for distance calculations that will be needed, the boundary's projection will be transformed from WGS84 to **Projected Coordinate Systems of Nigeria**.
+It is important to check for duplicated name in the data main data fields. Using `duplicated()` of Base R, we can flag out LGA names that might be duplicated as shown in the code chuck below.
 
 ```{r}
-nigeria_boundary26391 <- st_transform(nigeria_boundary,
-                                      crs = 26391)
+NGA$ADM2_EN[duplicated(NGA$ADM2_EN) == TRUE]
 ```
 
-We can see now the `nigeria_boundary26391` correctly projects in **Projected Coordinate Systems of Nigeria**, noted by `"Minna / Nigeria West Belt"`, and the EPSG code is [26391]{.underline}.
+```{r}
+NGA$ADM2_EN[94] <- "Bassa, Kogi"
+NGA$ADM2_EN[95] <- "Bassa, Plateau"
+NGA$ADM2_EN[304] <- "Ifelodun, Kwara"
+NGA$ADM2_EN[305] <- "Ifelodun, Osun"
+NGA$ADM2_EN[355] <- "Irepodun, Kwara"
+NGA$ADM2_EN[356] <- "Irepodun, Osun"
+NGA$ADM2_EN[519] <- "Nasarawa, Kano"
+NGA$ADM2_EN[520] <- "Nasarawa, Nasarawa"
+NGA$ADM2_EN[546] <- "Obi, Benue"
+NGA$ADM2_EN[547] <- "Obi, Nasarawa"
+NGA$ADM2_EN[693] <- "Surulure, Lagos"
+NGA$ADM2_EN[694] <- "Surulure, Oyo"
+```
+
+# Data Wrangling for Water Point Data
 
 ```{r}
-st_crs(nigeria_boundary26391)
+freq(data = wp_sf,
+     input = '#status_clean')
+```
+
+```{r}
+wp_sf_nga <- wp_sf %>%
+  rename(status_clean = '#status_clean') %>%
+  select(status_clean) %>%
+  mutate(status_clean = replace_na(
+    status_clean, "unknown" # rename NA to be called "unknown"
+  ))
+
+freq(data = wp_sf_nga,
+     input = 'status_clean')
+```
+
+## Extract Water Point Data
+
+```{r}
+wp_functional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Functional",
+             "Functional but not in use",
+             "Functional but needs repair"))
+```
+
+```{r}
+wp_nonfunctional <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("Abandoned/Decommissioned",
+             "Abandoned",
+             "Non-Functional due to dry season",
+             "Non-Functional",
+             "Non functional due to dry season",
+             "Non-Functional due to dry season"))
+wp_nonfunctional
+```
+
+```{r}
+wp_unknown <- wp_sf_nga %>%
+  filter(status_clean %in%
+           c("unknown"))
+wp_unknown
+```
+
+## Performing Point-in-Polygon Count
+
+```{r}
+NGA_wp <- NGA %>%
+  mutate('total_wp' = lengths(
+    st_intersects(NGA, wp_sf_nga))) %>%
+  mutate('wp_functional' = lengths(
+    st_intersects(NGA, wp_functional))) %>%
+  mutate('wp_nonfunctional' = lengths(
+    st_intersects(NGA, wp_nonfunctional))) %>%
+  mutate('wp_unknown' = lengths(
+    st_intersects(NGA, wp_unknown)))
+```
+
+## Visualising attributes by using statistical graphs
+
+```{r}
+ggplot(data = NGA_wp,
+       aes(x = total_wp)) +
+  geom_histogram(bins = 20,
+                 color = "black",
+                 fill = "light blue") +
+  geom_vline(aes(xintercept = mean(
+    total_wp,  na.rm = T)),
+    color = "red",
+    linetype = "dashed",
+    size = 0.8) +
+  ggtitle("Distribution of total water points by LGA") +
+  xlab("No of water points") +
+  ylab("No. of\nLGAs") +
+  theme(axis.title.y = element_text(angle = 0)) # total y-axis title
+```
+
+# Saving the analytical data in rds format
+
+```{r}
+write_rds(NGA_wp, "data/rds/NGA_wp.rds")
 ```

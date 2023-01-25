@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2023-01-24">
+<meta name="dcterms.date" content="2023-01-25">
 
 <title>Ailys’ IS415 Journey - Hands-on Exercise 1: Geospatial Data Wrangling with R</title>
 <style>
@@ -175,6 +175,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex02/In-class_Ex02.html">
  <span class="dropdown-text">In-class Exercise 2</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03.html">
+ <span class="dropdown-text">In-class Exercise 3</span></a>
+  </li>  
     </ul>
   </li>
 </ul>
@@ -200,8 +204,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#importing-geospatial-data" id="toc-importing-geospatial-data" class="nav-link" data-scroll-target="#importing-geospatial-data">Importing Geospatial Data</a>
   <ul class="collapse">
   <li><a href="#master-plan-2014-subzone-boundary" id="toc-master-plan-2014-subzone-boundary" class="nav-link" data-scroll-target="#master-plan-2014-subzone-boundary">Master Plan 2014 Subzone Boundary</a></li>
-  <li><a href="#pre-schools-location" id="toc-pre-schools-location" class="nav-link" data-scroll-target="#pre-schools-location">Pre-Schools Location</a></li>
   <li><a href="#cycling-path" id="toc-cycling-path" class="nav-link" data-scroll-target="#cycling-path">Cycling Path</a></li>
+  <li><a href="#pre-schools-location" id="toc-pre-schools-location" class="nav-link" data-scroll-target="#pre-schools-location">Pre-Schools Location</a></li>
   </ul></li>
   <li><a href="#retrieve-information-from-simple-feature-dataframe" id="toc-retrieve-information-from-simple-feature-dataframe" class="nav-link" data-scroll-target="#retrieve-information-from-simple-feature-dataframe">Retrieve Information from simple feature DataFrame</a>
   <ul class="collapse">
@@ -257,7 +261,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 24, 2023</p>
+      <p class="date">January 25, 2023</p>
     </div>
   </div>
   
@@ -320,8 +324,8 @@ Projected CRS: SVY21</code></pre>
 </div>
 <p>The simple feature DataFrame is in Singapore <strong>svy21</strong> projected coordinates systems.</p>
 </section>
-<section id="pre-schools-location" class="level3">
-<h3 class="anchored" data-anchor-id="pre-schools-location">Pre-Schools Location</h3>
+<section id="cycling-path" class="level3">
+<h3 class="anchored" data-anchor-id="cycling-path">Cycling Path</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>cyclingpath <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn=</span><span class="st">"data/geospatial"</span>,</span>
 <span id="cb4-2"><a href="#cb4-2"></a>                       <span class="at">layer =</span> <span class="st">"CyclingPathGazette"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -338,8 +342,8 @@ Projected CRS: SVY21</code></pre>
 </div>
 <p>The simple feature DataFrame is in Singapore <strong>svy21</strong> projected coordinates systems.</p>
 </section>
-<section id="cycling-path" class="level3">
-<h3 class="anchored" data-anchor-id="cycling-path">Cycling Path</h3>
+<section id="pre-schools-location" class="level3">
+<h3 class="anchored" data-anchor-id="pre-schools-location">Pre-Schools Location</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>preschool <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial/preschools-location.kml"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">

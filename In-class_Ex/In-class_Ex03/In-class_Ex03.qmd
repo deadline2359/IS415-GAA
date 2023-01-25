@@ -1,0 +1,145 @@
+---
+title: "Hands-on Exercise 3: Choropleth Mapping with R"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    echo: true
+    eval: true
+    highlight-style: github
+execute:
+  warning: false
+date: "25 January 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Getting Started
+
+## Import and Load Packages
+
+```{r}
+pacman::p_load(tmap, tidyverse, sf)
+```
+
+## Import Data
+
+```{r}
+NGA_wp <- read_rds("data/rds/NGA_wp.rds")
+```
+
+# Basic Choropleth Mapping
+
+## Visualising distribution of functional water points
+
+```{r}
+p1 <- tm_shape(NGA_wp) +
+  tm_fill("wp_functional",
+          n = 10,
+          style = "equal",
+          palette = "Blues") +
+  tm_borders(lwd = 0.1,
+             alpha = 1) +
+  tm_layout(main.title = "Distribution of Functional Water Points",
+            legend.outside = FALSE)
+```
+
+```{r}
+p2 <- tm_shape(NGA_wp) +
+  tm_fill("total_wp",
+          n = 10,
+          style = "equal",
+          palette = "Blues") +
+  tm_borders(lwd = 0.1,
+             alpha = 1) +
+  tm_layout(main.title = "Distribution of Total Water Points",
+            legend.outside = FALSE)
+```
+
+Areas with more water points (functional or non-functional) will have more functional water points regardless.
+
+```{r}
+tmap_arrange(p2, p1, nrow = 1)
+```
+
+# Choropleth Map for Rates
+
+## Deriving Proportion of Functional Water Points and Non-functional Water Points
+
+```{r}
+NGA_wp <- NGA_wp %>%
+  mutate(pct_functional = wp_functional/total_wp) %>%
+  mutate(pct_nonfunctional = wp_nonfunctional/total_wp)
+```
+
+## Plotting Map of Rate
+
+```{r}
+tm_shape(NGA_wp) +
+  tm_fill("pct_functional",
+          n = 10,
+          style = "equal",
+          palette = "Blues") +
+  tm_borders(lwd = 0.1,
+             alpha = 1) +
+  tm_layout(main.title = "Rate Map of Functional Water Points",
+            legend.outside = TRUE)
+```
+
+# Extreme Value Maps
+
+## Percentile Map
+
+### Data Preparation
+
+```{r}
+NGA_wp <- NGA_wp %>%
+  drop_na()
+```
+
+```{r}
+percent = c(0, 0.01, 0.1, 0.5, 0.9, 0.99, 1)
+var <- NGA_wp["pct_functional"] %>%
+  st_set_geometry(NULL) # drop geometric field; quantile() doesnt under geometric
+quantile(var[,1], percent)
+```
+
+```{r}
+get.var <- function(vname, df) {
+  v <- df[vname] %>%
+    st_set_geometry(NULL)
+  v <- unname(v[,1])
+  return(v)
+}
+```
+
+```{r}
+percentmap <- function(vname, df, legtitle=NA, mtitle="Percentile Map"){
+  percent = c(0, 0.01, 0.1, 0.5, 0.9, 0.99, 1)
+  var <- get.var(vname, df)
+  bprec <- quantile(var, percent)
+  tm_shape(df) +
+    tm_polygons() +
+    tm_shape(df) +
+      tm_fill(vname,
+              title = legtitle,
+              breaks = bprec,
+              palette = "Blues",
+            labels = c("< 1%", "1% - 10%", "10% - 50%", "50% - 90%", "90% - 99%", "> 99%")) +
+    tm_borders() +
+    tm_layout(main.title = mtitle,
+              title.position = c("right", "bottom"))
+  }
+```
+
+```{r}
+percentmap("wp_functional", NGA_wp)
+```
+
+## Box Map
+
+```{r}
+ggplot(data = NGA_wp,
+       aes(x = "",
+           y = wp_nonfunctional)) +
+  geom_boxplot()
+```
