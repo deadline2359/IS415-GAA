@@ -1,0 +1,165 @@
+---
+title: "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "30 January 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Overview
+
+This is a continuation of [Hands-on Exercise 3](../Hands-on_Ex03/Hands-on_Ex03.html). Please refer to [Hands-on Exercise 3](../Hands-on_Ex03/Hands-on_Ex03.html) for overview of Spatial Point Pattern Analysis and goals of this exercise.
+
+Sections from [Datasets] to [Geospatial Data Wrangling] will be the same as [Hands-on Exercise 3](../Hands-on_Ex03/Hands-on_Ex03.html).
+
+# Datasets {#datasets}
+
+-   **CHILDCARE**
+
+    a *point feature* data providing both location and attribute information of childcare centres. It was downloaded from Data.gov.sg and is in geojson format.
+
+-   **MP14_SUBZONE_WEB_PL**
+
+    a *polygon feature* data providing information of URA 2014 Master Plan Planning Subzone boundary data. It is in ESRI shapefile format. This data set was also downloaded from Data.gov.sg.
+
+-   **CostalOutline**
+
+    a *polygon feature* data showing the national boundary of Singapore. It is provided by SLA and is in ESRI shapefile format.
+
+# Datasets
+
+```{r}
+pacman::p_load(maptools, sf, raster, spatstat, tmap, dplyr)
+```
+
+# Spatial Data Wrangling
+
+## Importing Spatial Data
+
+::: panel-tabset
+## Import
+
+```{r}
+childcare_sf <- st_read("data/child-care-services-geojson.geojson") %>% 
+  st_transform(crs = 3414)
+```
+
+## Glimpse
+
+```{r}
+glimpse(childcare_sf)
+```
+:::
+
+::: panel-tabset
+## Import
+
+```{r}
+mpsz_sf <- st_read(dsn = "data",
+                   layer = "MP14_SUBZONE_WEB_PL")
+```
+
+## Glimpse
+
+```{r}
+glimpse(mpsz_sf)
+```
+:::
+
+::: panel-tabset
+## Import
+
+```{r}
+sg_sf <- st_read(dsn = "data",
+                 layer = "CostalOutline")
+```
+
+## Glimpse
+
+```{r}
+glimpse(sg_sf)
+```
+:::
+
+## Map Projection
+
+You can see that `mpsz_sf` and `sg_sf` have CRS code 9001, which is incorrect, compared to `childcare_sf`.
+
+```{r}
+st_crs(childcare_sf)
+```
+
+```{r}
+st_crs(mpsz_sf)
+```
+
+```{r}
+st_crs(sg_sf)
+```
+
+Hence the CRS code needs to be reassigned.
+
+```{r}
+mpsz_sf <- st_set_crs(mpsz_sf, 3414)
+st_crs(mpsz_sf)
+```
+
+```{r}
+sg_sf <- st_set_crs(sg_sf, 3414)
+st_crs(sg_sf)
+```
+
+### Mapping Geospatial Datasets
+
+```{r}
+tmap_mode("view")
+tm_shape(childcare_sf) +
+  tm_dots()
+tmap_mode("plot")
+```
+
+# Geospatial Data Wrangling
+
+## Converting sf data frames to sp\'s Spatial\* class
+
+```{r}
+childcare <- as_Spatial(childcare_sf)
+mpsz <- as_Spatial(mpsz_sf)
+sg <- as_Spatial(sg_sf)
+```
+
+## Converting the Spatial\* class into generic sp format
+
+Generic sp format drops the data object, leaving only the geospatial data.
+
+```{r}
+childcare_sp <- as(childcare, "SpatialPoints")
+sg_sp <- as(sg, "SpatialPolygons")
+```
+
+## Converting the generic sp format into spatstat\'s ppp format
+
+Converting from generic sp format into ppp format will provide new columns of *x* and *y*.
+
+```{r}
+childcare_ppp <- as(childcare_sp, "ppp")
+childcare_ppp
+```
+
+```{r}
+plot(childcare_ppp)
+```
+
+These are the summary information of childcare in **ppp** format.
+
+```{r}
+summary(childcare_ppp)
+```
