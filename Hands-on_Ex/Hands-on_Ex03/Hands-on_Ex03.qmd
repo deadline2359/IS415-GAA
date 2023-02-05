@@ -150,7 +150,7 @@ Always **remember to switch back to plot mode** after creating an interactive ma
 
 Although simple feature data frame is gaining popularity against sp's Spatial\* classes, many geospatial analysis packages still require the input geospatial data be in sp's Spatial\* classes.
 
-## 
+## Converting sf data frames to sp's Spatial\* class
 
 Converting sf DataFrames to sp's Spatial\* Class
 
