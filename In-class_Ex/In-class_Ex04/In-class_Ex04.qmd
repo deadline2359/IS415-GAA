@@ -125,6 +125,7 @@ Alternatively, a pin map can be prepared by using the code chunk below.
 ```{r}
 tmap_mode("view") # interactive
 tm_shape(childcare_sf) +
+  tm_view(set.view= 11) +
   tm_dots()
 
 tmap_mode("plot") # return to default

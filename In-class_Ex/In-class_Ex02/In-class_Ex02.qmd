@@ -27,8 +27,7 @@ The following data will be utilised in this exercise:
 
 [Nigeria Level-2 Administrative Boundary](https://www.geoboundaries.org/index.html#getdata) (also known as Local Government Area)
 
-or
-[Nigeria - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-nga) from Humanitarian Data Exchange
+or [Nigeria - Subnational Administrative Boundaries](https://data.humdata.org/dataset/cod-ab-nga) from Humanitarian Data Exchange
 
 ## Download R Packages
 

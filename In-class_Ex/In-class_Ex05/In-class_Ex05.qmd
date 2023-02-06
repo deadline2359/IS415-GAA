@@ -1,0 +1,95 @@
+---
+title: "In-class Exercise 5"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "6 February 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Load R Packages
+
+```{r}
+pacman::p_load(tidyverse, tmap, sf, sfdep)
+```
+
+# Importing Data
+
+```{r}
+studyArea <- st_read(dsn = "data",
+                     layer = "study_area") %>%
+  st_transform(crs = 3829)
+```
+
+```{r}
+stores <- st_read(dsn = "data",
+                  layer = "stores") %>%
+  st_transform(crs = 3829)
+```
+
+# Visualising sf Layers
+
+```{r}
+tmap_mode("view")
+tm_shape(studyArea) +
+  tm_polygons() +
+tm_shape(stores) +
+  tm_dots(col = "Name",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+  tm_view(set.zoom.limits = c(12,16))
+```
+
+# Local Colocation Quotients (LCLQ)
+
+```{r}
+nb <- include_self(
+  st_knn(st_geometry(stores), 6) # includes itself; hence surround neighbours = 5
+)
+
+wt <- st_kernel_weights(nb,
+                        stores,
+                        "gaussian",
+                        adaptive = TRUE)
+```
+
+```{r}
+FamilyMart <- stores %>% 
+  filter(Name == "Family Mart")
+A <- FamilyMart$Name
+```
+
+```{r}
+SevenEleven <- stores %>% 
+  filter(Name == "7-Eleven")
+B <- SevenEleven$Name
+```
+
+```{r}
+LCLQ <- local_colocation(A, B, nb, wt, 49) # 49 simulations
+```
+
+```{r}
+LCLQ_stores <- cbind(stores, LCLQ) # appending 
+# cannot do relational join as LCLQ doesn't have unique identifier
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(studyArea) +
+  tm_polygons() +
+tm_shape(LCLQ_stores) +
+  tm_dots(col = "X7.Eleven",
+          size = 0.01,
+          border.col = "black",
+          border.lwd = 0.5) +
+  tm_view(set.zoom.limits = c(12,16))
+```

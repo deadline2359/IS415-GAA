@@ -21,6 +21,69 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -124,6 +187,10 @@ ul.task-list li input[type="checkbox"] {
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
  <span class="dropdown-text">In-class Exercise 4</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex05/In-class_Ex05.html">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -148,7 +215,33 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#import-r-packages" id="toc-import-r-packages" class="nav-link active" data-scroll-target="#import-r-packages"><span class="toc-section-number">1</span>  Import R Packages</a></li>
+  <li><a href="#import-datasets" id="toc-import-datasets" class="nav-link" data-scroll-target="#import-datasets"><span class="toc-section-number">2</span>  Import Datasets</a>
+  <ul class="collapse">
+  <li><a href="#wpdx-dataset" id="toc-wpdx-dataset" class="nav-link" data-scroll-target="#wpdx-dataset"><span class="toc-section-number">2.1</span>  WPdx+ Dataset</a></li>
+  <li><a href="#nigeria-osun-state" id="toc-nigeria-osun-state" class="nav-link" data-scroll-target="#nigeria-osun-state"><span class="toc-section-number">2.2</span>  Nigeria Osun State</a></li>
+  </ul></li>
+  <li><a href="#data-handling" id="toc-data-handling" class="nav-link" data-scroll-target="#data-handling"><span class="toc-section-number">3</span>  Data Handling</a>
+  <ul class="collapse">
+  <li><a href="#wpdx-dataset-1" id="toc-wpdx-dataset-1" class="nav-link" data-scroll-target="#wpdx-dataset-1"><span class="toc-section-number">3.1</span>  WPdx+ Dataset</a></li>
+  </ul></li>
+  <li><a href="#geospatial-data-cleaning" id="toc-geospatial-data-cleaning" class="nav-link" data-scroll-target="#geospatial-data-cleaning"><span class="toc-section-number">4</span>  Geospatial Data Cleaning</a>
+  <ul class="collapse">
+  <li><a href="#excluding-redundant-fields" id="toc-excluding-redundant-fields" class="nav-link" data-scroll-target="#excluding-redundant-fields"><span class="toc-section-number">4.1</span>  Excluding Redundant Fields</a></li>
+  <li><a href="#checking-for-duplicated-name" id="toc-checking-for-duplicated-name" class="nav-link" data-scroll-target="#checking-for-duplicated-name"><span class="toc-section-number">4.2</span>  Checking for Duplicated Name</a></li>
+  </ul></li>
+  <li><a href="#data-wrangling-for-water-point-data" id="toc-data-wrangling-for-water-point-data" class="nav-link" data-scroll-target="#data-wrangling-for-water-point-data"><span class="toc-section-number">5</span>  Data Wrangling for Water Point Data</a>
+  <ul class="collapse">
+  <li><a href="#extract-water-point-data" id="toc-extract-water-point-data" class="nav-link" data-scroll-target="#extract-water-point-data"><span class="toc-section-number">5.1</span>  Extract Water Point Data</a></li>
+  <li><a href="#performing-point-in-polygon-count" id="toc-performing-point-in-polygon-count" class="nav-link" data-scroll-target="#performing-point-in-polygon-count"><span class="toc-section-number">5.2</span>  Performing Point-in-Polygon Count</a></li>
+  </ul></li>
+  <li><a href="#first-order-spatial-point-patterns-analysis" id="toc-first-order-spatial-point-patterns-analysis" class="nav-link" data-scroll-target="#first-order-spatial-point-patterns-analysis"><span class="toc-section-number">6</span>  First-order Spatial Point Patterns Analysis</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -182,8 +275,270 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<section id="import-r-packages" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Import R Packages</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, tidyverse, funModeling, tmap)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="import-datasets" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Import Datasets</h1>
+<section id="wpdx-dataset" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="wpdx-dataset"><span class="header-section-number">2.1</span> WPdx+ Dataset</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>wp_osun <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv"</span>) <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="st">`</span><span class="at">#clean_country_name</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Nigeria"</span> <span class="sc">&amp;</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>                                                                                              <span class="st">`</span><span class="at">#clean_adm1</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Osun"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="nigeria-osun-state" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="nigeria-osun-state"><span class="header-section-number">2.2</span> Nigeria Osun State</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>NGA <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial/nga_adm_osgof_20190417"</span>,</span>
+<span id="cb3-2"><a href="#cb3-2"></a>               <span class="at">layer =</span> <span class="st">"nga_admbnda_adm2_osgof_20190417"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">26392</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `nga_admbnda_adm2_osgof_20190417' from data source 
+  `C:\deadline2359\IS415-GAA\Take-home_Ex\Take-home_Ex01\data\geospatial\nga_adm_osgof_20190417' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 774 features and 16 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 2.668534 ymin: 4.273007 xmax: 14.67882 ymax: 13.89442
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="data-handling" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Data Handling</h1>
+<section id="wpdx-dataset-1" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="wpdx-dataset-1"><span class="header-section-number">3.1</span> WPdx+ Dataset</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>wp_osun<span class="sc">$</span>Geometry <span class="ot">=</span> <span class="fu">st_as_sfc</span>(wp_osun<span class="sc">$</span><span class="st">`</span><span class="at">New Georeferenced Column</span><span class="st">`</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>wp_osun</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5,557 × 71
+   row_id `#source`      #lat_…¹ #lon_…² #repo…³ #stat…⁴ #wate…⁵ #wate…⁶ #wate…⁷
+    &lt;dbl&gt; &lt;chr&gt;            &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;  
+ 1 429123 GRID3             8.02    5.06 08/29/… Unknown &lt;NA&gt;    &lt;NA&gt;    Tapsta…
+ 2  70566 Federal Minis…    7.32    4.79 05/11/… No      Protec… Well    Mechan…
+ 3  70578 Federal Minis…    7.76    4.56 05/11/… No      Boreho… Well    Mechan…
+ 4  66401 Federal Minis…    8.03    4.64 04/30/… No      Boreho… Well    Mechan…
+ 5 422190 GRID3             7.87    4.88 08/29/… Unknown &lt;NA&gt;    &lt;NA&gt;    Tapsta…
+ 6 422064 GRID3             7.7     4.89 08/29/… Unknown &lt;NA&gt;    &lt;NA&gt;    Tapsta…
+ 7  65607 Federal Minis…    7.89    4.71 05/12/… No      Boreho… Well    Mechan…
+ 8  68989 Federal Minis…    7.51    4.27 05/07/… No      Boreho… Well    &lt;NA&gt;   
+ 9  67708 Federal Minis…    7.48    4.35 04/29/… Yes     Boreho… Well    Mechan…
+10  66419 Federal Minis…    7.63    4.50 05/08/… Yes     Boreho… Well    Hand P…
+# … with 5,547 more rows, 62 more variables: `#water_tech_category` &lt;chr&gt;,
+#   `#facility_type` &lt;chr&gt;, `#clean_country_name` &lt;chr&gt;, `#clean_adm1` &lt;chr&gt;,
+#   `#clean_adm2` &lt;chr&gt;, `#clean_adm3` &lt;chr&gt;, `#clean_adm4` &lt;chr&gt;,
+#   `#install_year` &lt;dbl&gt;, `#installer` &lt;chr&gt;, `#rehab_year` &lt;lgl&gt;,
+#   `#rehabilitator` &lt;lgl&gt;, `#management_clean` &lt;chr&gt;, `#status_clean` &lt;chr&gt;,
+#   `#pay` &lt;chr&gt;, `#fecal_coliform_presence` &lt;chr&gt;,
+#   `#fecal_coliform_value` &lt;dbl&gt;, `#subjective_quality` &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+<section id="create-simple-feature-dataframe" class="level4" data-number="3.1.0.1">
+<h4 data-number="3.1.0.1" class="anchored" data-anchor-id="create-simple-feature-dataframe"><span class="header-section-number">3.1.0.1</span> Create Simple Feature DataFrame</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>wp_sf <span class="ot">&lt;-</span> <span class="fu">st_sf</span>(wp_osun, <span class="at">crs=</span><span class="dv">4326</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>wp_sf <span class="ot">&lt;-</span> wp_sf <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">26392</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="geospatial-data-cleaning" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Geospatial Data Cleaning</h1>
+<section id="excluding-redundant-fields" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="excluding-redundant-fields"><span class="header-section-number">4.1</span> Excluding Redundant Fields</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>NGA <span class="ot">&lt;-</span> NGA  <span class="sc">%&gt;%</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="fu">filter</span>(<span class="st">`</span><span class="at">ADM1_EN</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Osun"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb9-3"><a href="#cb9-3"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">3</span><span class="sc">:</span><span class="dv">4</span>, <span class="dv">8</span><span class="sc">:</span><span class="dv">9</span>))</span>
+<span id="cb9-4"><a href="#cb9-4"></a>NGA</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 30 features and 4 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 176503.2 ymin: 331434.7 xmax: 291043.8 ymax: 454520.1
+Projected CRS: Minna / Nigeria Mid Belt
+First 10 features:
+          ADM2_EN ADM2_PCODE ADM1_EN ADM1_PCODE                       geometry
+1        Aiyedade   NG030001    Osun      NG030 MULTIPOLYGON (((213526.6 34...
+2        Aiyedire   NG030002    Osun      NG030 MULTIPOLYGON (((212542.6 40...
+3  Atakumosa East   NG030003    Osun      NG030 MULTIPOLYGON (((265746.8 37...
+4  Atakumosa West   NG030004    Osun      NG030 MULTIPOLYGON (((248871.4 40...
+5      Boluwaduro   NG030005    Osun      NG030 MULTIPOLYGON (((266092.2 43...
+6          Boripe   NG030006    Osun      NG030 MULTIPOLYGON (((255072.5 43...
+7       Ede North   NG030007    Osun      NG030 MULTIPOLYGON (((236386.9 41...
+8       Ede South   NG030008    Osun      NG030 MULTIPOLYGON (((236386.9 41...
+9        Egbedore   NG030009    Osun      NG030 MULTIPOLYGON (((220756 4317...
+10         Ejigbo   NG030010    Osun      NG030 MULTIPOLYGON (((214422.1 42...</code></pre>
+</div>
+</div>
+</section>
+<section id="checking-for-duplicated-name" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="checking-for-duplicated-name"><span class="header-section-number">4.2</span> Checking for Duplicated Name</h2>
+<p>You can see that no duplicated LGAs in the Osun state.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>NGA<span class="sc">$</span>ADM2_EN[<span class="fu">duplicated</span>(NGA<span class="sc">$</span>ADM2_EN) <span class="sc">==</span> <span class="cn">TRUE</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>wp_sf <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(NGA, wp_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="data-wrangling-for-water-point-data" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Data Wrangling for Water Point Data</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">freq</span>(<span class="at">data =</span> wp_sf,</span>
+<span id="cb14-2"><a href="#cb14-2"></a>     <span class="at">input =</span> <span class="st">'X.status_clean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                    X.status_clean frequency percentage cumulative_perc
+1                       Functional      2232      41.94           41.94
+2                   Non-Functional      1894      35.59           77.53
+3                             &lt;NA&gt;       734      13.79           91.32
+4      Functional but needs repair       236       4.43           95.75
+5 Non-Functional due to dry season       146       2.74           98.49
+6        Functional but not in use        61       1.15           99.64
+7                        Abandoned        15       0.28           99.92
+8         Abandoned/Decommissioned         4       0.08          100.00</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>wp_sf_nga <span class="ot">&lt;-</span> wp_sf <span class="sc">%&gt;%</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="fu">rename</span>(<span class="at">status_clean =</span> <span class="st">'X.status_clean'</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="fu">select</span>(status_clean) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="fu">mutate</span>(<span class="at">status_clean =</span> <span class="fu">replace_na</span>(</span>
+<span id="cb16-5"><a href="#cb16-5"></a>    status_clean, <span class="st">"unknown"</span> <span class="co"># rename NA to be called "unknown"</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>  ))</span>
+<span id="cb16-7"><a href="#cb16-7"></a></span>
+<span id="cb16-8"><a href="#cb16-8"></a><span class="fu">freq</span>(<span class="at">data =</span> wp_sf_nga,</span>
+<span id="cb16-9"><a href="#cb16-9"></a>     <span class="at">input =</span> <span class="st">'status_clean'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      status_clean frequency percentage cumulative_perc
+1                       Functional      2232      41.94           41.94
+2                   Non-Functional      1894      35.59           77.53
+3                          unknown       734      13.79           91.32
+4      Functional but needs repair       236       4.43           95.75
+5 Non-Functional due to dry season       146       2.74           98.49
+6        Functional but not in use        61       1.15           99.64
+7                        Abandoned        15       0.28           99.92
+8         Abandoned/Decommissioned         4       0.08          100.00</code></pre>
+</div>
+</div>
+<section id="extract-water-point-data" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="extract-water-point-data"><span class="header-section-number">5.1</span> Extract Water Point Data</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>wp_functional <span class="ot">&lt;-</span> wp_sf_nga <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">filter</span>(status_clean <span class="sc">%in%</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>           <span class="fu">c</span>(<span class="st">"Functional"</span>,</span>
+<span id="cb18-4"><a href="#cb18-4"></a>             <span class="st">"Functional but not in use"</span>,</span>
+<span id="cb18-5"><a href="#cb18-5"></a>             <span class="st">"Functional but needs repair"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>wp_nonfunctional <span class="ot">&lt;-</span> wp_sf_nga <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>  <span class="fu">filter</span>(status_clean <span class="sc">%in%</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>           <span class="fu">c</span>(<span class="st">"Abandoned/Decommissioned"</span>,</span>
+<span id="cb19-4"><a href="#cb19-4"></a>             <span class="st">"Abandoned"</span>,</span>
+<span id="cb19-5"><a href="#cb19-5"></a>             <span class="st">"Non-Functional due to dry season"</span>,</span>
+<span id="cb19-6"><a href="#cb19-6"></a>             <span class="st">"Non-Functional"</span>,</span>
+<span id="cb19-7"><a href="#cb19-7"></a>             <span class="st">"Non functional due to dry season"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>wp_unknown <span class="ot">&lt;-</span> wp_sf_nga <span class="sc">%&gt;%</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">filter</span>(status_clean <span class="sc">==</span> <span class="st">"unknown"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="performing-point-in-polygon-count" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="performing-point-in-polygon-count"><span class="header-section-number">5.2</span> Performing Point-in-Polygon Count</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>NGA_wp <span class="ot">&lt;-</span> NGA <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">mutate</span>(<span class="st">'total_wp'</span> <span class="ot">=</span> <span class="fu">lengths</span>(</span>
+<span id="cb21-3"><a href="#cb21-3"></a>    <span class="fu">st_intersects</span>(NGA, wp_sf_nga))) <span class="sc">%&gt;%</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">mutate</span>(<span class="st">'wp_functional'</span> <span class="ot">=</span> <span class="fu">lengths</span>(</span>
+<span id="cb21-5"><a href="#cb21-5"></a>    <span class="fu">st_intersects</span>(NGA, wp_functional))) <span class="sc">%&gt;%</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a>  <span class="fu">mutate</span>(<span class="st">'wp_nonfunctional'</span> <span class="ot">=</span> <span class="fu">lengths</span>(</span>
+<span id="cb21-7"><a href="#cb21-7"></a>    <span class="fu">st_intersects</span>(NGA, wp_nonfunctional))) <span class="sc">%&gt;%</span></span>
+<span id="cb21-8"><a href="#cb21-8"></a>  <span class="fu">mutate</span>(<span class="st">'wp_unknown'</span> <span class="ot">=</span> <span class="fu">lengths</span>(</span>
+<span id="cb21-9"><a href="#cb21-9"></a>    <span class="fu">st_intersects</span>(NGA, wp_unknown)))</span>
+<span id="cb21-10"><a href="#cb21-10"></a>NGA_wp</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 30 features and 8 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 176503.2 ymin: 331434.7 xmax: 291043.8 ymax: 454520.1
+Projected CRS: Minna / Nigeria Mid Belt
+First 10 features:
+          ADM2_EN ADM2_PCODE ADM1_EN ADM1_PCODE                       geometry
+1        Aiyedade   NG030001    Osun      NG030 MULTIPOLYGON (((213526.6 34...
+2        Aiyedire   NG030002    Osun      NG030 MULTIPOLYGON (((212542.6 40...
+3  Atakumosa East   NG030003    Osun      NG030 MULTIPOLYGON (((265746.8 37...
+4  Atakumosa West   NG030004    Osun      NG030 MULTIPOLYGON (((248871.4 40...
+5      Boluwaduro   NG030005    Osun      NG030 MULTIPOLYGON (((266092.2 43...
+6          Boripe   NG030006    Osun      NG030 MULTIPOLYGON (((255072.5 43...
+7       Ede North   NG030007    Osun      NG030 MULTIPOLYGON (((236386.9 41...
+8       Ede South   NG030008    Osun      NG030 MULTIPOLYGON (((236386.9 41...
+9        Egbedore   NG030009    Osun      NG030 MULTIPOLYGON (((220756 4317...
+10         Ejigbo   NG030010    Osun      NG030 MULTIPOLYGON (((214422.1 42...
+   total_wp wp_functional wp_nonfunctional wp_unknown
+1       389           157              154         78
+2       175            89               57         29
+3       223            98               92         33
+4       246           111              103         32
+5       129            63               51         15
+6       177            79               85         13
+7       216           141               50         25
+8       146            72               39         35
+9       142            63               44         35
+10      434           274              126         34</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> NGA_wp,</span>
+<span id="cb23-2"><a href="#cb23-2"></a>       <span class="fu">aes</span>(<span class="at">x =</span> total_wp)) <span class="sc">+</span> </span>
+<span id="cb23-3"><a href="#cb23-3"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins=</span><span class="dv">20</span>,</span>
+<span id="cb23-4"><a href="#cb23-4"></a>                 <span class="at">color=</span><span class="st">"black"</span>,</span>
+<span id="cb23-5"><a href="#cb23-5"></a>                 <span class="at">fill=</span><span class="st">"light blue"</span>) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept=</span><span class="fu">mean</span>(</span>
+<span id="cb23-7"><a href="#cb23-7"></a>    total_wp, <span class="at">na.rm=</span>T)),</span>
+<span id="cb23-8"><a href="#cb23-8"></a>             <span class="at">color=</span><span class="st">"red"</span>, </span>
+<span id="cb23-9"><a href="#cb23-9"></a>             <span class="at">linetype=</span><span class="st">"dashed"</span>, </span>
+<span id="cb23-10"><a href="#cb23-10"></a>             <span class="at">size=</span><span class="fl">0.8</span>) <span class="sc">+</span></span>
+<span id="cb23-11"><a href="#cb23-11"></a>  <span class="fu">ggtitle</span>(<span class="st">"Distribution of total water points by LGA"</span>) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12"></a>  <span class="fu">xlab</span>(<span class="st">"No. of water points"</span>) <span class="sc">+</span></span>
+<span id="cb23-13"><a href="#cb23-13"></a>  <span class="fu">ylab</span>(<span class="st">"No. of</span><span class="sc">\n</span><span class="st">LGAs"</span>) <span class="sc">+</span></span>
+<span id="cb23-14"><a href="#cb23-14"></a>  <span class="fu">theme</span>(<span class="at">axis.title.y=</span><span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="first-order-spatial-point-patterns-analysis" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> First-order Spatial Point Patterns Analysis</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co">#tmap_mode("view")</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="co">#tm_shape(rbind(wp_functional, wp_nonfunctional)) +</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a> <span class="co"># tm_dots(col = "status_clean",</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a>  <span class="co">#        palette = colors("greens"))</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
