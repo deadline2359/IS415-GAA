@@ -4,7 +4,7 @@
     "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html",
     "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
     "section": "",
-    "text": "pacman::p_load(sf, tidyverse, funModeling, tmap)"
+    "text": "pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools)"
   },
   {
     "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#wpdx-dataset",
@@ -68,5 +68,33 @@
     "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
     "section": "7.1 Kernel Density Maps",
     "text": "7.1 Kernel Density Maps\n\n7.1.1 Conversion of Datatypes\n\n7.1.1.1 Converting sf data frames to sp's Spatial* class"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#conversion-of-datatypes",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#conversion-of-datatypes",
+    "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
+    "section": "6.1 Conversion of Datatypes",
+    "text": "6.1 Conversion of Datatypes\n\n6.1.1 Converting sf data frames to sp’s Spatial* class\n\nwp_functional_spatial <- as_Spatial(wp_functional)\nwp_nonfunctional_spatial <- as_Spatial(wp_nonfunctional)\nNGA_spatial <- as_Spatial(NGA)\n\n\n\n6.1.2 Converting sp’s Spatial* Class into Generic sp Format\n\nwp_functional_sp <- as(wp_functional_spatial, \"SpatialPoints\")\nwp_nonfunctional_sp <- as(wp_nonfunctional_spatial, \"SpatialPoints\")\nNGA_sp <- as(NGA_spatial, \"SpatialPolygons\")\n\n\n\n6.1.3 Converting Generic sp Format into spatstat's ppp Format\n\nwp_functional_ppp <- as(wp_functional_sp, \"ppp\")\nwp_nonfunctional_ppp <- as(wp_nonfunctional_sp, \"ppp\")\n\nBelow shows the results of both functional and non-functional water points, using ppp object.\n\nFunctionalNon-Functional\n\n\n\nplot(wp_functional_ppp)\n\n\n\n\n\n\n\nplot(wp_nonfunctional_ppp)\n\n\n\n\n\n\n\n\n\n6.1.4 \nCheck for Duplicate Data Points\nDuplicated data points should be removed as processes under spatial point patterns analysis are largely assumed to be simple (i.e., no duplicated data).\n\nany(duplicated(wp_functional_ppp))\n\n[1] FALSE\n\n\n\nany(duplicated(wp_nonfunctional_ppp))\n\n[1] FALSE"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#section-1",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#section-1",
+    "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
+    "section": "6.2 ",
+    "text": "6.2"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#creating-owin-object",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#creating-owin-object",
+    "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
+    "section": "6.3 Creating owin Object",
+    "text": "6.3 Creating owin Object\n\nNGA_owin <- as(NGA_sp, \"owin\")\nwp_functional_ppp = wp_functional_ppp[NGA_owin]\nwp_nonfunctional_ppp = wp_nonfunctional_ppp[NGA_owin]\nplot(NGA_owin)"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#kernel-density-estimation-kde",
+    "href": "Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html#kernel-density-estimation-kde",
+    "title": "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods",
+    "section": "6.4 Kernel Density Estimation (KDE)",
+    "text": "6.4 Kernel Density Estimation (KDE)\n\n6.4.1 Computing KDE using Automatic Bandwidth Selection Method\nbw.ppl() is chosen as it highlights clusters more clearly compared to bw.diggle(), while not misleading resulted from using bw.CvL() or bw.scott().\n\n\n\n\n\n\nWarning\n\n\n\nchange the sigma and/or kernel to make the clusters more obvious\n\n\n\nwp_functional_bw <- density(wp_functional_ppp,\n                              sigma = bw.ppl,\n                              edge = TRUE,\n                              kernel = \"gaussian\")\nplot(wp_functional_bw)\n\n\n\n\n\nwp_nonfunctional_bw <- density(wp_nonfunctional_ppp,\n                              sigma = bw.ppl,\n                              edge = TRUE,\n                              kernel = \"gaussian\")\nplot(wp_nonfunctional_bw)\n\n\n\n\nWe will need to rescale the KDE values as the current values will not be easily understood.\n\nwp_functional_ppp.km <- rescale(wp_functional_ppp, 1000, \"km\")\nwp_nonfunctional_ppp.km <- rescale(wp_nonfunctional_ppp, 1000, \"km\")\n\n\nwp_functional_bw <- density(wp_functional_ppp.km,\n                              sigma = bw.ppl,\n                              edge = TRUE,\n                              kernel = \"gaussian\")\nplot(wp_functional_bw)\n\n\n\n\n\nwp_nonfunctional_bw <- density(wp_nonfunctional_ppp.km,\n                              sigma = bw.ppl,\n                              edge = TRUE,\n                              kernel = \"gaussian\")\nplot(wp_nonfunctional_bw)\n\n\n\n\n\nkde_wp_functional_adaptive <- adaptive.density(wp_functional_ppp.km, method = \"kernel\")\n\n\nkde_wp_nonfunctional_adaptive <- adaptive.density(wp_nonfunctional_ppp.km, method = \"kernel\")\n\n\npar(mfrow = c(1,2))\nplot(kde_wp_functional_adaptive, main = \"Functional\")\nplot(kde_wp_nonfunctional_adaptive, main = \"Non-Functional\")"
   }
 ]

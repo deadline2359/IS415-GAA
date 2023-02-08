@@ -297,6 +297,10 @@ plot(NGA_owin)
 
 `bw.ppl()` is chosen as it highlights clusters more clearly compared to `bw.diggle()`, while not misleading resulted from using `bw.CvL()` or `bw.scott()`.
 
+::: callout-warning
+change the sigma and/or kernel to make the clusters more obvious
+:::
+
 ```{r}
 wp_functional_bw <- density(wp_functional_ppp,
                               sigma = bw.ppl,
@@ -340,15 +344,14 @@ plot(wp_nonfunctional_bw)
 
 ```{r}
 kde_wp_functional_adaptive <- adaptive.density(wp_functional_ppp.km, method = "kernel")
-plot(kde_wp_functional_adaptive, , main = "Adaptive Bandwidth")
 ```
 
 ```{r}
 kde_wp_nonfunctional_adaptive <- adaptive.density(wp_nonfunctional_ppp.km, method = "kernel")
-plot(kde_wp_nonfunctional_adaptive, main = "Adaptive Bandwidth")
 ```
 
 ```{r}
-#par(mfrow = c(1,2))
-
+par(mfrow = c(1,2))
+plot(kde_wp_functional_adaptive, main = "Functional")
+plot(kde_wp_nonfunctional_adaptive, main = "Non-Functional")
 ```
