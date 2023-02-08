@@ -17,7 +17,7 @@ date-modified: "`r Sys.Date()`"
 # Import R Packages
 
 ```{r}
-pacman::p_load(sf, tidyverse, funModeling, tmap)
+pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools)
 ```
 
 # Import Datasets
@@ -158,9 +158,197 @@ ggplot(data = NGA_wp,
 
 # First-order Spatial Point Patterns Analysis
 
+Creating a simple interactive map, we can easily see that most of the water points are located towards the north of Osun, leaving the south with little.
+
 ```{r}
-#tmap_mode("view")
-#tm_shape(rbind(wp_functional, wp_nonfunctional)) +
- # tm_dots(col = "status_clean",
-  #        palette = colors("greens"))
+tmap_mode("view")
+tm_shape(wp_functional) +
+ tm_dots(col = "status_clean",
+         pal = "darkblue",
+         title = "Functional") +
+tm_shape(wp_nonfunctional) +
+ tm_dots(col = "status_clean",
+         pal = "orange",
+         title = "Non-Functional") +
+  tm_view(set.zoom.limits = c(5,25),
+          set.view = 9) 
+tmap_mode("plot")
+```
+
+Looking at the functional and non-functional water points separately, both maps reflect the same trend as the above map where the water points are largely located towards the north.
+
+```{r}
+wp_functional_map <-  tm_shape(NGA) + 
+  tm_fill() + 
+  tm_borders() + 
+  tm_shape(wp_functional) +
+  tm_dots(col = "status_clean",
+         title = "Functional",
+         palette = "darkblue",
+         legend.show = FALSE) +
+  tm_layout(title="Functional") +
+  tm_view(set.view = 9) 
+wp_nonfunctional_map <- tm_shape(NGA) + 
+  tm_fill() + 
+  tm_borders() + 
+  tm_shape(wp_nonfunctional) +
+  tm_dots(col = "status_clean",
+         title = "Non-Functional",
+         palette = "orange",
+         legend.show = FALSE) +
+  tm_layout(title="Non-Functional") +
+  tm_view(set.view = 9) 
+
+
+tmap_arrange(wp_functional_map, wp_nonfunctional_map,
+             asp = 1,
+             ncol = 2)
+```
+
+As **spatstat** needs its inputs to be of ***ppp*** object type, we need to convert the **Simple Feature** DataFrame to ***ppp***, which will be need to go through a few conversion.
+
+```{r echo=FALSE}
+pacman::p_load(DiagrammeR)
+grViz(diagram = "digraph flowchart {
+  node [fontname = arial, shape = oval]
+  tab1 [label = '@@1']
+  tab2 [label = '@@2']
+  tab3 [label = '@@3']
+  tab4 [label = '@@4']
+  
+  tab1 -> tab2 -> tab3 -> tab4;
+}
+  
+  [1]: 'simple feature'
+  [2]: 'spatial*'    
+  [3]: 'generic spatial'   
+  [4]: 'ppp'  
+  ")
+```
+
+## Conversion of Datatypes
+
+### **Converting sf data frames to sp's Spatial\* class**
+
+```{r}
+wp_functional_spatial <- as_Spatial(wp_functional)
+wp_nonfunctional_spatial <- as_Spatial(wp_nonfunctional)
+NGA_spatial <- as_Spatial(NGA)
+```
+
+### **Converting sp's Spatial\* Class into Generic sp Format**
+
+```{r}
+wp_functional_sp <- as(wp_functional_spatial, "SpatialPoints")
+wp_nonfunctional_sp <- as(wp_nonfunctional_spatial, "SpatialPoints")
+NGA_sp <- as(NGA_spatial, "SpatialPolygons")
+```
+
+### **Converting Generic sp Format into spatstat\'s ppp Format**
+
+```{r}
+wp_functional_ppp <- as(wp_functional_sp, "ppp")
+wp_nonfunctional_ppp <- as(wp_nonfunctional_sp, "ppp")
+```
+
+Below shows the results of both functional and non-functional water points, using **ppp** object.
+
+::: panel-tabset
+#### Functional 
+
+```{r}
+plot(wp_functional_ppp)
+```
+
+#### Non-Functional
+
+```{r}
+plot(wp_nonfunctional_ppp)
+```
+:::
+
+### 
+Check for Duplicate Data Points
+
+Duplicated data points should be removed as processes under spatial point patterns analysis are largely assumed to be simple (i.e., no duplicated data).
+
+```{r}
+any(duplicated(wp_functional_ppp))
+```
+
+```{r}
+any(duplicated(wp_nonfunctional_ppp))
+```
+
+## 
+
+## **Creating *owin* Object**
+
+```{r}
+NGA_owin <- as(NGA_sp, "owin")
+wp_functional_ppp = wp_functional_ppp[NGA_owin]
+wp_nonfunctional_ppp = wp_nonfunctional_ppp[NGA_owin]
+plot(NGA_owin)
+```
+
+## **Kernel Density Estimation (KDE)**
+
+### **Computing KDE using Automatic Bandwidth Selection Method**
+
+`bw.ppl()` is chosen as it highlights clusters more clearly compared to `bw.diggle()`, while not misleading resulted from using `bw.CvL()` or `bw.scott()`.
+
+```{r}
+wp_functional_bw <- density(wp_functional_ppp,
+                              sigma = bw.ppl,
+                              edge = TRUE,
+                              kernel = "gaussian")
+plot(wp_functional_bw)
+```
+
+```{r}
+wp_nonfunctional_bw <- density(wp_nonfunctional_ppp,
+                              sigma = bw.ppl,
+                              edge = TRUE,
+                              kernel = "gaussian")
+plot(wp_nonfunctional_bw)
+```
+
+We will need to rescale the KDE values as the current values will not be easily understood.
+
+```{r}
+wp_functional_ppp.km <- rescale(wp_functional_ppp, 1000, "km")
+wp_nonfunctional_ppp.km <- rescale(wp_nonfunctional_ppp, 1000, "km")
+```
+
+```{r}
+
+wp_functional_bw <- density(wp_functional_ppp.km,
+                              sigma = bw.ppl,
+                              edge = TRUE,
+                              kernel = "gaussian")
+plot(wp_functional_bw)
+```
+
+```{r}
+
+wp_nonfunctional_bw <- density(wp_nonfunctional_ppp.km,
+                              sigma = bw.ppl,
+                              edge = TRUE,
+                              kernel = "gaussian")
+plot(wp_nonfunctional_bw)
+```
+
+```{r}
+kde_wp_functional_adaptive <- adaptive.density(wp_functional_ppp.km, method = "kernel")
+plot(kde_wp_functional_adaptive, , main = "Adaptive Bandwidth")
+```
+
+```{r}
+kde_wp_nonfunctional_adaptive <- adaptive.density(wp_nonfunctional_ppp.km, method = "kernel")
+plot(kde_wp_nonfunctional_adaptive, main = "Adaptive Bandwidth")
+```
+
+```{r}
+#par(mfrow = c(1,2))
+
 ```
