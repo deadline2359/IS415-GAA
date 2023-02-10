@@ -17,7 +17,7 @@ date-modified: "`r Sys.Date()`"
 # Import R Packages
 
 ```{r}
-pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools)
+pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools, raster)
 ```
 
 # Import Datasets
@@ -25,7 +25,7 @@ pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools)
 ## WPdx+ Dataset
 
 ```{r}
-wp_osun <- read_csv("data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv") %>% filter(`#clean_country_name` == "Nigeria" &
+wp_oswp_osunun <- read_csv("data/aspatial/Water_Point_Data_Exchange_-_Plus__WPdx__.csv") %>% filter(`#clean_country_name` == "Nigeria" &
                                                                                               `#clean_adm1` == "Osun")
 ```
 
@@ -64,7 +64,7 @@ wp_sf <- wp_sf %>%
 ```{r}
 NGA <- NGA  %>%
   filter(`ADM1_EN` == "Osun") %>%
-  select(c(3:4, 8:9))
+  dplyr::select(c(3:4, 8:9))
 NGA
 ```
 
@@ -83,19 +83,19 @@ wp_sf <- st_intersection(NGA, wp_sf)
 # Data Wrangling for Water Point Data
 
 ```{r}
-freq(data = wp_sf,
+funModeling::freq(data = wp_sf,
      input = 'X.status_clean')
 ```
 
 ```{r}
 wp_sf_nga <- wp_sf %>%
   rename(status_clean = 'X.status_clean') %>%
-  select(status_clean) %>%
+  dplyr::select(status_clean) %>%
   mutate(status_clean = replace_na(
     status_clean, "unknown" # rename NA to be called "unknown"
   ))
 
-freq(data = wp_sf_nga,
+funModeling::freq(data = wp_sf_nga,
      input = 'status_clean')
 ```
 
@@ -244,7 +244,7 @@ wp_nonfunctional_sp <- as(wp_nonfunctional_spatial, "SpatialPoints")
 NGA_sp <- as(NGA_spatial, "SpatialPolygons")
 ```
 
-### **Converting Generic sp Format into spatstat\'s ppp Format**
+### **Converting Generic sp Format into spatstat's ppp Format**
 
 ```{r}
 wp_functional_ppp <- as(wp_functional_sp, "ppp")
@@ -254,7 +254,7 @@ wp_nonfunctional_ppp <- as(wp_nonfunctional_sp, "ppp")
 Below shows the results of both functional and non-functional water points, using **ppp** object.
 
 ::: panel-tabset
-#### Functional 
+#### Functional
 
 ```{r}
 plot(wp_functional_ppp)
@@ -268,6 +268,7 @@ plot(wp_nonfunctional_ppp)
 :::
 
 ### 
+
 Check for Duplicate Data Points
 
 Duplicated data points should be removed as processes under spatial point patterns analysis are largely assumed to be simple (i.e., no duplicated data).
@@ -354,4 +355,120 @@ kde_wp_nonfunctional_adaptive <- adaptive.density(wp_nonfunctional_ppp.km, metho
 par(mfrow = c(1,2))
 plot(kde_wp_functional_adaptive, main = "Functional")
 plot(kde_wp_nonfunctional_adaptive, main = "Non-Functional")
+```
+
+```{r}
+bw.diggle(wp_nonfunctional_ppp)
+```
+
+### **Converting KDE Output into Grid Object**
+
+```{r}
+gridded_wp_functional_bw <- as.SpatialGridDataFrame.im(wp_functional_bw)
+spplot(gridded_wp_functional_bw)
+```
+
+```{r}
+gridded_wp_nonfunctional_bw <- as.SpatialGridDataFrame.im(wp_nonfunctional_bw)
+spplot(gridded_wp_nonfunctional_bw)
+```
+
+### **Converting Gridded Output into Raster**
+
+```{r}
+kde_wp_nonfunctional_bw_raster <- raster(gridded_wp_nonfunctional_bw)
+projection(kde_wp_nonfunctional_bw_raster) <- CRS("+init=EPSG:26392")
+kde_wp_nonfunctional_bw_raster
+```
+
+### **Visualising the Output in tmap**
+
+```{r}
+tm_shape(kde_wp_nonfunctional_bw_raster) +
+  tm_raster("v") +
+  tm_layout(legend.position = c("right", "bottom"), 
+            frame = FALSE) +
+  tm_basemap(leaflet::providers$OpenStreetMap)
+```
+
+```{r}
+
+```
+
+# **Second-order Spatial Point Patterns Analysis**
+
+## **Analysing Spatial Point Process Using [L-Function]{.underline}**
+
+### Functional Water Points
+
+#### **Computing L-function estimation**
+
+```{r}
+L_wp_functional = Lest(wp_functional_ppp, correction = "Ripley")
+plot(L_wp_functional, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+#### **Performing Complete Spatial Randomness Test**
+
+-   Ho = The distribution of functional water points at Osun are randomly distributed.
+
+-   H1= The distribution of functional water points at Osun are not randomly distributed.
+
+```{r}
+L_functional.csr <- envelope(wp_functional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+### Non-Functional Water Points
+
+#### **Computing L-function estimation**
+
+```{r}
+L_wp_nonfunctional = Lest(wp_nonfunctional_ppp, correction = "Ripley")
+plot(L_wp_nonfunctional, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+#### **Performing Complete Spatial Randomness Test**
+
+-   Ho = The distribution of non-functional water points at Osun are randomly distributed.
+
+-   H1= The distribution of non-functional water points at Osun are not randomly distributed.
+
+```{r}
+L_nonfunctional.csr <- envelope(wp_nonfunctional_ppp, Lest, nsim = 99, rank = 1, glocal=TRUE)
+```
+
+# Spatial Correlation Analysis
+
+```{r}
+wp_neighbours <- include_self(
+  st_knn(st_geometry(wp_sf_nga), 6) 
+)
+
+wp_weights <- st_kernel_weights(wp_neighbours,
+                        wp_sf_nga,
+                        "gaussian",
+                        adaptive = TRUE)
+```
+
+```{r}
+LCLQ <- local_colocation(wp_functional, wp_nonfunctional, nb, wt, 39)
+```
+
+```{r}
+LCLQ_wp <- cbind(wp_sf_nga, LCLQ)
+```
+
+```{r}
+#tmap_mode("view")
+#tm_shape(NGA) +
+ # tm_polygons() +
+#tm_shape(LCLQ_wp) +
+ # tm_dots(col = "X7.Eleven",
+   #       size = 0.01,
+  #        border.col = "black",
+   #      border.lwd = 0.5) +
+# tm_view(set.zoom.limits = c(12,16))
+#tmap_mode("plot")
 ```
