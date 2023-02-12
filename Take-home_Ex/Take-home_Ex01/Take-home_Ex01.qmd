@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 4: 2nd Order Spatial Point Patterns Analysis Methods"
+title: "Take-home Exercise 1: Water Points in Osun, Nigeria"
 format: 
   html:
     code-line-numbers: true
