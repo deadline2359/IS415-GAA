@@ -65,6 +65,7 @@ wt <- st_kernel_weights(nb,
 FamilyMart <- stores %>% 
   filter(Name == "Family Mart")
 A <- FamilyMart$Name
+FamilyMart
 ```
 
 ```{r}
@@ -80,6 +81,7 @@ LCLQ <- local_colocation(A, B, nb, wt, 49) # 49 simulations
 ```{r}
 LCLQ_stores <- cbind(stores, LCLQ) # appending 
 # cannot do relational join as LCLQ doesn't have unique identifier
+head(LCLQ_stores, 5)
 ```
 
 ```{r}
