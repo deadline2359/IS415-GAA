@@ -37,6 +37,8 @@ This exercise looks into the accessibility of water in Osun, a state located in 
 
 # Import R Packages
 
+These are the R packages we will be using:
+
 ```{r}
 pacman::p_load(sf, tidyverse, funModeling, tmap, spatstat, maptools, raster, sfdep)
 ```
@@ -115,7 +117,7 @@ wp_sf <- wp_sf %>%
 
 ## Filtering Redundant Fields
 
-Looking at Nigeria's state boundary [Dataset](#dataset-1), there are many fields and rows that not necessary for our project. Hence, we will filter for those of Osun, and select only **"ADM1_EN"** and **"ADM2_EN"** fields which hold information on 1st and 2nd level administrative zones.
+Looking at Nigeria's state boundary [Dataset](#dataset-1), there are many fields and rows that not necessary for our project. Hence, we will filter for those of Osun, and select only **"ADM1_EN"** and **"ADM2_EN"** fields which hold information on 1st and 2nd level administrative zones. Inclusion of **"ADM2_EN"** allows us to check if there's a duplication of LGAs that will impact map generation.
 
 ```{r}
 NGA <- NGA  %>%
@@ -288,7 +290,7 @@ ggplot(data = NGA_wp,
 ```
 :::
 
-# First-order Spatial Point Patterns Analysis
+# Map Visualisations
 
 ```{r}
 wp_functional["functionality"] = "functional"
@@ -340,7 +342,13 @@ tmap_arrange(wp_functional_map, wp_nonfunctional_map,
              ncol = 2)
 ```
 
-As **spatstat** needs its inputs to be of ***ppp*** object type, we need to convert the **Simple Feature** DataFrame to ***ppp***, which will be need to go through a few conversion.
+# First-order Spatial Point Patterns Analysis
+
+Using First-order Spatial Point Patterns Analysis, we hope to observe the variations of densities around the study area, which in our case will be how do the water points spread across the state.
+
+To proceed with producing a raster map, we will be making use of **spatstat**.
+
+As **spatstat** needs its inputs to be of ***ppp*** object type, we need to convert the **Simple Feature** DataFrame to ***ppp***, which will need to go through a few conversions.
 
 ```{r echo=FALSE}
 pacman::p_load(DiagrammeR)
@@ -390,7 +398,7 @@ wp_nonfunctional_ppp <- as(wp_nonfunctional_sp, "ppp")
 wp_nonunknown_ppp <- as(wp_nonunknown_sp, "ppp")
 ```
 
-Below shows the results of both functional and non-functional water points, using **ppp** object. We already start to better see where the concentrations of water points are.
+Below shows the of both functional and non-functional water points, using **ppp** object. We already start to better see where the concentrations of water points are.
 
 ::: panel-tabset
 #### All excluding unknown
@@ -483,6 +491,10 @@ plot(wp_nonfunctional_bw)
 
 ### **Converting KDE Output into Grid Object**
 
+The raster maps below more visually showcase the water points are located. Like mentioned above, we can see much of the water points are located in the northern side of Osun. Glancing at the scales beside of the maps, we will notice that the highlighted surfaces only spread around 25km at their peak in a state around 8,500km\^2.
+
+Areas with high density of functional water points seem to also show similar high density of non-functional water points. We will see if this is true further down.
+
 #### **All excluding unknown**
 
 ```{r}
@@ -542,6 +554,24 @@ tm_shape(kde_wp_nonfunctional_bw_raster) +
 tmap_mode("plot")
 ```
 
+## **Nearest Neighbour Analysis**
+
+Here, we will be using [`clarkevans.test()`](https://www.rdocumentation.org/packages/spatstat/versions/1.63-3/topics/clarkevans.test) to conduct an aggregation for a spatial point pattern. The 95% confident interval will be used.
+
+-   Ho = The distribution of water points are randomly distributed.
+
+-   H1 = The distribution of water points are not randomly distributed.
+
+With the p-value lower than the alpha value of 0.05, we reject the null hypothesis and accept that water points are not randomly distributed.
+
+```{r}
+clarkevans.test(wp_nonunknown_ppp.km,
+                correction = "none", 
+                clipregion = "NGA_owin", 
+                alternative = c("clustered"), 
+                nsim = 99)
+```
+
 ## **Advantages of Kernel Density Map over Point Map**
 
 -   Visually, clusters are more visible in kernel density maps, compared to point maps where concentrated points overlapped each other. This is due to KDE is able to smooth the concentrations of points and create a surface fitted over these points. Whereas point maps simply accept that data points are already spreaded out, else those of same or similar coordinates will be depicted overlapped together.
@@ -555,7 +585,7 @@ To conduct our second-order spatial point patterns analysis, we are opting to us
 
 Using the `envelope()` of **spatstat** package, **Monte Carlo** simulations have be developed to observe the randomness of the water points.
 
-At 95% confident interval, we will set `nsim` to be 39 and reject the null hypothesis if the p-value is small than the alpha value of [**0.05**]{.underline}.
+At 95% confident interval, we will set `nsim` to be 39 and reject the null hypothesis if the p-value is smaller than the alpha value of [**0.05**]{.underline}.
 
 ### Functional Water Points
 
@@ -575,7 +605,7 @@ plot(L_wp_functional, . -r ~ r,
 
 -   H1 = The distribution of functional water points at Osun are not randomly distributed.
 
-Having **L(r)\>0** (i.e., the line) above break line and the upper confidence envelop, the null hypothesis is rejected and accept the hypothesis that functional water points are not distributed randomly.
+Having **L value** (i.e., the line) above break line and the upper confidence envelop, the null hypothesis is rejected and we will accept the hypothesis that functional water points are not distributed randomly.
 
 ```{r eval=FALSE}
 L_functional.csr <- envelope(wp_functional_ppp, Lest, nsim = 39, rank = 1, glocal=TRUE)
@@ -621,6 +651,10 @@ Similar to **8.1.1.2** **Performing Complete Spatial Randomness Test** in depict
 
 # Spatial Correlation Analysis
 
+In this section, we are observing the density of functional water points surrounding a non-functional water point and vice-versa. This will prove or disprove the aforementioned theory that areas with high concentrations of functional water points have also higher concentrations of non-functional ones.
+
+Using `include_self()`, we are grouping a water point and its 5 neighbours, and see if they are co-located.
+
 ```{r}
 wp_neighbours <- include_self(
   st_knn(st_geometry(wp_nonunknown), 6) 
@@ -656,6 +690,8 @@ tmap_mode("plot")
 ```
 
 ## Conversion of Datatypes
+
+Like above, we want to utilise `Lest()` to test whether the positions of functional and non-functional water points have any relations.
 
 ### **Converting sf data frames to sp's Spatial\* class**
 
@@ -713,3 +749,5 @@ We have rejected all our null hypotheses in understanding the water points in Os
 1.  Both functional and non-functional water points in Osun are not distributed randomly.
 
 2.  In addition, the spatial locations of these two groups of water points are dependent on each other, suggesting that areas with high number of functional water points will too have high number of non-functional water points. All these mean that water points in general cluster together.
+
+    1.  This also tells us that places outside these areas, though have little non-functional water points, seem to have lower number of functional water points as well. This is worrying in a state with around 4.8 million people, with the raster maps showing that the concentrations of water points are rather small.
