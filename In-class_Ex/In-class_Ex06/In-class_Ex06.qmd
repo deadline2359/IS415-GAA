@@ -1,0 +1,93 @@
+---
+title: "In-class Exercise 6"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Goals
+
+-   Learn how to compute spatial weights
+
+# Datasets
+
+-   **Hunan county boundary layer**: This is a geospatial data set in ESRI shapefile format.
+-   **Hunan_2012.csv**: This csv file contains selected Hunan's local development indicators in 2012.
+
+# R Packages
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, tidyverse)
+```
+
+# Import Data
+
+## Hunan County Boundaries
+
+::: tabset
+### Importing
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### Data
+
+```{r}
+head(hunan, 5)
+```
+:::
+
+## Hunan's Local Development Indicators (2012)
+
+::: tabset
+### Importing
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### Data
+
+```{r}
+head(hunan2012, 5)
+```
+:::
+
+## Performing Relational Join
+
+Update the attribute table of *hunan*\'s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using `left_join()` of **dplyr** package.
+
+```{r}
+hunan <- left_join(hunan,hunan2012)%>%
+  select(1:4, 7, 15)
+head(hunan)
+```
+
+# Visualising Regional Development Indicator
+
+Now, we are going to prepare a [basemap]{.underline} and a [choropleth]{.underline} map showing the **distribution of GDPPC 2012** by using `qtm()` of **tmap** package.
+
+```{r}
+basemap <- tm_shape(hunan) +
+  tm_polygons() +
+  tm_text("NAME_3", size=0.5) # add text labels
+
+gdppc <- qtm(hunan, "GDPPC")
+tmap_arrange(basemap, gdppc, asp=1, ncol=2)
+```
+
+# 
+Computing Contiguity Spatial Weights
+
+In this section, you will learn how to use [`poly2nb()`](https://r-spatial.github.io/spdep/reference/poly2nb.html) of **spdep** package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a \"queen\" argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don\'t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
