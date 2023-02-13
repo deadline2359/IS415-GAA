@@ -1,0 +1,23 @@
+---
+title: "Take-home Exercise 2"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "13 February 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+Only import first or last of the month
+
+A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is an administrative division of a village in [Indonesia](https://en.wikipedia.org/wiki/Indonesia "Indonesia"), under a [*rukun warga*](https://en.wikipedia.org/wiki/Rukun_warga "Rukun warga"). The RT is the lowest administrative division of Indonesia.
+
+-   use lesson 6
+
+-   use hot and cold spots

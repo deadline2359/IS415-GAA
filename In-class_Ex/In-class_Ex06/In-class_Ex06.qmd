@@ -1,5 +1,5 @@
 ---
-title: "In-class Exercise 6"
+title: "In-class Exercise 6: Spatial Weights and Applications"
 format: 
   html:
     code-line-numbers: true
@@ -33,7 +33,7 @@ pacman::p_load(sf, sfdep, tmap, tidyverse)
 
 ## Hunan County Boundaries
 
-::: tabset
+::: panel-tabset
 ### Importing
 
 ```{r}
@@ -50,7 +50,7 @@ head(hunan, 5)
 
 ## Hunan's Local Development Indicators (2012)
 
-::: tabset
+::: panel-tabset
 ### Importing
 
 ```{r}
@@ -66,28 +66,96 @@ head(hunan2012, 5)
 
 ## Performing Relational Join
 
-Update the attribute table of *hunan*\'s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using `left_join()` of **dplyr** package.
+Update the attribute table of *hunan*'s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using `left_join()` of **dplyr** package.
+
+::: panel-tabset
+### Code
 
 ```{r}
-hunan <- left_join(hunan,hunan2012)%>%
+hunan_GDPPC <- left_join(hunan,hunan2012)%>%
   select(1:4, 7, 15)
-head(hunan)
+colnames(hunan_GDPPC)
 ```
+
+### Data
+
+```{r}
+head(hunan_GDPPC, 5)
+```
+:::
+
+::: callout-warning
+In order to retain the geospatial properties, the [left]{.underline} dataframe must be a **sf** dataframe (i.e., **hunan** in our case)
+
+In addition, `left_join()` does not allow joining columns where their names are of different cases.
+:::
 
 # Visualising Regional Development Indicator
 
-Now, we are going to prepare a [basemap]{.underline} and a [choropleth]{.underline} map showing the **distribution of GDPPC 2012** by using `qtm()` of **tmap** package.
+Now, we will create a [choropleth]{.underline} map showing the **distribution of GDPPC 2012**.
+
+::: panel-tabset
+## Using [tmap]{.underline}
 
 ```{r}
-basemap <- tm_shape(hunan) +
+tm_shape(hunan_GDPPC) +
+  tm_fill("GDPPC",
+          style = "quantile",
+          palette = "Blues",
+          title = "GDP Per Capita") +
+  tm_layout(main.title = "Distribution of GDP Per Capita by distribution",
+            main.title.position = "center",
+            main.title.size = 1.2,
+            legend.height = 0.45,
+            legend.width = 0.35,
+            frame = TRUE) +
+  tm_borders(alpha = 0.5) +
+  tm_compass(type = "8star", size = 2) +
+  tm_scale_bar() +
+  tm_grid(alpha = 0.2)
+```
+
+## Using `qtm()`
+
+```{r}
+basemap <- tm_shape(hunan_GDPPC) +
   tm_polygons() +
   tm_text("NAME_3", size=0.5) # add text labels
 
-gdppc <- qtm(hunan, "GDPPC")
+gdppc <- qtm(hunan_GDPPC, "GDPPC")
 tmap_arrange(basemap, gdppc, asp=1, ncol=2)
 ```
+:::
 
-# 
-Computing Contiguity Spatial Weights
+# Computing Contiguity Spatial Weights
 
-In this section, you will learn how to use [`poly2nb()`](https://r-spatial.github.io/spdep/reference/poly2nb.html) of **spdep** package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a \"queen\" argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don\'t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
+[`st_contiguity()`](https://rdrr.io/cran/sfdep/man/st_contiguity.html) is used to derive a contiguity neighoubour list. `st_contiguity()` wraps `poly2nb()` in **spdep**.
+
+It will create a new column "**nb**" (i.e., neighbours). Each row will contain a list for areas adjacent to a region.
+
+`st_weights()` then using **nb** to create a list of weights.
+
+::: panel-tabset
+## Queen
+
+```{r}
+wm_queen <- hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry), 
+         wt = st_weights(nb),
+         .before = 1) # put it as the first column
+head(wm_queen, 5)
+```
+
+## Rook
+
+Include the parameter `queen = FALSE` to change to rook's method.
+
+```{r}
+cn_rook <- hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry), 
+         wt = st_weights(nb),
+         queen = FALSE,
+         .before = 1)
+head(cn_rook, 5)
+```
+:::
