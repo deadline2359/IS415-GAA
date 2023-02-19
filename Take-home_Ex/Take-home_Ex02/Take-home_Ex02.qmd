@@ -14,6 +14,7 @@ date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
 ---
 
+::: callout-warning
 Only import first or last of the month
 
 A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is an administrative division of a village in [Indonesia](https://en.wikipedia.org/wiki/Indonesia "Indonesia"), under a [*rukun warga*](https://en.wikipedia.org/wiki/Rukun_warga "Rukun warga"). The RT is the lowest administrative division of Indonesia.
@@ -21,5 +22,140 @@ A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is
 -   use lesson 6
 
 -   use hot and cold spots
+:::
 
--   Data Vaksinasi Berbasis Kelurahan dan Kecamatan
+# R Packages
+
+```{r}
+pacman::p_load(sf, sfdep, tmap, tidyverse, readxl)
+```
+
+# Importing
+
+## Aspatial Dataset
+
+::: panel-tabset
+### Jul 2021
+
+```{r}
+jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Juli 2021).xlsx", sheet = "Data Kelurahan")
+jul2021["Date"] <- "2021-07-31"
+```
+
+### Aug 2021
+
+```{r}
+aug2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Agustus 2021).xlsx", sheet = "Data Kelurahan")
+aug2021["Date"] <- "2021-08-31"
+```
+
+### Sep 2021
+
+```{r}
+sep2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 September 2021).xlsx", sheet = "Data Kelurahan")
+sep2021["Date"] <- "2021-09-30"
+```
+
+### Oct 2021
+
+```{r}
+oct2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx", sheet = "Data Kelurahan")
+oct2021["Date"] <- "2021-10-31"
+```
+
+### Nov 2021
+
+```{r}
+nov2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx", sheet = "Data Kelurahan")
+nov2021["Date"] <- "2021-11-30"
+```
+
+
+### Dec 2021
+
+```{r}
+dec2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx", sheet = "Data Kelurahan")
+dec2021["Date"] <- "2021-12-31"
+```
+
+### Jan 2022
+
+```{r}
+jan2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx", sheet = "Data Kelurahan")
+jan2022["Date"] <- "2022-01-31"
+```
+
+### Feb 2022
+
+```{r}
+feb2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx", sheet = "Data Kelurahan")
+feb2022["Date"] <- "2022-02-27"
+```
+
+### Mar 2022
+
+```{r}
+mar2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx", sheet = "Data Kelurahan")
+mar2022["Date"] <- "2022-03-31"
+```
+
+### Apr 2022
+
+```{r}
+apr2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx", sheet = "Data Kelurahan")
+apr2022["Date"] <- "2022-04-30"
+```
+
+### Mei 2022
+
+```{r}
+may2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx", sheet = "Data Kelurahan")
+may2022["Date"] <- "2022-05-31"
+```
+
+### Jun 2022
+
+```{r}
+jun2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx", sheet = "Data Kelurahan")
+jun2022["Date"] <- "2022-06-30"
+```
+:::
+
+### Combine
+
+::: {.panel-tabset}
+#### Combining Month
+
+```{r}
+#vaccine_months <- rbind(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)
+#vaccine_months
+column_name27 <- names(jul2021)
+```
+
+```{r}
+column_name35 <- names(jun2022)
+
+intersect(column_name27, column_name35)
+```
+
+
+#### Dataset
+
+:::
+
+## Geospatial Dataset
+::: {.panel-tabset}
+### Importing
+The EPSG code for Indonesia is 23845.
+```{r}
+jakarta_boundary <- st_read(dsn = "data/geospatial", 
+                 layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA") %>% 
+  select(c(1:9)) %>% 
+  st_transform(crs = 23845) 
+```
+
+### Dataset
+```{r}
+head(jakarta_boundary, 5)
+```
+:::

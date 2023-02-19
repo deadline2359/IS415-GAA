@@ -21,6 +21,69 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1.6em;
   vertical-align: middle;
 }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -168,7 +231,21 @@ ul.task-list li input[type="checkbox"] {
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#r-packages" id="toc-r-packages" class="nav-link active" data-scroll-target="#r-packages"><span class="toc-section-number">1</span>  R Packages</a></li>
+  <li><a href="#importing" id="toc-importing" class="nav-link" data-scroll-target="#importing"><span class="toc-section-number">2</span>  Importing</a>
+  <ul class="collapse">
+  <li><a href="#aspatial-dataset" id="toc-aspatial-dataset" class="nav-link" data-scroll-target="#aspatial-dataset"><span class="toc-section-number">2.1</span>  Aspatial Dataset</a>
+  <ul class="collapse">
+  <li><a href="#combine" id="toc-combine" class="nav-link" data-scroll-target="#combine"><span class="toc-section-number">2.1.1</span>  Combine</a></li>
+  </ul></li>
+  <li><a href="#geospatial-dataset" id="toc-geospatial-dataset" class="nav-link" data-scroll-target="#geospatial-dataset"><span class="toc-section-number">2.2</span>  Geospatial Dataset</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -193,7 +270,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 19, 2023</p>
+      <p class="date-modified">February 20, 2023</p>
     </div>
   </div>
     
@@ -202,15 +279,225 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
+<div class="callout-warning callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Only import first or last of the month</p>
 <p>A <strong><em>rukun tetangga</em></strong> (abbrievated <strong>RT</strong>, literally “pillar of neighbours”) is an administrative division of a village in <a href="https://en.wikipedia.org/wiki/Indonesia" title="Indonesia">Indonesia</a>, under a <a href="https://en.wikipedia.org/wiki/Rukun_warga" title="Rukun warga"><em>rukun warga</em></a>. The RT is the lowest administrative division of Indonesia.</p>
 <ul>
 <li><p>use lesson 6</p></li>
 <li><p>use hot and cold spots</p></li>
-<li><p>Data Vaksinasi Berbasis Kelurahan dan Kecamatan</p></li>
 </ul>
+</div>
+</div>
+<section id="r-packages" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> R Packages</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(sf, sfdep, tmap, tidyverse, readxl)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="importing" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Importing</h1>
+<section id="aspatial-dataset" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="aspatial-dataset"><span class="header-section-number">2.1</span> Aspatial Dataset</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Jul 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Aug 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">Sep 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-4" role="tab" aria-controls="tabset-1-4" aria-selected="false">Oct 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-5-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-5" role="tab" aria-controls="tabset-1-5" aria-selected="false">Nov 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-6-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-6" role="tab" aria-controls="tabset-1-6" aria-selected="false">Dec 2021</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-7-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-7" role="tab" aria-controls="tabset-1-7" aria-selected="false">Jan 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-8-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-8" role="tab" aria-controls="tabset-1-8" aria-selected="false">Feb 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-9-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-9" role="tab" aria-controls="tabset-1-9" aria-selected="false">Mar 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-10-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-10" role="tab" aria-controls="tabset-1-10" aria-selected="false">Apr 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-11-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-11" role="tab" aria-controls="tabset-1-11" aria-selected="false">Mei 2022</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-12-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-12" role="tab" aria-controls="tabset-1-12" aria-selected="false">Jun 2022</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Juli 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>jul2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-07-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>aug2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Agustus 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>aug2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-08-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>sep2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 September 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>sep2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-09-30"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>oct2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-10-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>nov2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-11-30"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>dec2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-12-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2"></a>jan2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-01-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-8-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2"></a>feb2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-02-27"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-9-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>mar2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-03-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-10-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb11-2"><a href="#cb11-2"></a>apr2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-04-30"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-11-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>may2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-05-31"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-12-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2"></a>jun2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-06-30"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+<section id="combine" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="combine"><span class="header-section-number">2.1.1</span> Combine</h3>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Combining Month</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">Dataset</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="co">#vaccine_months &lt;- rbind(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)</span></span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="co">#vaccine_months</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>column_name27 <span class="ot">&lt;-</span> <span class="fu">names</span>(jul2021)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>column_name35 <span class="ot">&lt;-</span> <span class="fu">names</span>(jun2022)</span>
+<span id="cb15-2"><a href="#cb15-2"></a></span>
+<span id="cb15-3"><a href="#cb15-3"></a><span class="fu">intersect</span>(column_name27, column_name35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "KODE KELURAHAN"                            
+ [2] "WILAYAH KOTA"                              
+ [3] "KECAMATAN"                                 
+ [4] "KELURAHAN"                                 
+ [5] "SASARAN"                                   
+ [6] "BELUM VAKSIN"                              
+ [7] "JUMLAH\r\nDOSIS 1"                         
+ [8] "JUMLAH\r\nDOSIS 2"                         
+ [9] "TOTAL VAKSIN\r\nDIBERIKAN"                 
+[10] "LANSIA\r\nDOSIS 1"                         
+[11] "LANSIA\r\nDOSIS 2"                         
+[12] "LANSIA TOTAL \r\nVAKSIN DIBERIKAN"         
+[13] "PELAYAN PUBLIK\r\nDOSIS 1"                 
+[14] "PELAYAN PUBLIK\r\nDOSIS 2"                 
+[15] "PELAYAN PUBLIK TOTAL\r\nVAKSIN DIBERIKAN"  
+[16] "GOTONG ROYONG\r\nDOSIS 1"                  
+[17] "GOTONG ROYONG\r\nDOSIS 2"                  
+[18] "GOTONG ROYONG TOTAL\r\nVAKSIN DIBERIKAN"   
+[19] "TENAGA KESEHATAN\r\nDOSIS 1"               
+[20] "TENAGA KESEHATAN\r\nDOSIS 2"               
+[21] "TENAGA KESEHATAN TOTAL\r\nVAKSIN DIBERIKAN"
+[22] "TAHAPAN 3\r\nDOSIS 1"                      
+[23] "TAHAPAN 3\r\nDOSIS 2"                      
+[24] "TAHAPAN 3 TOTAL\r\nVAKSIN DIBERIKAN"       
+[25] "REMAJA\r\nDOSIS 1"                         
+[26] "REMAJA\r\nDOSIS 2"                         
+[27] "REMAJA TOTAL\r\nVAKSIN DIBERIKAN"          
+[28] "Date"                                      </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="geospatial-dataset" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="geospatial-dataset"><span class="header-section-number">2.2</span> Geospatial Dataset</h2>
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Importing</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Dataset</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<p>The EPSG code for Indonesia is 23845.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>jakarta_boundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb17-2"><a href="#cb17-2"></a>                 <span class="at">layer =</span> <span class="st">"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">23845</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA' from data source 
+  `C:\deadline2359\IS415-GAA\Take-home_Ex\Take-home_Ex02\data\geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 269 features and 161 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.3831 ymin: -6.370815 xmax: 106.9728 ymax: -5.184322
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">head</span>(jakarta_boundary, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 5 features and 9 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -3667896 ymin: 689350.6 xmax: -3619528 ymax: 751796
+Projected CRS: DGN95 / Indonesia TM-3 zone 54.1
+  OBJECT_ID  KODE_DESA           DESA   KODE    PROVINSI         KAB_KOTA
+1     25477 3173031006      KEAGUNGAN 317303 DKI JAKARTA    JAKARTA BARAT
+2     25478 3173031007         GLODOK 317303 DKI JAKARTA    JAKARTA BARAT
+3     25397 3171031003  HARAPAN MULIA 317103 DKI JAKARTA    JAKARTA PUSAT
+4     25400 3171031006   CEMPAKA BARU 317103 DKI JAKARTA    JAKARTA PUSAT
+5     25378 3101011001 PULAU PANGGANG 310101 DKI JAKARTA KEPULAUAN SERIBU
+               KECAMATAN     DESA_KELUR JUMLAH_PEN
+1             TAMAN SARI      KEAGUNGAN      21609
+2             TAMAN SARI         GLODOK       9069
+3              KEMAYORAN  HARAPAN MULIA      29085
+4              KEMAYORAN   CEMPAKA BARU      41913
+5 KEPULAUAN SERIBU UTARA PULAU PANGGANG       6947
+                        geometry
+1 MULTIPOLYGON (((-3626874 69...
+2 MULTIPOLYGON (((-3627130 69...
+3 MULTIPOLYGON (((-3621251 68...
+4 MULTIPOLYGON (((-3620608 69...
+5 MULTIPOLYGON (((-3667409 74...</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">

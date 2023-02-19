@@ -501,7 +501,7 @@
     "href": "Hands-on_Ex/Hands-on_Ex07.2/Hands-on_Ex07.2.html#gi-statistics-using-fixed-distance",
     "title": "In-class Exercise 7.2: Local Measures of Spatial Autocorrelation",
     "section": "9.1 Gi Statistics using Fixed Distance",
-    "text": "9.1 Gi Statistics using Fixed Distance\n\nfips <- order(hunan$County)\ngi.fixed <- localG(hunan$GDPPC, wm62_lw)\ngi.fixed\n\n [1]  0.436075843 -0.265505650 -0.073033665  0.413017033  0.273070579\n [6] -0.377510776  2.863898821  2.794350420  5.216125401  0.228236603\n[11]  0.951035346 -0.536334231  0.176761556  1.195564020 -0.033020610\n[16]  1.378081093 -0.585756761 -0.419680565  0.258805141  0.012056111\n[21] -0.145716531 -0.027158687 -0.318615290 -0.748946051 -0.961700582\n[26] -0.796851342 -1.033949773 -0.460979158 -0.885240161 -0.266671512\n[31] -0.886168613 -0.855476971 -0.922143185 -1.162328599  0.735582222\n[36] -0.003358489 -0.967459309 -1.259299080 -1.452256513 -1.540671121\n[41] -1.395011407 -1.681505286 -1.314110709 -0.767944457 -0.192889342\n[46]  2.720804542  1.809191360 -1.218469473 -0.511984469 -0.834546363\n[51] -0.908179070 -1.541081516 -1.192199867 -1.075080164 -1.631075961\n[56] -0.743472246  0.418842387  0.832943753 -0.710289083 -0.449718820\n[61] -0.493238743 -1.083386776  0.042979051  0.008596093  0.136337469\n[66]  2.203411744  2.690329952  4.453703219 -0.340842743 -0.129318589\n[71]  0.737806634 -1.246912658  0.666667559  1.088613505 -0.985792573\n[76]  1.233609606 -0.487196415  1.626174042 -1.060416797  0.425361422\n[81] -0.837897118 -0.314565243  0.371456331  4.424392623 -0.109566928\n[86]  1.364597995 -1.029658605 -0.718000620\nattr(,\"cluster\")\n [1] Low  Low  High High High High High High High Low  Low  High Low  Low  Low \n[16] High High High High Low  High High Low  Low  High Low  Low  Low  Low  Low \n[31] Low  Low  Low  High Low  Low  Low  Low  Low  Low  High Low  Low  Low  Low \n[46] High High Low  Low  Low  Low  High Low  Low  Low  Low  Low  High Low  Low \n[61] Low  Low  Low  High High High Low  High Low  Low  High Low  High High Low \n[76] High Low  Low  Low  Low  Low  Low  High High Low  High Low  Low \nLevels: Low High\nattr(,\"gstari\")\n[1] FALSE\nattr(,\"call\")\nlocalG(x = hunan$GDPPC, listw = wm62_lw)\nattr(,\"class\")\n[1] \"localG\"\n\n\nThe output of localG() is a vector of G or Gstar values, with attributes \"gstari\" set to TRUE or FALSE, \"call\" set to the function call, and class \"localG\".\nThe Gi statistics is represented as a Z-score. Greater values represent a greater intensity of clustering and the direction (positive or negative) indicates high or low clusters.\nNext, we will join the Gi values to their corresponding hunan sf data frame by using the code chunk below.\n\nhunan.gi <- cbind(hunan, as.matrix(gi.fixed)) %>%\n  rename(gstat_fixed = as.matrix.gi.fixed.)\nhunan.gi\n\nSimple feature collection with 88 features and 9 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\nFirst 10 features:\n     NAME_2  ID_3    NAME_3   ENGTYPE_3    County GDPPC      Z.GDPPC lag_GDPPC\n1   Changde 21098   Anxiang      County   Anxiang 23667 -0.049205949  24847.20\n2   Changde 21100   Hanshou      County   Hanshou 20981 -0.228341158  22724.80\n3   Changde 21101    Jinshi County City    Jinshi 34592  0.679406172  24143.25\n4   Changde 21102        Li      County        Li 24473  0.004547952  27737.50\n5   Changde 21103     Linli      County     Linli 25554  0.076642204  27270.25\n6   Changde 21104    Shimen      County    Shimen 27137  0.182215933  21248.80\n7  Changsha 21109   Liuyang County City   Liuyang 63118  2.581867439  43747.00\n8  Changsha 21110 Ningxiang      County Ningxiang 62202  2.520777398  33582.71\n9  Changsha 21111 Wangcheng      County Wangcheng 70666  3.085260051  45651.17\n10 Chenzhou 21112     Anren      County     Anren 12761 -0.776550918  32027.62\n   gstat_fixed                       geometry\n1   0.43607584 POLYGON ((112.0625 29.75523...\n2  -0.26550565 POLYGON ((112.2288 29.11684...\n3  -0.07303367 POLYGON ((111.8927 29.6013,...\n4   0.41301703 POLYGON ((111.3731 29.94649...\n5   0.27307058 POLYGON ((111.6324 29.76288...\n6  -0.37751078 POLYGON ((110.8825 30.11675...\n7   2.86389882 POLYGON ((113.9905 28.5682,...\n8   2.79435042 POLYGON ((112.7181 28.38299...\n9   5.21612540 POLYGON ((112.7914 28.52688...\n10  0.22823660 POLYGON ((113.1757 26.82734...\n\n\nIn fact, the code chunk above performs three tasks.\n\nIt convert the output vector (i.e. gi.fixed) into r matrix object by using as.matrix().\ncbind() is used to join hunan@data and gi.fixed matrix to produce a new SpatialPolygonDataFrame called hunan.gi.\nThe field name of the gi values is renamed to gstat_fixed by using rename()."
+    "text": "9.1 Gi Statistics using Fixed Distance\n\nfips <- order(hunan$County)\ngi.fixed <- localG(hunan$GDPPC, wm62_lw)\ngi.fixed\n\n [1]  0.436075843 -0.265505650 -0.073033665  0.413017033  0.273070579\n [6] -0.377510776  2.863898821  2.794350420  5.216125401  0.228236603\n[11]  0.951035346 -0.536334231  0.176761556  1.195564020 -0.033020610\n[16]  1.378081093 -0.585756761 -0.419680565  0.258805141  0.012056111\n[21] -0.145716531 -0.027158687 -0.318615290 -0.748946051 -0.961700582\n[26] -0.796851342 -1.033949773 -0.460979158 -0.885240161 -0.266671512\n[31] -0.886168613 -0.855476971 -0.922143185 -1.162328599  0.735582222\n[36] -0.003358489 -0.967459309 -1.259299080 -1.452256513 -1.540671121\n[41] -1.395011407 -1.681505286 -1.314110709 -0.767944457 -0.192889342\n[46]  2.720804542  1.809191360 -1.218469473 -0.511984469 -0.834546363\n[51] -0.908179070 -1.541081516 -1.192199867 -1.075080164 -1.631075961\n[56] -0.743472246  0.418842387  0.832943753 -0.710289083 -0.449718820\n[61] -0.493238743 -1.083386776  0.042979051  0.008596093  0.136337469\n[66]  2.203411744  2.690329952  4.453703219 -0.340842743 -0.129318589\n[71]  0.737806634 -1.246912658  0.666667559  1.088613505 -0.985792573\n[76]  1.233609606 -0.487196415  1.626174042 -1.060416797  0.425361422\n[81] -0.837897118 -0.314565243  0.371456331  4.424392623 -0.109566928\n[86]  1.364597995 -1.029658605 -0.718000620\nattr(,\"cluster\")\n [1] Low  Low  High High High High High High High Low  Low  High Low  Low  Low \n[16] High High High High Low  High High Low  Low  High Low  Low  Low  Low  Low \n[31] Low  Low  Low  High Low  Low  Low  Low  Low  Low  High Low  Low  Low  Low \n[46] High High Low  Low  Low  Low  High Low  Low  Low  Low  Low  High Low  Low \n[61] Low  Low  Low  High High High Low  High Low  Low  High Low  High High Low \n[76] High Low  Low  Low  Low  Low  Low  High High Low  High Low  Low \nLevels: Low High\nattr(,\"gstari\")\n[1] FALSE\nattr(,\"call\")\nlocalG(x = hunan$GDPPC, listw = wm62_lw)\nattr(,\"class\")\n[1] \"localG\"\n\n\nThe output of localG() is a vector of G or Gstar values, with attributes “gstari” set to TRUE or FALSE, “call” set to the function call, and class “localG”.\nThe Gi statistics is represented as a Z-score. Greater values represent a greater intensity of clustering and the direction (positive or negative) indicates high or low clusters.\nNext, we will join the Gi values to their corresponding hunan sf data frame by using the code chunk below.\n\nhunan.gi <- cbind(hunan, as.matrix(gi.fixed)) %>%\n  rename(gstat_fixed = as.matrix.gi.fixed.)\nhunan.gi\n\nSimple feature collection with 88 features and 9 fields\nGeometry type: POLYGON\nDimension:     XY\nBounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812\nGeodetic CRS:  WGS 84\nFirst 10 features:\n     NAME_2  ID_3    NAME_3   ENGTYPE_3    County GDPPC      Z.GDPPC lag_GDPPC\n1   Changde 21098   Anxiang      County   Anxiang 23667 -0.049205949  24847.20\n2   Changde 21100   Hanshou      County   Hanshou 20981 -0.228341158  22724.80\n3   Changde 21101    Jinshi County City    Jinshi 34592  0.679406172  24143.25\n4   Changde 21102        Li      County        Li 24473  0.004547952  27737.50\n5   Changde 21103     Linli      County     Linli 25554  0.076642204  27270.25\n6   Changde 21104    Shimen      County    Shimen 27137  0.182215933  21248.80\n7  Changsha 21109   Liuyang County City   Liuyang 63118  2.581867439  43747.00\n8  Changsha 21110 Ningxiang      County Ningxiang 62202  2.520777398  33582.71\n9  Changsha 21111 Wangcheng      County Wangcheng 70666  3.085260051  45651.17\n10 Chenzhou 21112     Anren      County     Anren 12761 -0.776550918  32027.62\n   gstat_fixed                       geometry\n1   0.43607584 POLYGON ((112.0625 29.75523...\n2  -0.26550565 POLYGON ((112.2288 29.11684...\n3  -0.07303367 POLYGON ((111.8927 29.6013,...\n4   0.41301703 POLYGON ((111.3731 29.94649...\n5   0.27307058 POLYGON ((111.6324 29.76288...\n6  -0.37751078 POLYGON ((110.8825 30.11675...\n7   2.86389882 POLYGON ((113.9905 28.5682,...\n8   2.79435042 POLYGON ((112.7181 28.38299...\n9   5.21612540 POLYGON ((112.7914 28.52688...\n10  0.22823660 POLYGON ((113.1757 26.82734...\n\n\nIn fact, the code chunk above performs three tasks.\n\nIt convert the output vector (i.e. gi.fixed) into r matrix object by using as.matrix().\ncbind() is used to join hunan@data and gi.fixed matrix to produce a new SpatialPolygonDataFrame called hunan.gi.\nThe field name of the gi values is renamed to gstat_fixed by using rename()."
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex07.2/Hands-on_Ex07.2.html#mapping-gi-values-with-fixed-distance-weights",
@@ -914,7 +914,7 @@
     "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html",
     "title": "Take-home Exercise 2",
     "section": "",
-    "text": "Only import first or last of the month\nA rukun tetangga (abbrievated RT, literally “pillar of neighbours”) is an administrative division of a village in Indonesia, under a rukun warga. The RT is the lowest administrative division of Indonesia.\n\nuse lesson 6\nuse hot and cold spots\nData Vaksinasi Berbasis Kelurahan dan Kecamatan"
+    "text": "Warning\n\n\n\nOnly import first or last of the month\nA rukun tetangga (abbrievated RT, literally “pillar of neighbours”) is an administrative division of a village in Indonesia, under a rukun warga. The RT is the lowest administrative division of Indonesia.\n\nuse lesson 6\nuse hot and cold spots"
   },
   {
     "objectID": "Hands-on_Ex/Hands-on_Ex07.2/Hands-on_Ex07.2.html#section-3",
@@ -929,5 +929,89 @@
     "title": "In-class Exercise 7.2: Local Measures of Spatial Autocorrelation",
     "section": "9.3 Gi Statistics using Adaptive Distance",
     "text": "9.3 Gi Statistics using Adaptive Distance\nThe code chunk below are used to compute the Gi values for GDPPC2012 by using an adaptive distance weight matrix (i.e knb_lw).\n\nfips <- order(hunan$County)\ngi.adaptive <- localG(hunan$GDPPC, knn_lw)\nhunan.gi <- cbind(hunan, as.matrix(gi.adaptive)) %>%\n  rename(gstat_adaptive = as.matrix.gi.adaptive.)"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#aspatial-dataset",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#aspatial-dataset",
+    "title": "Take-home Exercise 2",
+    "section": "2.1 Aspatial Dataset",
+    "text": "2.1 Aspatial Dataset\n\nJul 2021Aug 2021Sep 2021Oct 2021Nov 2021Dec 2021Jan 2022Feb 2022Mar 2022Apr 2022Mei 2022Jun 2022\n\n\n\njul2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Juli 2021).xlsx\", sheet = \"Data Kelurahan\")\njul2021[\"Date\"] <- \"2021-07-31\"\n\n\n\n\naug2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Agustus 2021).xlsx\", sheet = \"Data Kelurahan\")\naug2021[\"Date\"] <- \"2021-08-31\"\n\n\n\n\nsep2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 September 2021).xlsx\", sheet = \"Data Kelurahan\")\nsep2021[\"Date\"] <- \"2021-09-30\"\n\n\n\n\noct2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx\", sheet = \"Data Kelurahan\")\noct2021[\"Date\"] <- \"2021-10-31\"\n\n\n\n\nnov2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx\", sheet = \"Data Kelurahan\")\nnov2021[\"Date\"] <- \"2021-11-30\"\n\n\n\n\ndec2021 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx\", sheet = \"Data Kelurahan\")\ndec2021[\"Date\"] <- \"2021-12-31\"\n\n\n\n\njan2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx\", sheet = \"Data Kelurahan\")\njan2022[\"Date\"] <- \"2022-01-31\"\n\n\n\n\nfeb2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx\", sheet = \"Data Kelurahan\")\nfeb2022[\"Date\"] <- \"2022-02-27\"\n\n\n\n\nmar2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx\", sheet = \"Data Kelurahan\")\nmar2022[\"Date\"] <- \"2022-03-31\"\n\n\n\n\napr2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx\", sheet = \"Data Kelurahan\")\napr2022[\"Date\"] <- \"2022-04-30\"\n\n\n\n\nmay2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx\", sheet = \"Data Kelurahan\")\nmay2022[\"Date\"] <- \"2022-05-31\"\n\n\n\n\njun2022 <- read_excel(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx\", sheet = \"Data Kelurahan\")\njun2022[\"Date\"] <- \"2022-06-30\"\n\n\n\n\n\n2.1.1 Combine\n\nCombining MonthDataset\n\n\n\n#vaccine_months <- rbind(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)\n#vaccine_months\ncolumn_name27 <- names(jul2021)\n\n\ncolumn_name35 <- names(jun2022)\n\nintersect(column_name27, column_name35)\n\n [1] \"KODE KELURAHAN\"                            \n [2] \"WILAYAH KOTA\"                              \n [3] \"KECAMATAN\"                                 \n [4] \"KELURAHAN\"                                 \n [5] \"SASARAN\"                                   \n [6] \"BELUM VAKSIN\"                              \n [7] \"JUMLAH\\r\\nDOSIS 1\"                         \n [8] \"JUMLAH\\r\\nDOSIS 2\"                         \n [9] \"TOTAL VAKSIN\\r\\nDIBERIKAN\"                 \n[10] \"LANSIA\\r\\nDOSIS 1\"                         \n[11] \"LANSIA\\r\\nDOSIS 2\"                         \n[12] \"LANSIA TOTAL \\r\\nVAKSIN DIBERIKAN\"         \n[13] \"PELAYAN PUBLIK\\r\\nDOSIS 1\"                 \n[14] \"PELAYAN PUBLIK\\r\\nDOSIS 2\"                 \n[15] \"PELAYAN PUBLIK TOTAL\\r\\nVAKSIN DIBERIKAN\"  \n[16] \"GOTONG ROYONG\\r\\nDOSIS 1\"                  \n[17] \"GOTONG ROYONG\\r\\nDOSIS 2\"                  \n[18] \"GOTONG ROYONG TOTAL\\r\\nVAKSIN DIBERIKAN\"   \n[19] \"TENAGA KESEHATAN\\r\\nDOSIS 1\"               \n[20] \"TENAGA KESEHATAN\\r\\nDOSIS 2\"               \n[21] \"TENAGA KESEHATAN TOTAL\\r\\nVAKSIN DIBERIKAN\"\n[22] \"TAHAPAN 3\\r\\nDOSIS 1\"                      \n[23] \"TAHAPAN 3\\r\\nDOSIS 2\"                      \n[24] \"TAHAPAN 3 TOTAL\\r\\nVAKSIN DIBERIKAN\"       \n[25] \"REMAJA\\r\\nDOSIS 1\"                         \n[26] \"REMAJA\\r\\nDOSIS 2\"                         \n[27] \"REMAJA TOTAL\\r\\nVAKSIN DIBERIKAN\"          \n[28] \"Date\""
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#oct-2021",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#oct-2021",
+    "title": "Take-home Exercise 2",
+    "section": "2.2 Oct 2021",
+    "text": "2.2 Oct 2021\n\noct2021 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#nov-2021",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#nov-2021",
+    "title": "Take-home Exercise 2",
+    "section": "2.3 Nov 2021",
+    "text": "2.3 Nov 2021\n\nnov2021 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#dec-2021",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#dec-2021",
+    "title": "Take-home Exercise 2",
+    "section": "2.4 Dec 2021",
+    "text": "2.4 Dec 2021\n\ndec2021 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#jan-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#jan-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.5 Jan 2022",
+    "text": "2.5 Jan 2022\n\njan2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#feb-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#feb-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.6 Feb 2022",
+    "text": "2.6 Feb 2022\n\nfeb2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#mar-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#mar-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.7 Mar 2022",
+    "text": "2.7 Mar 2022\n\nmar2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#apr-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#apr-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.8 Apr 2022",
+    "text": "2.8 Apr 2022\n\napr2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#mei-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#mei-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.9 Mei 2022",
+    "text": "2.9 Mei 2022\n\nmay2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#jun-2022",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#jun-2022",
+    "title": "Take-home Exercise 2",
+    "section": "2.10 Jun 2022",
+    "text": "2.10 Jun 2022\n\njun2022 <- read_csv(\"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx\")"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#combine",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#combine",
+    "title": "Take-home Exercise 2",
+    "section": "2.11 Combine",
+    "text": "2.11 Combine"
+  },
+  {
+    "objectID": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#geospatial-dataset",
+    "href": "Take-home_Ex/Take-home_Ex02/Take-home_Ex02.html#geospatial-dataset",
+    "title": "Take-home Exercise 2",
+    "section": "2.2 Geospatial Dataset",
+    "text": "2.2 Geospatial Dataset\n\nImportingDataset\n\n\nThe EPSG code for Indonesia is 23845.\n\njakarta_boundary <- st_read(dsn = \"data/geospatial\", \n                 layer = \"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA\") %>% \n  select(c(1:9)) %>% \n  st_transform(crs = 23845) \n\nReading layer `BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA' from data source \n  `C:\\deadline2359\\IS415-GAA\\Take-home_Ex\\Take-home_Ex02\\data\\geospatial' \n  using driver `ESRI Shapefile'\nSimple feature collection with 269 features and 161 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: 106.3831 ymin: -6.370815 xmax: 106.9728 ymax: -5.184322\nGeodetic CRS:  WGS 84\n\n\n\n\n\nhead(jakarta_boundary, 5)\n\nSimple feature collection with 5 features and 9 fields\nGeometry type: MULTIPOLYGON\nDimension:     XY\nBounding box:  xmin: -3667896 ymin: 689350.6 xmax: -3619528 ymax: 751796\nProjected CRS: DGN95 / Indonesia TM-3 zone 54.1\n  OBJECT_ID  KODE_DESA           DESA   KODE    PROVINSI         KAB_KOTA\n1     25477 3173031006      KEAGUNGAN 317303 DKI JAKARTA    JAKARTA BARAT\n2     25478 3173031007         GLODOK 317303 DKI JAKARTA    JAKARTA BARAT\n3     25397 3171031003  HARAPAN MULIA 317103 DKI JAKARTA    JAKARTA PUSAT\n4     25400 3171031006   CEMPAKA BARU 317103 DKI JAKARTA    JAKARTA PUSAT\n5     25378 3101011001 PULAU PANGGANG 310101 DKI JAKARTA KEPULAUAN SERIBU\n               KECAMATAN     DESA_KELUR JUMLAH_PEN\n1             TAMAN SARI      KEAGUNGAN      21609\n2             TAMAN SARI         GLODOK       9069\n3              KEMAYORAN  HARAPAN MULIA      29085\n4              KEMAYORAN   CEMPAKA BARU      41913\n5 KEPULAUAN SERIBU UTARA PULAU PANGGANG       6947\n                        geometry\n1 MULTIPOLYGON (((-3626874 69...\n2 MULTIPOLYGON (((-3627130 69...\n3 MULTIPOLYGON (((-3621251 68...\n4 MULTIPOLYGON (((-3620608 69...\n5 MULTIPOLYGON (((-3667409 74..."
   }
 ]
