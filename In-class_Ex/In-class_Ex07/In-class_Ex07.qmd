@@ -1,0 +1,252 @@
+---
+title: "In-class Exercise 7"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "20 February 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Install R Packages
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse, plotly)
+```
+
+# Datasets
+
+## Hunan County Boundaries
+
+::: panel-tabset
+### Importing
+
+```{r}
+hunan <- st_read(dsn = "data/geospatial", 
+                 layer = "Hunan")
+```
+
+### Data
+
+```{r}
+head(hunan, 5)
+```
+:::
+
+## Hunan's Local Development Indicators (2012)
+
+::: panel-tabset
+### Importing
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+```
+
+### Data
+
+```{r}
+head(hunan2012, 5)
+```
+:::
+
+### Performing Relational Join
+
+Update the attribute table of *hunan*'s SpatialPolygonsDataFrame with the attribute fields of *hunan2012* dataframe. This is performed by using `left_join()` of **dplyr** package.
+
+::: panel-tabset
+### Code
+
+```{r}
+hunan_GDPPC <- left_join(hunan, hunan2012)%>%
+  select(1:4, 7, 15)
+colnames(hunan_GDPPC)
+```
+
+### Data
+
+```{r}
+head(hunan_GDPPC, 5)
+```
+:::
+
+## Global Measures of Spatial Association
+
+### Step 1: Deriving contiguity weights: Queen's method
+
+```{r}
+wm_q <- hunan_GDPPC %>% 
+  mutate(nb = st_contiguity(geometry), 
+         wt = st_weights(nb, # my own weight list
+                         style = "W"),
+         .before = 1) # put it as the first column
+head(wm_q, 5)
+```
+
+### Performing Global Moran Test
+
+The following code chunk will produce a tibble table.
+
+```{r}
+moranI <- global_moran(wm_q$GDPPC,
+                        wm_q$nb,
+                        wm_q$wt)
+```
+
+### Performing Global Moran Test
+
+Usually, `global_moran_test` will be directly run, instead of the above code individually.
+
+```{r}
+global_moran_test(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt)
+```
+
+::: callout-note
+The p-value is [**1.095e-06**]{.underline}, which is way smaller than the significance value of 0.05. This suggests us to reject null hypothesis.
+:::
+
+### Performing Global Moran's I Permutation Test
+
+```{r}
+set.seed(1234) # ensure work is reproducible
+```
+
+```{r}
+global_moran_perm(wm_q$GDPPC,
+                  wm_q$nb,
+                  wm_q$wt,
+                  nsim = 999) # if input is 9, it's actually 10 simulation (n+1)
+```
+
+::: callout-note
+The statistic (0.30075) will be quite close to one from `global_moran_test().`
+
+The p-value is [**2.2e-16**]{.underline}, which is way smaller than the significance value of 0.05. This suggests us to reject null hypothesis.
+:::
+
+### Computing Local Moran's I
+
+```{r}
+lisa <- wm_q %>% 
+  mutate(local_moran = local_moran(
+    GDPPC, nb, wt, nsim = 99),
+    .before = 1) %>% # push to the first column
+  unnest(local_moran) # unnest() helps to plot as local_moran is a list
+lisa
+```
+
+#### Visualising local Moran's I
+
+use p_ii_sim or p_folded_sim instead
+
+::: panel-tabset
+##### ii
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("ii") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+##### p_ii
+
+```{r}
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_fill("p_ii") + # the p-value when run on raw test
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+:::
+
+```{r}
+lisa_sig <- lisa %>% 
+  filter(p_ii < 0.05)
+
+tmap_mode("plot")
+tm_shape(lisa) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(lisa_sig) +
+  tm_fill("mean") +
+  tm_borders(alpha = 0.4)
+```
+
+## Computing Local Gi
+
+```{r}
+HCSA <-wm_q %>% 
+  mutate(local_Gi = local_gstar_perm(
+    GDPPC, nb, wt, nsim = 99), # wanna to ensure results are more stable
+    .before = 1) %>% 
+  unnest(local_Gi)
+HCSA
+```
+
+interactive map allows for better checking of data
+
+```{r}
+tmap_mode("view")
+tm_shape(HCSA) +
+  tm_fill("gi_star") +
+  tm_borders(alpha = 0.5) +
+  tm_view(set.zoom.limits = c(6,8))
+```
+
+#### Visualising Gi
+
+```{r}
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_fill("p_sim") + # use the p_ii_sim or p_folded_sim instead
+  tm_borders(alpha = 0.5)
+```
+
+# Emerging Hot Spot Analysis: sfdep Analysis
+
+```{r}
+GDPPC <- read_csv("data/aspatial/Hunan_GDPPC.csv")
+```
+
+```{r}
+# add spatial entity to df
+GDPPC_st <- spacetime(GDPPC, hunan, 
+                      .loc_col = "County",
+                      .time_col = "Year")
+GDPPC_st
+```
+
+```{r}
+GDPPC_nb <- GDPPC_st %>% 
+  activate("geometry") %>% # using geometry
+  mutate(
+    nb = include_self(st_contiguity(geometry)), # doing a calculation of neighbours
+    wt = st_weights(nb)
+  ) %>% 
+  set_nbs("nb") %>% # to create columns for space and time
+  set_wts("wt")
+```
+
+```{r}
+# cbg <- gi_stars %>% 
+  
+```
+
+```{r}
+ebsa <- emerging_hotspot_analysis(
+  x = GDPPC_st,
+  .var = "GDPPC",
+  l = 1,
+  nsim = 99
+)
+ebsa
+```
