@@ -14,6 +14,17 @@ date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
 ---
 
+```{css, echo=FALSE}
+.panel-tabset .nav-link {
+  background-color: #a3d2e3;
+  box-shadow: 8px 5px 5px darkgrey;
+}
+
+.panel-tabset .tab-content{
+  box-shadow: 8px 5px 5px darkgrey;
+}
+```
+
 ::: callout-warning
 Only import first or last of the month
 
@@ -27,7 +38,7 @@ A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is
 # R Packages
 
 ```{r}
-pacman::p_load(sf, sfdep, tmap, tidyverse, readxl)
+pacman::p_load(sf, sfdep, tmap, tidyverse, readxl, spdep, dplyr)
 ```
 
 # Importing
@@ -39,123 +50,538 @@ pacman::p_load(sf, sfdep, tmap, tidyverse, readxl)
 
 ```{r}
 jul2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Juli 2021).xlsx", sheet = "Data Kelurahan")
-jul2021["Date"] <- "2021-07-31"
+jul2021["Date"] <- as.Date("2021-07-31", format = "%Y-%m-%d")
+head(jul2021, 5)
 ```
 
 ### Aug 2021
 
 ```{r}
 aug2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Agustus 2021).xlsx", sheet = "Data Kelurahan")
-aug2021["Date"] <- "2021-08-31"
+aug2021["Date"] <- as.Date("2021-08-31", format = "%Y-%m-%d")
+head(aug2021, 5)
 ```
 
 ### Sep 2021
 
 ```{r}
 sep2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 September 2021).xlsx", sheet = "Data Kelurahan")
-sep2021["Date"] <- "2021-09-30"
+sep2021["Date"] <- as.Date("2021-09-30", format = "%Y-%m-%d")
+sep2021["Date"]
+head(sep2021, 5)
 ```
 
 ### Oct 2021
 
 ```{r}
 oct2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx", sheet = "Data Kelurahan")
-oct2021["Date"] <- "2021-10-31"
+oct2021["Date"] <- as.Date("2021-10-31", format = "%Y-%m-%d")
+head(oct2021, 5)
 ```
 
 ### Nov 2021
 
 ```{r}
 nov2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx", sheet = "Data Kelurahan")
-nov2021["Date"] <- "2021-11-30"
+nov2021["Date"] <- as.Date("2021-11-30", format = "%Y-%m-%d")
+head(nov2021, 5)
 ```
-
 
 ### Dec 2021
 
 ```{r}
 dec2021 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx", sheet = "Data Kelurahan")
-dec2021["Date"] <- "2021-12-31"
+dec2021["Date"] <- as.Date("2021-12-31", format = "%Y-%m-%d")
+head(dec2021, 5)
 ```
 
 ### Jan 2022
 
 ```{r}
 jan2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx", sheet = "Data Kelurahan")
-jan2022["Date"] <- "2022-01-31"
+jan2022["Date"] <- as.Date("2022-01-31", format = "%Y-%m-%d")
+head(jan2022, 5)
 ```
 
 ### Feb 2022
 
 ```{r}
 feb2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx", sheet = "Data Kelurahan")
-feb2022["Date"] <- "2022-02-27"
+feb2022["Date"] <- as.Date("2022-02-27", format = "%Y-%m-%d")
+head(feb2022, 5)
 ```
 
 ### Mar 2022
 
 ```{r}
 mar2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx", sheet = "Data Kelurahan")
-mar2022["Date"] <- "2022-03-31"
+mar2022["Date"] <- as.Date("2022-03-31", format = "%Y-%m-%d")
+head(mar2022, 5)
 ```
 
 ### Apr 2022
 
 ```{r}
 apr2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx", sheet = "Data Kelurahan")
-apr2022["Date"] <- "2022-04-30"
+apr2022["Date"] <- as.Date("2022-04-30", format = "%Y-%m-%d")
+head(apr2022, 5)
 ```
 
 ### Mei 2022
 
 ```{r}
 may2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx", sheet = "Data Kelurahan")
-may2022["Date"] <- "2022-05-31"
+may2022["Date"] <- as.Date("2022-05-31", format = "%Y-%m-%d")
+head(may2022, 5)
 ```
 
 ### Jun 2022
 
 ```{r}
 jun2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx", sheet = "Data Kelurahan")
-jun2022["Date"] <- "2022-06-30"
+jun2022["Date"] <- as.Date("2022-06-30", format = "%Y-%m-%d")
+head(jun2022, 5)
 ```
-:::
-
-### Combine
-
-::: {.panel-tabset}
-#### Combining Month
-
-```{r}
-#vaccine_months <- rbind(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)
-#vaccine_months
-column_name27 <- names(jul2021)
-```
-
-```{r}
-column_name35 <- names(jun2022)
-
-intersect(column_name27, column_name35)
-```
-
-
-#### Dataset
-
 :::
 
 ## Geospatial Dataset
-::: {.panel-tabset}
+
+::: panel-tabset
 ### Importing
+
 The EPSG code for Indonesia is 23845.
+
 ```{r}
 jakarta_boundary <- st_read(dsn = "data/geospatial", 
                  layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA") %>% 
-  select(c(1:9)) %>% 
-  st_transform(crs = 23845) 
+  select(c(1:9))%>%  
+  na.omit() %>% 
+  dplyr::filter(KAB_KOTA != "KEPULAUAN SERIBU")
+jakarta_boundary$geometry
 ```
 
 ### Dataset
+
 ```{r}
 head(jakarta_boundary, 5)
 ```
 :::
+
+# Data Preparation
+
+## Combine
+
+You may realise that the dataframes from the months March to June in 2022 have 35 columns in total. Whereas the months before have only 28. Note that all dataframes have been added an additional one "date" column stating their month.
+
+Since we will not have any data on these extra 7 columns, we will pick out find the common 28 columns and slice the dataframes before combining all together.
+
+::: panel-tabset
+### Combining Months
+
+```{r}
+column_name28 <- names(jul2021)
+column_name35 <- names(jun2022)
+overlapped_cols = intersect(column_name28, column_name35)
+```
+
+```{r}
+vaccine_months_list <- list(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)
+
+vaccine_months <- data.frame()
+
+for (month in vaccine_months_list) {
+  vaccine_months <- rbind(vaccine_months, month[2:nrow(month),overlapped_cols])
+}
+```
+
+### Data
+
+```{r}
+head(vaccine_months, 5)
+```
+:::
+
+Considering that the columns are in Bahasa Indonesia, you may want to check out the translations to better understand the process.
+
+::: {.callout-tip collapse="true"}
+### Translations of Column Names
+
+| Bahasa Indonesia                        |                            English |
+|-------------------------------------|----------------------------------:|
+| Kode Kelurahan                          |                  Sub-district Code |
+| Wilayah Kota                            |                          City Area |
+| Kecamatan                               |                       Sub-district |
+| Sasaran                                 |                             Target |
+| Belum Vaksin                            |               Yet to be Vaccinated |
+| Jumlah Dosis 1                          |                 Number of Dosage 1 |
+| Jumlah Dosis 2                          |                 Number of Dosage 2 |
+| Total Vaksin Diberikan                  |               Total Vaccines Given |
+| Lansia Dosis 1                          |                   Elderly Dosage 1 |
+| Lansia Dosis 2                          |                   Elderly Dosage 2 |
+| Lansia Total Vaksin Diberikan           |        Total Elderly Vaccine Given |
+| Pelayan Publik Dosis 1                  |            Public Servant Dosage 1 |
+| Pelayan Publik Dosis 2                  |            Public Servant Dosage 2 |
+| Pelayan Publik Total Vaksin Diberikan   | Total Public Servant Vaccine Given |
+| Gotong Royong Dosis 1                   |                Mutual Aid Dosage 1 |
+| Gotong Royong Dosis 2                   |                Mutual Aid Dosage 2 |
+| Gotong Royong Total Vaksin Diberikan    |     Total Mutual Aid Vaccine Given |
+| Tenaga Kesehatan Dosis 1                |            Health Workers Dosage 1 |
+| Tenaga Kesehatan Dosis 2                |            Health Workers Dosage 2 |
+| Tenaga Kesehatan Total Vaksin Diberikan | Total Health Workers Vaccine Given |
+| Tahapan 3 Dosis 1                       |                   Stage 3 Dosage 1 |
+| Tahapan 3 Dosis 2                       |                   Stage 3 Dosage 2 |
+| Tahapan 3 Total Vaksin Diberikan        |        Total Stage 3 Vaccine Given |
+| Remaja Dosis 1                          |                  Teenager Dosage 1 |
+| Remaja Dosis 2                          |                  Teenager Dosage 2 |
+| Remaja Total Vaksin Diberikan           |       Total Teenager Vaccine Given |
+:::
+
+## Create Monthly Vaccination Rate
+
+There is a total of 267 kelurahan or urban villages in the Special Capital Region of Jakarta.
+
+$$
+267kelurahan \times 12 months = 3204
+$$
+
+We can tell that we have the correct number of rows in our final dataframe, *vaccine_months*.
+
+```{r}
+nrow(vaccine_months)
+```
+
+### Calculate Monthly Vaccination Rate
+
+We will need to create a column with the vaccination rates of each village in order to map a choropleth map.
+
+Since *"Sasaran"* is the target number of vaccinations provided and *"Belum Vaksin"* tells of the number of people not yet vaccinated, we can derive vaccination rates of each month.
+
+```{r}
+vaccine_months["vaccination rate"] <- (vaccine_months["SASARAN"] - vaccine_months["BELUM VAKSIN"])/vaccine_months["SASARAN"] * 100
+```
+
+## Joining of Geospatial and Aspatial Datasets
+
+As mentioned we want to visualise the vaccination rates on the map Of Jakarta, this will require us to join the two existing dataframes in order to have a complete dataframe for the map.
+
+We will join the two dataframes using "KELURAHAN" in *vaccine_months* and "DESA" in *jakarta_boundary*, both meaning village.
+
+```{r}
+jakarta <- left_join(vaccine_months, jakarta_boundary, by=c("KODE KELURAHAN"="KODE_DESA"))
+
+jakarta <- na.omit(jakarta[jakarta["KAB_KOTA"] != ("KEPULAUAN SERIBU"), ])
+
+head(jakarta, 5)
+```
+
+#  Visualisation of Vaccination Rates
+::: {.panel-tabset}
+
+## Jul 2021
+
+```{r}
+jul21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-07-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (July 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Aug 2021
+
+```{r}
+aug21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-08-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (August 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Sep 2021
+
+```{r}
+sep21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-09-30",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (September 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Oct 2021
+
+```{r}
+oct21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-10-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (October 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Nov 2021
+
+```{r}
+nov21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-11-30",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (November 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Dec 2021
+
+```{r}
+dec21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-12-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (December 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Jan 2022
+
+```{r}
+jan22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-01-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (January 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Feb 2022
+
+```{r}
+feb22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-02-27",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (February 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Mar 2022
+
+```{r}
+mar22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-03-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (March 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Apr 2022
+
+```{r}
+apr22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-04-30",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (April 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## May 2022
+
+```{r}
+may22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-05-31",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (May 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+## Jun 2022
+
+```{r}
+jun22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-06-30",])
+tm_shape(month_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (June 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+:::
+
+# Local Gi* Analysis
+
+```{r}
+wm_idw <- jun22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+```
+
+
+```{r}
+HCSA <- wm_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+tmap_mode("plot")
+map1 <- tm_shape(HCSA) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Gi* of GDPPC",
+            main.title.size = 0.8)
+
+map2 <- tm_shape(HCSA) +
+  tm_fill("p_value",
+          breaks = c(0, 0.001, 0.01, 0.05, 1),
+              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "p-value of Gi*",
+            main.title.size = 0.8)
+
+tmap_arrange(map1, map2, ncol = 2)
+```
+
+```{r}
+HCSA_sig <- HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+tm_shape(HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(HCSA_sig) +
+  tm_fill("gi_star") + 
+  tm_borders(alpha = 0.4)
+```
+
+# Emerging Hot Spot Analysis(EHSA)
+```{r}
+colnames(jakarta_boundary)[colnames(jakarta_boundary) == "KODE_DESA"] ="KODE KELURAHAN"
+
+jakarta_st <- spacetime(.data=jakarta, .geometry=jakarta_boundary,
+                      .loc_col = "KODE KELURAHAN",
+                      .time_col = "Date")
+
+is_spacetime_cube(jakarta_st)
+```
+```{r}
+jakarta_nb <- jakarta_st %>%
+  activate("geometry") %>%
+  mutate(nb = include_self(st_contiguity(geometry)),
+         wt = st_inverse_distance(nb, geometry,
+                                  scale = 1,
+                                  alpha = 1),
+         .before = 1) %>%
+  set_nbs("nb") %>%
+  set_wts("wt")
+head(jakarta_nb)
+```
+
+```{r}
+gi_stars <- jakarta_nb %>% 
+  group_by(Date) %>% 
+  mutate(gi_star = local_gstar_perm(
+    `vaccination rate`, nb, wt)) %>% 
+  tidyr::unnest(gi_star)
+```
+
+
+
+# Deriving Centroid
+
+```{r}
+# jakarta_clean_boundary <- jakarta_boundary %>%  
+#   na.omit() %>% 
+#   dplyr::filter(KAB_KOTA != "KEPULAUAN SERIBU")
+# 
+# longitude <- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[1]])
+# 
+# latitude <- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[2]])
+# 
+# coords <- cbind(longitude, latitude)
+```
+
+## Determine Cut-off Distance
+```{r}
+# k1 <- knn2nb(knearneigh(coords))
+# k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
+# summary(k1dists)
+```
+The report shows that the furthest first nearest neighbour distance is 2.9152 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
+
+```{r}
+# knn <- knn2nb(knearneigh(coords, k=8))
+# knn
+```
+```{r}
+# knn_lw <- nb2listw(knn, style = 'B')
+# summary(knn_lw)
+```
+
+## Computing Gi statistics
+
+### Jun 2022
+```{r}
+# fips <- order(jakarta$KELURAHAN)
+# gi.adaptive <- localG(jun22_vaccination_rate$`vaccination rate`, knn_lw)
+# jun22_vaccination_rate.gi <- cbind(jun22_vaccination_rate, as.matrix(gi.adaptive)) %>%
+#   rename(gstat_adaptive = as.matrix.gi.adaptive.)
+```
+
+```{r}
+# vaccination_rate_qtm<- qtm(jun22_vaccination_rate, "vaccination rate")
+# 
+# Gimap <- tm_shape(jun22_vaccination_rate.gi) + 
+#   tm_fill(col = "gstat_adaptive", 
+#           style = "pretty", 
+#           palette="-RdBu", 
+#           title = "local Gi") + 
+#   tm_borders(alpha = 0.5)
+# 
+# tmap_arrange(vaccination_rate_qtm, 
+#              Gimap, 
+#              asp=1, 
+#              ncol=2)
+```
+
