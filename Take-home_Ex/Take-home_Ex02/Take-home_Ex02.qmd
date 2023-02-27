@@ -281,7 +281,7 @@ head(jakarta, 5)
 
 ```{r}
 jul21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-07-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(jul21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -295,7 +295,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 aug21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-08-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(aug21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -309,7 +309,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 sep21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-09-30",])
-tm_shape(month_vaccination_rate) +
+tm_shape(sep21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -323,7 +323,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 oct21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-10-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(oct21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -337,7 +337,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 nov21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-11-30",])
-tm_shape(month_vaccination_rate) +
+tm_shape(nov21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -351,7 +351,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 dec21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-12-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(dec21_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -365,7 +365,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 jan22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-01-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(jan22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -379,7 +379,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 feb22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-02-27",])
-tm_shape(month_vaccination_rate) +
+tm_shape(feb22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -393,7 +393,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 mar22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-03-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(mar22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -407,7 +407,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 apr22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-04-30",])
-tm_shape(month_vaccination_rate) +
+tm_shape(apr22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -421,7 +421,7 @@ tm_shape(month_vaccination_rate) +
 
 ```{r}
 may22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-05-31",])
-tm_shape(month_vaccination_rate) +
+tm_shape(may22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -434,8 +434,9 @@ tm_shape(month_vaccination_rate) +
 ## Jun 2022
 
 ```{r}
+tmap_mode("view")
 jun22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-06-30",])
-tm_shape(month_vaccination_rate) +
+tm_shape(jun22_vaccination_rate) +
   tm_fill("vaccination rate",
           n = 5,
           style = "quantile") +
@@ -524,9 +525,26 @@ gi_stars <- jakarta_nb %>%
   mutate(gi_star = local_gstar_perm(
     `vaccination rate`, nb, wt)) %>% 
   tidyr::unnest(gi_star)
+
+glimpse(jakarta_nb)
 ```
 
 
+## Man-Kendall Test
+```{r}
+cbg <- gi_stars %>% 
+  ungroup() %>% 
+  filter(`KELURAHAN` == "PLUIT") |> 
+  select(`KELURAHAN`, `Date`, gi_star)
+```
+
+```{r}
+ggplot(data = cbg, 
+       aes(x = `Date`, 
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+```
 
 # Deriving Centroid
 

@@ -256,10 +256,15 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#joining-of-geospatial-and-aspatial-datasets" id="toc-joining-of-geospatial-and-aspatial-datasets" class="nav-link" data-scroll-target="#joining-of-geospatial-and-aspatial-datasets"><span class="toc-section-number">3.3</span>  Joining of Geospatial and Aspatial Datasets</a></li>
   </ul></li>
   <li><a href="#visualisation-of-vaccination-rates" id="toc-visualisation-of-vaccination-rates" class="nav-link" data-scroll-target="#visualisation-of-vaccination-rates"><span class="toc-section-number">4</span>  Visualisation of Vaccination Rates</a></li>
-  <li><a href="#local-gi-analysis" id="toc-local-gi-analysis" class="nav-link" data-scroll-target="#local-gi-analysis"><span class="toc-section-number">5</span>  Local Gi* Analysis</a>
+  <li><a href="#local-gi-analysis" id="toc-local-gi-analysis" class="nav-link" data-scroll-target="#local-gi-analysis"><span class="toc-section-number">5</span>  Local Gi* Analysis</a></li>
+  <li><a href="#emerging-hot-spot-analysisehsa" id="toc-emerging-hot-spot-analysisehsa" class="nav-link" data-scroll-target="#emerging-hot-spot-analysisehsa"><span class="toc-section-number">6</span>  Emerging Hot Spot Analysis(EHSA)</a></li>
+  <li><a href="#deriving-centroid" id="toc-deriving-centroid" class="nav-link" data-scroll-target="#deriving-centroid"><span class="toc-section-number">7</span>  Deriving Centroid</a>
   <ul class="collapse">
-  <li><a href="#deriving-centroid" id="toc-deriving-centroid" class="nav-link" data-scroll-target="#deriving-centroid"><span class="toc-section-number">5.1</span>  Deriving Centroid</a></li>
-  <li><a href="#determine-cut-off-distance" id="toc-determine-cut-off-distance" class="nav-link" data-scroll-target="#determine-cut-off-distance"><span class="toc-section-number">5.2</span>  Determine Cut-off Distance</a></li>
+  <li><a href="#determine-cut-off-distance" id="toc-determine-cut-off-distance" class="nav-link" data-scroll-target="#determine-cut-off-distance"><span class="toc-section-number">7.1</span>  Determine Cut-off Distance</a></li>
+  <li><a href="#computing-gi-statistics" id="toc-computing-gi-statistics" class="nav-link" data-scroll-target="#computing-gi-statistics"><span class="toc-section-number">7.2</span>  Computing Gi statistics</a>
+  <ul class="collapse">
+  <li><a href="#jun-2022-2" id="toc-jun-2022-2" class="nav-link" data-scroll-target="#jun-2022-2"><span class="toc-section-number">7.2.1</span>  Jun 2022</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -287,7 +292,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">February 26, 2023</p>
+      <p class="date-modified">February 27, 2023</p>
     </div>
   </div>
     
@@ -342,7 +347,7 @@ Warning
 <div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>jul2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Juli 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a>jul2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-07-00"</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>jul2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-07-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3"></a><span class="fu">head</span>(jul2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
@@ -366,7 +371,7 @@ Warning
 <div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>aug2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Agustus 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb4-2"><a href="#cb4-2"></a>aug2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-08-00"</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>aug2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-08-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3"></a><span class="fu">head</span>(aug2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
@@ -390,8 +395,25 @@ Warning
 <div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>sep2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 September 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb6-2"><a href="#cb6-2"></a>sep2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-09-00"</span></span>
-<span id="cb6-3"><a href="#cb6-3"></a><span class="fu">head</span>(sep2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-2"><a href="#cb6-2"></a>sep2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-09-30"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>sep2021[<span class="st">"Date"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 268 × 1
+   Date      
+   &lt;date&gt;    
+ 1 2021-09-30
+ 2 2021-09-30
+ 3 2021-09-30
+ 4 2021-09-30
+ 5 2021-09-30
+ 6 2021-09-30
+ 7 2021-09-30
+ 8 2021-09-30
+ 9 2021-09-30
+10 2021-09-30
+# … with 258 more rows</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">head</span>(sep2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -413,9 +435,9 @@ Warning
 </div>
 <div id="tabset-1-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-4-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb8-2"><a href="#cb8-2"></a>oct2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-10-00"</span></span>
-<span id="cb8-3"><a href="#cb8-3"></a><span class="fu">head</span>(oct2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>oct2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Oktober 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb10-2"><a href="#cb10-2"></a>oct2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-10-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="fu">head</span>(oct2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -437,9 +459,9 @@ Warning
 </div>
 <div id="tabset-1-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-5-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb10-2"><a href="#cb10-2"></a>nov2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-11-00"</span></span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="fu">head</span>(nov2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>nov2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 November 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>nov2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-11-30"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="fu">head</span>(nov2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -461,9 +483,9 @@ Warning
 </div>
 <div id="tabset-1-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-6-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb12-2"><a href="#cb12-2"></a>dec2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2021-12-00"</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a><span class="fu">head</span>(dec2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>dec2021 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Desember 2021).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb14-2"><a href="#cb14-2"></a>dec2021[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2021-12-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="fu">head</span>(dec2021, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -485,9 +507,9 @@ Warning
 </div>
 <div id="tabset-1-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-7-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb14-2"><a href="#cb14-2"></a>jan2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-01-00"</span></span>
-<span id="cb14-3"><a href="#cb14-3"></a><span class="fu">head</span>(jan2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>jan2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Januari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2"></a>jan2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-01-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3"></a><span class="fu">head</span>(jan2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -509,9 +531,9 @@ Warning
 </div>
 <div id="tabset-1-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-8-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2"></a>feb2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-02-00"</span></span>
-<span id="cb16-3"><a href="#cb16-3"></a><span class="fu">head</span>(feb2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>feb2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (27 Februari 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb18-2"><a href="#cb18-2"></a>feb2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-02-27"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">head</span>(feb2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -533,9 +555,9 @@ Warning
 </div>
 <div id="tabset-1-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-9-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb18-2"><a href="#cb18-2"></a>mar2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-03-00"</span></span>
-<span id="cb18-3"><a href="#cb18-3"></a><span class="fu">head</span>(mar2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>mar2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Maret 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb20-2"><a href="#cb20-2"></a>mar2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-03-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb20-3"><a href="#cb20-3"></a><span class="fu">head</span>(mar2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 35
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ JUMLA…⁸
@@ -557,9 +579,9 @@ Warning
 </div>
 <div id="tabset-1-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-10-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb20-2"><a href="#cb20-2"></a>apr2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-04-00"</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a><span class="fu">head</span>(apr2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>apr2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 April 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>apr2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-04-30"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3"></a><span class="fu">head</span>(apr2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 35
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ JUMLA…⁸
@@ -581,9 +603,9 @@ Warning
 </div>
 <div id="tabset-1-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-11-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb22-2"><a href="#cb22-2"></a>may2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-05-00"</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a><span class="fu">head</span>(may2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>may2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb24-2"><a href="#cb24-2"></a>may2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-05-31"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="fu">head</span>(may2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 35
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ JUMLA…⁸
@@ -605,9 +627,9 @@ Warning
 </div>
 <div id="tabset-1-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-12-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
-<span id="cb24-2"><a href="#cb24-2"></a>jun2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="st">"2022-06-00"</span></span>
-<span id="cb24-3"><a href="#cb24-3"></a><span class="fu">head</span>(jun2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>jun2022 <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"data/aspatial/Data Vaksinasi Berbasis Kelurahan (30 Juni 2022).xlsx"</span>, <span class="at">sheet =</span> <span class="st">"Data Kelurahan"</span>)</span>
+<span id="cb26-2"><a href="#cb26-2"></a>jun2022[<span class="st">"Date"</span>] <span class="ot">&lt;-</span> <span class="fu">as.Date</span>(<span class="st">"2022-06-30"</span>, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="fu">head</span>(jun2022, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 35
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ JUMLA…⁸
@@ -638,10 +660,11 @@ Warning
 <div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <p>The EPSG code for Indonesia is 23845.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>jakarta_boundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
-<span id="cb26-2"><a href="#cb26-2"></a>                 <span class="at">layer =</span> <span class="st">"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-4"><a href="#cb26-4"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">23845</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>jakarta_boundary <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"data/geospatial"</span>, </span>
+<span id="cb28-2"><a href="#cb28-2"></a>                 <span class="at">layer =</span> <span class="st">"BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="fu">select</span>(<span class="fu">c</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">9</span>))<span class="sc">%&gt;%</span>  </span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(KAB_KOTA <span class="sc">!=</span> <span class="st">"KEPULAUAN SERIBU"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `BATAS_DESA_DESEMBER_2019_DUKCAPIL_DKI_JAKARTA' from data source 
   `C:\deadline2359\IS415-GAA\Take-home_Ex\Take-home_Ex02\data\geospatial' 
@@ -652,35 +675,38 @@ Dimension:     XY
 Bounding box:  xmin: 106.3831 ymin: -6.370815 xmax: 106.9728 ymax: -5.184322
 Geodetic CRS:  WGS 84</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>jakarta_boundary<span class="sc">$</span>geometry</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Geometry set for 261 features 
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 106.6862 ymin: -6.370815 xmax: 106.9728 ymax: -6.089036
+Geodetic CRS:  WGS 84
+First 5 geometries:</code></pre>
+</div>
 </div>
 </div>
 <div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="fu">head</span>(jakarta_boundary, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">head</span>(jakarta_boundary, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 5 features and 9 fields
 Geometry type: MULTIPOLYGON
 Dimension:     XY
-Bounding box:  xmin: -3667896 ymin: 689350.6 xmax: -3619528 ymax: 751796
-Projected CRS: DGN95 / Indonesia TM-3 zone 54.1
-  OBJECT_ID  KODE_DESA           DESA   KODE    PROVINSI         KAB_KOTA
-1     25477 3173031006      KEAGUNGAN 317303 DKI JAKARTA    JAKARTA BARAT
-2     25478 3173031007         GLODOK 317303 DKI JAKARTA    JAKARTA BARAT
-3     25397 3171031003  HARAPAN MULIA 317103 DKI JAKARTA    JAKARTA PUSAT
-4     25400 3171031006   CEMPAKA BARU 317103 DKI JAKARTA    JAKARTA PUSAT
-5     25378 3101011001 PULAU PANGGANG 310101 DKI JAKARTA KEPULAUAN SERIBU
-               KECAMATAN     DESA_KELUR JUMLAH_PEN
-1             TAMAN SARI      KEAGUNGAN      21609
-2             TAMAN SARI         GLODOK       9069
-3              KEMAYORAN  HARAPAN MULIA      29085
-4              KEMAYORAN   CEMPAKA BARU      41913
-5 KEPULAUAN SERIBU UTARA PULAU PANGGANG       6947
-                        geometry
-1 MULTIPOLYGON (((-3626874 69...
-2 MULTIPOLYGON (((-3627130 69...
-3 MULTIPOLYGON (((-3621251 68...
-4 MULTIPOLYGON (((-3620608 69...
-5 MULTIPOLYGON (((-3667409 74...</code></pre>
+Bounding box:  xmin: 106.8105 ymin: -6.17575 xmax: 106.8711 ymax: -6.141043
+Geodetic CRS:  WGS 84
+  OBJECT_ID  KODE_DESA          DESA   KODE    PROVINSI      KAB_KOTA
+1     25477 3173031006     KEAGUNGAN 317303 DKI JAKARTA JAKARTA BARAT
+2     25478 3173031007        GLODOK 317303 DKI JAKARTA JAKARTA BARAT
+3     25397 3171031003 HARAPAN MULIA 317103 DKI JAKARTA JAKARTA PUSAT
+4     25400 3171031006  CEMPAKA BARU 317103 DKI JAKARTA JAKARTA PUSAT
+5     25390 3171021001    PASAR BARU 317102 DKI JAKARTA JAKARTA PUSAT
+    KECAMATAN    DESA_KELUR JUMLAH_PEN                       geometry
+1  TAMAN SARI     KEAGUNGAN      21609 MULTIPOLYGON (((106.8164 -6...
+2  TAMAN SARI        GLODOK       9069 MULTIPOLYGON (((106.8148 -6...
+3   KEMAYORAN HARAPAN MULIA      29085 MULTIPOLYGON (((106.8576 -6...
+4   KEMAYORAN  CEMPAKA BARU      41913 MULTIPOLYGON (((106.8631 -6...
+5 SAWAH BESAR    PASAR BARU      15793 MULTIPOLYGON (((106.8369 -6...</code></pre>
 </div>
 </div>
 </div>
@@ -699,23 +725,23 @@ Projected CRS: DGN95 / Indonesia TM-3 zone 54.1
 <div class="tab-content">
 <div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>column_name28 <span class="ot">&lt;-</span> <span class="fu">names</span>(jul2021)</span>
-<span id="cb30-2"><a href="#cb30-2"></a>column_name35 <span class="ot">&lt;-</span> <span class="fu">names</span>(jun2022)</span>
-<span id="cb30-3"><a href="#cb30-3"></a>overlapped_cols <span class="ot">=</span> <span class="fu">intersect</span>(column_name28, column_name35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>column_name28 <span class="ot">&lt;-</span> <span class="fu">names</span>(jul2021)</span>
+<span id="cb34-2"><a href="#cb34-2"></a>column_name35 <span class="ot">&lt;-</span> <span class="fu">names</span>(jun2022)</span>
+<span id="cb34-3"><a href="#cb34-3"></a>overlapped_cols <span class="ot">=</span> <span class="fu">intersect</span>(column_name28, column_name35)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a>vaccine_months_list <span class="ot">&lt;-</span> <span class="fu">list</span>(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)</span>
-<span id="cb31-2"><a href="#cb31-2"></a></span>
-<span id="cb31-3"><a href="#cb31-3"></a>vaccine_months <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
-<span id="cb31-4"><a href="#cb31-4"></a></span>
-<span id="cb31-5"><a href="#cb31-5"></a><span class="cf">for</span> (month <span class="cf">in</span> vaccine_months_list) {</span>
-<span id="cb31-6"><a href="#cb31-6"></a>  vaccine_months <span class="ot">&lt;-</span> <span class="fu">rbind</span>(vaccine_months, month[<span class="dv">2</span><span class="sc">:</span><span class="fu">nrow</span>(month),overlapped_cols])</span>
-<span id="cb31-7"><a href="#cb31-7"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>vaccine_months_list <span class="ot">&lt;-</span> <span class="fu">list</span>(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)</span>
+<span id="cb35-2"><a href="#cb35-2"></a></span>
+<span id="cb35-3"><a href="#cb35-3"></a>vaccine_months <span class="ot">&lt;-</span> <span class="fu">data.frame</span>()</span>
+<span id="cb35-4"><a href="#cb35-4"></a></span>
+<span id="cb35-5"><a href="#cb35-5"></a><span class="cf">for</span> (month <span class="cf">in</span> vaccine_months_list) {</span>
+<span id="cb35-6"><a href="#cb35-6"></a>  vaccine_months <span class="ot">&lt;-</span> <span class="fu">rbind</span>(vaccine_months, month[<span class="dv">2</span><span class="sc">:</span><span class="fu">nrow</span>(month),overlapped_cols])</span>
+<span id="cb35-7"><a href="#cb35-7"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a><span class="fu">head</span>(vaccine_months, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a><span class="fu">head</span>(vaccine_months, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 28
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -880,7 +906,7 @@ Translations of Column Names
 \]</span></p>
 <p>We can tell that we have the correct number of rows in our final dataframe, <em>vaccine_months</em>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="fu">nrow</span>(vaccine_months)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a><span class="fu">nrow</span>(vaccine_months)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 3204</code></pre>
 </div>
@@ -890,7 +916,7 @@ Translations of Column Names
 <p>We will need to create a column with the vaccination rates of each village in order to map a choropleth map.</p>
 <p>Since <em>“Sasaran”</em> is the target number of vaccinations provided and <em>“Belum Vaksin”</em> tells of the number of people not yet vaccinated, we can derive vaccination rates of each month.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1"></a>vaccine_months[<span class="st">"vaccination rate"</span>] <span class="ot">&lt;-</span> (vaccine_months[<span class="st">"SASARAN"</span>] <span class="sc">-</span> vaccine_months[<span class="st">"BELUM VAKSIN"</span>])<span class="sc">/</span>vaccine_months[<span class="st">"SASARAN"</span>] <span class="sc">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>vaccine_months[<span class="st">"vaccination rate"</span>] <span class="ot">&lt;-</span> (vaccine_months[<span class="st">"SASARAN"</span>] <span class="sc">-</span> vaccine_months[<span class="st">"BELUM VAKSIN"</span>])<span class="sc">/</span>vaccine_months[<span class="st">"SASARAN"</span>] <span class="sc">*</span> <span class="dv">100</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -899,11 +925,11 @@ Translations of Column Names
 <p>As mentioned we want to visualise the vaccination rates on the map Of Jakarta, this will require us to join the two existing dataframes in order to have a complete dataframe for the map.</p>
 <p>We will join the two dataframes using “KELURAHAN” in <em>vaccine_months</em> and “DESA” in <em>jakarta_boundary</em>, both meaning village.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a>jakarta <span class="ot">&lt;-</span> <span class="fu">left_join</span>(vaccine_months, jakarta_boundary, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"KODE KELURAHAN"</span><span class="ot">=</span><span class="st">"KODE_DESA"</span>))</span>
-<span id="cb37-2"><a href="#cb37-2"></a></span>
-<span id="cb37-3"><a href="#cb37-3"></a>jakarta <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(jakarta[jakarta[<span class="st">"KAB_KOTA"</span>] <span class="sc">!=</span> (<span class="st">"KEPULAUAN SERIBU"</span>), ])</span>
-<span id="cb37-4"><a href="#cb37-4"></a></span>
-<span id="cb37-5"><a href="#cb37-5"></a><span class="fu">head</span>(jakarta, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>jakarta <span class="ot">&lt;-</span> <span class="fu">left_join</span>(vaccine_months, jakarta_boundary, <span class="at">by=</span><span class="fu">c</span>(<span class="st">"KODE KELURAHAN"</span><span class="ot">=</span><span class="st">"KODE_DESA"</span>))</span>
+<span id="cb41-2"><a href="#cb41-2"></a></span>
+<span id="cb41-3"><a href="#cb41-3"></a>jakarta <span class="ot">&lt;-</span> <span class="fu">na.omit</span>(jakarta[jakarta[<span class="st">"KAB_KOTA"</span>] <span class="sc">!=</span> (<span class="st">"KEPULAUAN SERIBU"</span>), ])</span>
+<span id="cb41-4"><a href="#cb41-4"></a></span>
+<span id="cb41-5"><a href="#cb41-5"></a><span class="fu">head</span>(jakarta, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 5 × 38
   KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
@@ -931,15 +957,15 @@ Translations of Column Names
 <div class="tab-content">
 <div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-07-00"</span>,])</span>
-<span id="cb39-2"><a href="#cb39-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb39-3"><a href="#cb39-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb39-4"><a href="#cb39-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb39-5"><a href="#cb39-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb39-6"><a href="#cb39-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb39-7"><a href="#cb39-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (July 2021)"</span>,</span>
-<span id="cb39-8"><a href="#cb39-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb39-9"><a href="#cb39-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>jul21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-07-31"</span>,])</span>
+<span id="cb43-2"><a href="#cb43-2"></a><span class="fu">tm_shape</span>(jul21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb43-3"><a href="#cb43-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb43-4"><a href="#cb43-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb43-5"><a href="#cb43-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb43-6"><a href="#cb43-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb43-7"><a href="#cb43-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (July 2021)"</span>,</span>
+<span id="cb43-8"><a href="#cb43-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb43-9"><a href="#cb43-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -947,15 +973,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-08-00"</span>,])</span>
-<span id="cb40-2"><a href="#cb40-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb40-3"><a href="#cb40-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb40-4"><a href="#cb40-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb40-5"><a href="#cb40-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb40-6"><a href="#cb40-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb40-7"><a href="#cb40-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (August 2021)"</span>,</span>
-<span id="cb40-8"><a href="#cb40-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb40-9"><a href="#cb40-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>aug21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-08-31"</span>,])</span>
+<span id="cb44-2"><a href="#cb44-2"></a><span class="fu">tm_shape</span>(aug21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb44-3"><a href="#cb44-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb44-4"><a href="#cb44-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb44-5"><a href="#cb44-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb44-6"><a href="#cb44-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb44-7"><a href="#cb44-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (August 2021)"</span>,</span>
+<span id="cb44-8"><a href="#cb44-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb44-9"><a href="#cb44-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-24-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -963,15 +989,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-09-00"</span>,])</span>
-<span id="cb41-2"><a href="#cb41-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb41-3"><a href="#cb41-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb41-4"><a href="#cb41-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb41-5"><a href="#cb41-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb41-6"><a href="#cb41-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb41-7"><a href="#cb41-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (September 2021)"</span>,</span>
-<span id="cb41-8"><a href="#cb41-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb41-9"><a href="#cb41-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a>sep21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-09-30"</span>,])</span>
+<span id="cb45-2"><a href="#cb45-2"></a><span class="fu">tm_shape</span>(sep21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb45-3"><a href="#cb45-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb45-4"><a href="#cb45-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb45-5"><a href="#cb45-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb45-6"><a href="#cb45-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb45-7"><a href="#cb45-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (September 2021)"</span>,</span>
+<span id="cb45-8"><a href="#cb45-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb45-9"><a href="#cb45-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -979,15 +1005,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-4-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-10-00"</span>,])</span>
-<span id="cb42-2"><a href="#cb42-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb42-3"><a href="#cb42-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb42-4"><a href="#cb42-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb42-5"><a href="#cb42-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb42-6"><a href="#cb42-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb42-7"><a href="#cb42-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (October 2021)"</span>,</span>
-<span id="cb42-8"><a href="#cb42-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb42-9"><a href="#cb42-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>oct21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-10-31"</span>,])</span>
+<span id="cb46-2"><a href="#cb46-2"></a><span class="fu">tm_shape</span>(oct21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb46-3"><a href="#cb46-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb46-4"><a href="#cb46-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb46-5"><a href="#cb46-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb46-6"><a href="#cb46-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb46-7"><a href="#cb46-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (October 2021)"</span>,</span>
+<span id="cb46-8"><a href="#cb46-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb46-9"><a href="#cb46-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-26-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -995,15 +1021,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-5" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-5-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-11-00"</span>,])</span>
-<span id="cb43-2"><a href="#cb43-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb43-3"><a href="#cb43-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb43-4"><a href="#cb43-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb43-5"><a href="#cb43-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb43-6"><a href="#cb43-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb43-7"><a href="#cb43-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (November 2021)"</span>,</span>
-<span id="cb43-8"><a href="#cb43-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb43-9"><a href="#cb43-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>nov21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-11-30"</span>,])</span>
+<span id="cb47-2"><a href="#cb47-2"></a><span class="fu">tm_shape</span>(nov21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb47-3"><a href="#cb47-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb47-4"><a href="#cb47-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb47-5"><a href="#cb47-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb47-6"><a href="#cb47-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb47-7"><a href="#cb47-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (November 2021)"</span>,</span>
+<span id="cb47-8"><a href="#cb47-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb47-9"><a href="#cb47-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-27-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1011,15 +1037,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-6" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-6-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-12-00"</span>,])</span>
-<span id="cb44-2"><a href="#cb44-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb44-3"><a href="#cb44-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb44-4"><a href="#cb44-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb44-5"><a href="#cb44-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb44-6"><a href="#cb44-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb44-7"><a href="#cb44-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (December 2021)"</span>,</span>
-<span id="cb44-8"><a href="#cb44-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb44-9"><a href="#cb44-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>dec21_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2021-12-31"</span>,])</span>
+<span id="cb48-2"><a href="#cb48-2"></a><span class="fu">tm_shape</span>(dec21_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb48-4"><a href="#cb48-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb48-5"><a href="#cb48-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb48-6"><a href="#cb48-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb48-7"><a href="#cb48-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (December 2021)"</span>,</span>
+<span id="cb48-8"><a href="#cb48-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb48-9"><a href="#cb48-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-28-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1027,15 +1053,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-7" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-7-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-01-00"</span>,])</span>
-<span id="cb45-2"><a href="#cb45-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb45-3"><a href="#cb45-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb45-4"><a href="#cb45-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb45-5"><a href="#cb45-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb45-6"><a href="#cb45-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb45-7"><a href="#cb45-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (January 2022)"</span>,</span>
-<span id="cb45-8"><a href="#cb45-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb45-9"><a href="#cb45-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>jan22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-01-31"</span>,])</span>
+<span id="cb49-2"><a href="#cb49-2"></a><span class="fu">tm_shape</span>(jan22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb49-3"><a href="#cb49-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb49-4"><a href="#cb49-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb49-5"><a href="#cb49-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb49-6"><a href="#cb49-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb49-7"><a href="#cb49-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (January 2022)"</span>,</span>
+<span id="cb49-8"><a href="#cb49-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb49-9"><a href="#cb49-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-29-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1043,15 +1069,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-8" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-8-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-02-00"</span>,])</span>
-<span id="cb46-2"><a href="#cb46-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb46-3"><a href="#cb46-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb46-4"><a href="#cb46-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb46-5"><a href="#cb46-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb46-6"><a href="#cb46-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb46-7"><a href="#cb46-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (February 2022)"</span>,</span>
-<span id="cb46-8"><a href="#cb46-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb46-9"><a href="#cb46-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>feb22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-02-27"</span>,])</span>
+<span id="cb50-2"><a href="#cb50-2"></a><span class="fu">tm_shape</span>(feb22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb50-3"><a href="#cb50-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb50-4"><a href="#cb50-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb50-5"><a href="#cb50-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb50-6"><a href="#cb50-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb50-7"><a href="#cb50-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (February 2022)"</span>,</span>
+<span id="cb50-8"><a href="#cb50-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb50-9"><a href="#cb50-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-30-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1059,15 +1085,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-9" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-9-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-03-00"</span>,])</span>
-<span id="cb47-2"><a href="#cb47-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb47-3"><a href="#cb47-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb47-4"><a href="#cb47-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb47-5"><a href="#cb47-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb47-6"><a href="#cb47-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb47-7"><a href="#cb47-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (March 2022)"</span>,</span>
-<span id="cb47-8"><a href="#cb47-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb47-9"><a href="#cb47-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>mar22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-03-31"</span>,])</span>
+<span id="cb51-2"><a href="#cb51-2"></a><span class="fu">tm_shape</span>(mar22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb51-3"><a href="#cb51-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb51-4"><a href="#cb51-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb51-5"><a href="#cb51-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb51-6"><a href="#cb51-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb51-7"><a href="#cb51-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (March 2022)"</span>,</span>
+<span id="cb51-8"><a href="#cb51-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb51-9"><a href="#cb51-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-31-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1075,15 +1101,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-10" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-10-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-04-00"</span>,])</span>
-<span id="cb48-2"><a href="#cb48-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb48-3"><a href="#cb48-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb48-4"><a href="#cb48-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb48-5"><a href="#cb48-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb48-6"><a href="#cb48-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb48-7"><a href="#cb48-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (April 2022)"</span>,</span>
-<span id="cb48-8"><a href="#cb48-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb48-9"><a href="#cb48-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>apr22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-04-30"</span>,])</span>
+<span id="cb52-2"><a href="#cb52-2"></a><span class="fu">tm_shape</span>(apr22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb52-3"><a href="#cb52-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb52-4"><a href="#cb52-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb52-5"><a href="#cb52-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb52-6"><a href="#cb52-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb52-7"><a href="#cb52-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (April 2022)"</span>,</span>
+<span id="cb52-8"><a href="#cb52-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb52-9"><a href="#cb52-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-32-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1091,15 +1117,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-11" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-11-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-05-00"</span>,])</span>
-<span id="cb49-2"><a href="#cb49-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb49-3"><a href="#cb49-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb49-4"><a href="#cb49-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb49-5"><a href="#cb49-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb49-6"><a href="#cb49-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb49-7"><a href="#cb49-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (May 2022)"</span>,</span>
-<span id="cb49-8"><a href="#cb49-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb49-9"><a href="#cb49-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1"></a>may22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-05-31"</span>,])</span>
+<span id="cb53-2"><a href="#cb53-2"></a><span class="fu">tm_shape</span>(may22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb53-3"><a href="#cb53-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb53-4"><a href="#cb53-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb53-5"><a href="#cb53-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb53-6"><a href="#cb53-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb53-7"><a href="#cb53-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (May 2022)"</span>,</span>
+<span id="cb53-8"><a href="#cb53-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb53-9"><a href="#cb53-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-33-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1107,15 +1133,15 @@ Translations of Column Names
 </div>
 <div id="tabset-4-12" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-12-tab">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a>month_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-06-00"</span>,])</span>
-<span id="cb50-2"><a href="#cb50-2"></a><span class="fu">tm_shape</span>(month_vaccination_rate) <span class="sc">+</span></span>
-<span id="cb50-3"><a href="#cb50-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
-<span id="cb50-4"><a href="#cb50-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb50-5"><a href="#cb50-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb50-6"><a href="#cb50-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb50-7"><a href="#cb50-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (June 2022)"</span>,</span>
-<span id="cb50-8"><a href="#cb50-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
-<span id="cb50-9"><a href="#cb50-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a>jun22_vaccination_rate <span class="ot">&lt;-</span> <span class="fu">st_as_sf</span>(jakarta[jakarta<span class="sc">$</span><span class="st">"Date"</span> <span class="sc">==</span> <span class="st">"2022-06-30"</span>,])</span>
+<span id="cb54-2"><a href="#cb54-2"></a><span class="fu">tm_shape</span>(jun22_vaccination_rate) <span class="sc">+</span></span>
+<span id="cb54-3"><a href="#cb54-3"></a>  <span class="fu">tm_fill</span>(<span class="st">"vaccination rate"</span>,</span>
+<span id="cb54-4"><a href="#cb54-4"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb54-5"><a href="#cb54-5"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
+<span id="cb54-6"><a href="#cb54-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb54-7"><a href="#cb54-7"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Vaccination Rates in Jakarta (June 2022)"</span>,</span>
+<span id="cb54-8"><a href="#cb54-8"></a>            <span class="at">main.title.size =</span> <span class="fl">1.10</span>,</span>
+<span id="cb54-9"><a href="#cb54-9"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid" width="672"></p>
 </div>
@@ -1126,33 +1152,166 @@ Translations of Column Names
 </section>
 <section id="local-gi-analysis" class="level1" data-number="5">
 <h1 data-number="5"><span class="header-section-number">5</span> Local Gi* Analysis</h1>
-<section id="deriving-centroid" class="level2" data-number="5.1">
-<h2 data-number="5.1" class="anchored" data-anchor-id="deriving-centroid"><span class="header-section-number">5.1</span> Deriving Centroid</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1"></a>jakarta_clean_boundary <span class="ot">&lt;-</span> jakarta_boundary <span class="sc">%&gt;%</span>  </span>
-<span id="cb51-2"><a href="#cb51-2"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb51-3"><a href="#cb51-3"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(KAB_KOTA <span class="sc">!=</span> <span class="st">"KEPULAUAN SERIBU"</span>)</span>
-<span id="cb51-4"><a href="#cb51-4"></a></span>
-<span id="cb51-5"><a href="#cb51-5"></a>longitude <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(jakarta_clean_boundary<span class="sc">$</span>geometry, <span class="sc">~</span><span class="fu">st_centroid</span>(.x)[[<span class="dv">1</span>]])</span>
-<span id="cb51-6"><a href="#cb51-6"></a></span>
-<span id="cb51-7"><a href="#cb51-7"></a>latitude <span class="ot">&lt;-</span> <span class="fu">map_dbl</span>(jakarta_clean_boundary<span class="sc">$</span>geometry, <span class="sc">~</span><span class="fu">st_centroid</span>(.x)[[<span class="dv">2</span>]])</span>
-<span id="cb51-8"><a href="#cb51-8"></a></span>
-<span id="cb51-9"><a href="#cb51-9"></a>coords <span class="ot">&lt;-</span> <span class="fu">cbind</span>(longitude, latitude)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1"></a>wm_idw <span class="ot">&lt;-</span> jun22_vaccination_rate <span class="sc">%&gt;%</span></span>
+<span id="cb55-2"><a href="#cb55-2"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">st_contiguity</span>(geometry),</span>
+<span id="cb55-3"><a href="#cb55-3"></a>         <span class="at">wts =</span> <span class="fu">st_inverse_distance</span>(nb, geometry,</span>
+<span id="cb55-4"><a href="#cb55-4"></a>                                   <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb55-5"><a href="#cb55-5"></a>                                   <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb55-6"><a href="#cb55-6"></a>         <span class="at">.before =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a>HCSA <span class="ot">&lt;-</span> wm_idw <span class="sc">%&gt;%</span> </span>
+<span id="cb56-2"><a href="#cb56-2"></a>  <span class="fu">mutate</span>(<span class="at">local_Gi =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb56-3"><a href="#cb56-3"></a>    <span class="st">`</span><span class="at">vaccination rate</span><span class="st">`</span>, nb, wt, <span class="at">nsim =</span> <span class="dv">99</span>),</span>
+<span id="cb56-4"><a href="#cb56-4"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-5"><a href="#cb56-5"></a>  <span class="fu">unnest</span>(local_Gi)</span>
+<span id="cb56-6"><a href="#cb56-6"></a></span>
+<span id="cb56-7"><a href="#cb56-7"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb56-8"><a href="#cb56-8"></a>map1 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb56-9"><a href="#cb56-9"></a>  <span class="fu">tm_fill</span>(<span class="st">"gi_star"</span>) <span class="sc">+</span> </span>
+<span id="cb56-10"><a href="#cb56-10"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb56-11"><a href="#cb56-11"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Gi* of GDPPC"</span>,</span>
+<span id="cb56-12"><a href="#cb56-12"></a>            <span class="at">main.title.size =</span> <span class="fl">0.8</span>)</span>
+<span id="cb56-13"><a href="#cb56-13"></a></span>
+<span id="cb56-14"><a href="#cb56-14"></a>map2 <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb56-15"><a href="#cb56-15"></a>  <span class="fu">tm_fill</span>(<span class="st">"p_value"</span>,</span>
+<span id="cb56-16"><a href="#cb56-16"></a>          <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.001</span>, <span class="fl">0.01</span>, <span class="fl">0.05</span>, <span class="dv">1</span>),</span>
+<span id="cb56-17"><a href="#cb56-17"></a>              <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"0.001"</span>, <span class="st">"0.01"</span>, <span class="st">"0.05"</span>, <span class="st">"Not sig"</span>)) <span class="sc">+</span> </span>
+<span id="cb56-18"><a href="#cb56-18"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb56-19"><a href="#cb56-19"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"p-value of Gi*"</span>,</span>
+<span id="cb56-20"><a href="#cb56-20"></a>            <span class="at">main.title.size =</span> <span class="fl">0.8</span>)</span>
+<span id="cb56-21"><a href="#cb56-21"></a></span>
+<span id="cb56-22"><a href="#cb56-22"></a><span class="fu">tmap_arrange</span>(map1, map2, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1"></a>HCSA_sig <span class="ot">&lt;-</span> HCSA  <span class="sc">%&gt;%</span></span>
+<span id="cb57-2"><a href="#cb57-2"></a>  <span class="fu">filter</span>(p_sim <span class="sc">&lt;</span> <span class="fl">0.05</span>)</span>
+<span id="cb57-3"><a href="#cb57-3"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb57-4"><a href="#cb57-4"></a><span class="fu">tm_shape</span>(HCSA) <span class="sc">+</span></span>
+<span id="cb57-5"><a href="#cb57-5"></a>  <span class="fu">tm_polygons</span>() <span class="sc">+</span></span>
+<span id="cb57-6"><a href="#cb57-6"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb57-7"><a href="#cb57-7"></a><span class="fu">tm_shape</span>(HCSA_sig) <span class="sc">+</span></span>
+<span id="cb57-8"><a href="#cb57-8"></a>  <span class="fu">tm_fill</span>(<span class="st">"gi_star"</span>) <span class="sc">+</span> </span>
+<span id="cb57-9"><a href="#cb57-9"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Take-home_Ex02_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid" width="672"></p>
+</div>
 </div>
 </section>
-<section id="determine-cut-off-distance" class="level2" data-number="5.2">
-<h2 data-number="5.2" class="anchored" data-anchor-id="determine-cut-off-distance"><span class="header-section-number">5.2</span> Determine Cut-off Distance</h2>
+<section id="emerging-hot-spot-analysisehsa" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Emerging Hot Spot Analysis(EHSA)</h1>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a>k1 <span class="ot">&lt;-</span> <span class="fu">knn2nb</span>(<span class="fu">knearneigh</span>(coords))</span>
-<span id="cb52-2"><a href="#cb52-2"></a>k1dists <span class="ot">&lt;-</span> <span class="fu">unlist</span>(<span class="fu">nbdists</span>(k1, coords, <span class="at">longlat =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb52-3"><a href="#cb52-3"></a><span class="fu">summary</span>(k1dists)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="fu">colnames</span>(jakarta_boundary)[<span class="fu">colnames</span>(jakarta_boundary) <span class="sc">==</span> <span class="st">"KODE_DESA"</span>] <span class="ot">=</span><span class="st">"KODE KELURAHAN"</span></span>
+<span id="cb58-2"><a href="#cb58-2"></a></span>
+<span id="cb58-3"><a href="#cb58-3"></a>jakarta_st <span class="ot">&lt;-</span> <span class="fu">spacetime</span>(<span class="at">.data=</span>jakarta, <span class="at">.geometry=</span>jakarta_boundary,</span>
+<span id="cb58-4"><a href="#cb58-4"></a>                      <span class="at">.loc_col =</span> <span class="st">"KODE KELURAHAN"</span>,</span>
+<span id="cb58-5"><a href="#cb58-5"></a>                      <span class="at">.time_col =</span> <span class="st">"Date"</span>)</span>
+<span id="cb58-6"><a href="#cb58-6"></a></span>
+<span id="cb58-7"><a href="#cb58-7"></a><span class="fu">is_spacetime_cube</span>(jakarta_st)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-   1430    7313   10177   10677   14112   19842 </code></pre>
+<pre><code>[1] TRUE</code></pre>
 </div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a>jakarta_nb <span class="ot">&lt;-</span> jakarta_st <span class="sc">%&gt;%</span></span>
+<span id="cb60-2"><a href="#cb60-2"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb60-3"><a href="#cb60-3"></a>  <span class="fu">mutate</span>(<span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
+<span id="cb60-4"><a href="#cb60-4"></a>         <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, geometry,</span>
+<span id="cb60-5"><a href="#cb60-5"></a>                                  <span class="at">scale =</span> <span class="dv">1</span>,</span>
+<span id="cb60-6"><a href="#cb60-6"></a>                                  <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb60-7"><a href="#cb60-7"></a>         <span class="at">.before =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb60-8"><a href="#cb60-8"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb60-9"><a href="#cb60-9"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span>
+<span id="cb60-10"><a href="#cb60-10"></a><span class="fu">head</span>(jakarta_nb)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 40
+  KODE KELURAH…¹ WILAY…² KECAM…³ KELUR…⁴ SASARAN BELUM…⁵ JUMLA…⁶ JUMLA…⁷ TOTAL…⁸
+  &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
+1 3173031006     JAKART… TAMAN … KEAGUN…   17387    8126    9261    3231   12492
+2 3173031007     JAKART… TAMAN … GLODOK     7837    3006    4831    2602    7433
+3 3171031003     JAKART… KEMAYO… HARAPA…   22557   11339   11218    3930   15148
+4 3171031006     JAKART… KEMAYO… CEMPAK…   32581   17361   15220    5541   20761
+5 3171021001     JAKART… SAWAH … PASAR …   12035    4899    7136    3397   10533
+6 3171021002     JAKART… SAWAH … KARANG…   25761   12303   13458    4699   18157
+# … with 31 more variables: `LANSIA\r\nDOSIS 1` &lt;dbl&gt;,
+#   `LANSIA\r\nDOSIS 2` &lt;dbl&gt;, `LANSIA TOTAL \r\nVAKSIN DIBERIKAN` &lt;dbl&gt;,
+#   `PELAYAN PUBLIK\r\nDOSIS 1` &lt;dbl&gt;, `PELAYAN PUBLIK\r\nDOSIS 2` &lt;dbl&gt;,
+#   `PELAYAN PUBLIK TOTAL\r\nVAKSIN DIBERIKAN` &lt;dbl&gt;,
+#   `GOTONG ROYONG\r\nDOSIS 1` &lt;dbl&gt;, `GOTONG ROYONG\r\nDOSIS 2` &lt;dbl&gt;,
+#   `GOTONG ROYONG TOTAL\r\nVAKSIN DIBERIKAN` &lt;dbl&gt;,
+#   `TENAGA KESEHATAN\r\nDOSIS 1` &lt;dbl&gt;, `TENAGA KESEHATAN\r\nDOSIS 2` &lt;dbl&gt;, …</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a>gi_stars <span class="ot">&lt;-</span> jakarta_nb <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2"></a>  <span class="fu">group_by</span>(Date) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-3"><a href="#cb62-3"></a>  <span class="fu">mutate</span>(<span class="at">gi_star =</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb62-4"><a href="#cb62-4"></a>    <span class="st">`</span><span class="at">vaccination rate</span><span class="st">`</span>, nb, wt)) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-5"><a href="#cb62-5"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(gi_star)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="deriving-centroid" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Deriving Centroid</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1"></a><span class="co"># jakarta_clean_boundary &lt;- jakarta_boundary %&gt;%  </span></span>
+<span id="cb63-2"><a href="#cb63-2"></a><span class="co">#   na.omit() %&gt;% </span></span>
+<span id="cb63-3"><a href="#cb63-3"></a><span class="co">#   dplyr::filter(KAB_KOTA != "KEPULAUAN SERIBU")</span></span>
+<span id="cb63-4"><a href="#cb63-4"></a><span class="co"># </span></span>
+<span id="cb63-5"><a href="#cb63-5"></a><span class="co"># longitude &lt;- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[1]])</span></span>
+<span id="cb63-6"><a href="#cb63-6"></a><span class="co"># </span></span>
+<span id="cb63-7"><a href="#cb63-7"></a><span class="co"># latitude &lt;- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[2]])</span></span>
+<span id="cb63-8"><a href="#cb63-8"></a><span class="co"># </span></span>
+<span id="cb63-9"><a href="#cb63-9"></a><span class="co"># coords &lt;- cbind(longitude, latitude)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="determine-cut-off-distance" class="level2" data-number="7.1">
+<h2 data-number="7.1" class="anchored" data-anchor-id="determine-cut-off-distance"><span class="header-section-number">7.1</span> Determine Cut-off Distance</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a><span class="co"># k1 &lt;- knn2nb(knearneigh(coords))</span></span>
+<span id="cb64-2"><a href="#cb64-2"></a><span class="co"># k1dists &lt;- unlist(nbdists(k1, coords, longlat = TRUE))</span></span>
+<span id="cb64-3"><a href="#cb64-3"></a><span class="co"># summary(k1dists)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The report shows that the furthest first nearest neighbour distance is 2.9152 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1"></a><span class="co"># knn &lt;- knn2nb(knearneigh(coords, k=8))</span></span>
+<span id="cb65-2"><a href="#cb65-2"></a><span class="co"># knn</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a><span class="co"># knn_lw &lt;- nb2listw(knn, style = 'B')</span></span>
+<span id="cb66-2"><a href="#cb66-2"></a><span class="co"># summary(knn_lw)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="computing-gi-statistics" class="level2" data-number="7.2">
+<h2 data-number="7.2" class="anchored" data-anchor-id="computing-gi-statistics"><span class="header-section-number">7.2</span> Computing Gi statistics</h2>
+<section id="jun-2022-2" class="level3" data-number="7.2.1">
+<h3 data-number="7.2.1" class="anchored" data-anchor-id="jun-2022-2"><span class="header-section-number">7.2.1</span> Jun 2022</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1"></a><span class="co"># fips &lt;- order(jakarta$KELURAHAN)</span></span>
+<span id="cb67-2"><a href="#cb67-2"></a><span class="co"># gi.adaptive &lt;- localG(jun22_vaccination_rate$`vaccination rate`, knn_lw)</span></span>
+<span id="cb67-3"><a href="#cb67-3"></a><span class="co"># jun22_vaccination_rate.gi &lt;- cbind(jun22_vaccination_rate, as.matrix(gi.adaptive)) %&gt;%</span></span>
+<span id="cb67-4"><a href="#cb67-4"></a><span class="co">#   rename(gstat_adaptive = as.matrix.gi.adaptive.)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a><span class="co"># vaccination_rate_qtm&lt;- qtm(jun22_vaccination_rate, "vaccination rate")</span></span>
+<span id="cb68-2"><a href="#cb68-2"></a><span class="co"># </span></span>
+<span id="cb68-3"><a href="#cb68-3"></a><span class="co"># Gimap &lt;- tm_shape(jun22_vaccination_rate.gi) + </span></span>
+<span id="cb68-4"><a href="#cb68-4"></a><span class="co">#   tm_fill(col = "gstat_adaptive", </span></span>
+<span id="cb68-5"><a href="#cb68-5"></a><span class="co">#           style = "pretty", </span></span>
+<span id="cb68-6"><a href="#cb68-6"></a><span class="co">#           palette="-RdBu", </span></span>
+<span id="cb68-7"><a href="#cb68-7"></a><span class="co">#           title = "local Gi") + </span></span>
+<span id="cb68-8"><a href="#cb68-8"></a><span class="co">#   tm_borders(alpha = 0.5)</span></span>
+<span id="cb68-9"><a href="#cb68-9"></a><span class="co"># </span></span>
+<span id="cb68-10"><a href="#cb68-10"></a><span class="co"># tmap_arrange(vaccination_rate_qtm, </span></span>
+<span id="cb68-11"><a href="#cb68-11"></a><span class="co">#              Gimap, </span></span>
+<span id="cb68-12"><a href="#cb68-12"></a><span class="co">#              asp=1, </span></span>
+<span id="cb68-13"><a href="#cb68-13"></a><span class="co">#              ncol=2)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 
+</section>
 </section>
 </section>
 
