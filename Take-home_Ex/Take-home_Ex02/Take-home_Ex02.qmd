@@ -32,15 +32,16 @@ This exercise examines the vaccination rates of Jakarta, capital of Indonesia. W
 
 According to a [government website](https://corona.jakarta.go.id/en/artikel/inilah-tahapan-vaksinasi-covid-19-di-jakarta), the whole immunisation programme is conducted in 4 phases, targetting different parts of the population.
 
-- Phase 1: Health professionals
-- Phase 2: Public servants and elderly
-- Phase 3: General public who are vulnerable to Covid-19 (e.g., living in poverty)
-- Phase 4: Rest of the general public
+-   Phase 1: Health professionals
+-   Phase 2: Public servants and elderly
+-   Phase 3: General public who are vulnerable to Covid-19 (e.g., living in poverty)
+-   Phase 4: Rest of the general public
 
-Not much information can be found about when each phase started and ended, except that 
-- the whole programme started in January 2021 in Indonesia,
-- [Phase 3](https://corona.jakarta.go.id/en/artikel/fakta-penting-vaksinasi-covid-19-untuk-18-tahun-ke-atas) started around June 2021, and
-- [Phase 3 and Phase 4](https://setkab.go.id/en/covid-19-vaccination-program-to-be-carried-out-in-four-phases) were planned to be carried out within April 2021 to March 2022. This period coincides with the period of July 2021 to June 2022 that we are looking into.
+Not much information can be found about when each phase started and ended, except that
+
+-   the whole programme started in January 2021 in Indonesia,
+-   [Phase 3](https://corona.jakarta.go.id/en/artikel/fakta-penting-vaksinasi-covid-19-untuk-18-tahun-ke-atas) started around June 2021, and
+-   [Phase 3 and Phase 4](https://setkab.go.id/en/covid-19-vaccination-program-to-be-carried-out-in-four-phases) were planned to be carried out within April 2021 to March 2022. This period coincides with the period of July 2021 to June 2022 that we are looking into.
 
 # R Packages
 
@@ -202,8 +203,6 @@ column_name28 <- names(jul2021)
 column_name35 <- names(jun2022)
 overlapped_cols = intersect(column_name28, column_name35)
 ```
-
-
 
 ```{r}
 vaccine_months_list <- list(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)
@@ -1113,9 +1112,9 @@ tm_shape(jun22_HCSA_sig) +
 ```
 :::
 
-## Observations
+## Observations {#observations-1}
 
-The Gi\* maps confirmed our theory on the shifting geographical regions the vaccination programme focused on. Hot spots clustered in the north region of Jakarta in the early months of July and August 2021. But hots spot clusters mainly appear in the south region starting from September of that year. 
+The Gi\* maps confirmed our theory on the shifting geographical regions the vaccination programme focused on. Hot spots clustered in the north region of Jakarta in the early months of July and August 2021. But hots spot clusters mainly appear in the south region starting from September of that year.
 
 Similarly, cold spots appear in central Jakarta, the densest region of the capital. It is likely one of the first places that is offered vaccination due to being the administrative center of Indonesia. This means that a big part of the population will be public servants, provided by vaccinations by Phase 2, before June 2021.
 
@@ -1298,7 +1297,7 @@ It too has a p-value lower than 0.05, suggesting the downward trend is significa
 
 #### Srengseng Sawah
 
-Srengseng Sawah is a village we have mentioned in the [Observations] of cholorpleth maps.
+Srengseng Sawah is a village we have mentioned in the [Observations](#observations-1) of cholorpleth maps.
 
 ```{r}
 srengseng_sawah <- gi_stars %>% 
@@ -1342,19 +1341,14 @@ nrow(ehsa[ehsa$sl < 0.05,])
 nrow(ehsa[ehsa$sl >= 0.05,])
 ```
 
-
-
 # Conclusions
 
-We have looked at the different aspects of Jakarta's vaccination programme. The whole programme followed the 4 phases, which we are observing the last 2 phases. I believe the programme can be said to be very successful. Within the 12 months, we see the increasing vaccination rates, with the worst performing villages reaching around at least 78%. 
+We have looked at the different aspects of Jakarta's vaccination programme. The whole programme followed the 4 phases, which we are observing the last 2 phases. I believe the programme can be said to be very successful. Within the 12 months, we see the increasing vaccination rates, with the worst performing villages reaching around at least 78%.
 
 The increase in vaccination rates is likely related to the when and where the programme is targeting. Areas more densely populated like north and central Jakarta having hot spots at the earlier months. Whereas areas more inland were focused on more, after populated areas were taken care.
 
 However, the statistics from this dataset might missing a key information. It was said that a substantial number of people who vaccinated [did not carry Jakarta IDs](https://en.antaranews.com/news/183630/15-sub-districts-of-jakarta-achieve-100-vaccinations), especially when Jakarta is the first province to open vaccination up to the general public. The hot spots at south Jakarta might be a result of nearby residents visiting the province for vaccinations, instead of actual local residents.
 
-
 # References
-  Tin Seong, K. (2023a). Local Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap10.html#computing-gi-statistics>
-  Tin Seong, K. (2023b). Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap09.html>
-  Tin Seong, K. (2023c, February 21). *IS415 AY2022-23T2 - Lesson 7: Global and Local Measures of Spatial Association*. <https://is415-ay2022-23t2.netlify.app/lesson/lesson07/lesson07-glsa#/39>
-  
+
+Tin Seong, K. (2023a). Local Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap10.html#computing-gi-statistics> Tin Seong, K. (2023b). Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap09.html> Tin Seong, K. (2023c, February 21). *IS415 AY2022-23T2 - Lesson 7: Global and Local Measures of Spatial Association*. <https://is415-ay2022-23t2.netlify.app/lesson/lesson07/lesson07-glsa#/39>
