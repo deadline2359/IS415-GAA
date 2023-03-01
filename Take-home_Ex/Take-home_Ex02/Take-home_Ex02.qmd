@@ -12,6 +12,7 @@ execute:
 editor: visual
 date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
+bibliography: references.bib
 ---
 
 ```{css, echo=FALSE}
@@ -25,17 +26,25 @@ date-modified: "`r Sys.Date()`"
 }
 ```
 
-::: callout-warning
-Only import first or last of the month
+# Background
 
-A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is an administrative division of a village in [Indonesia](https://en.wikipedia.org/wiki/Indonesia "Indonesia"), under a [*rukun warga*](https://en.wikipedia.org/wiki/Rukun_warga "Rukun warga"). The RT is the lowest administrative division of Indonesia.
+This exercise examines the vaccination rates of Jakarta, capital of Indonesia. Within the state, there are 267 subdistricts, which vaccination rates are not same as the others. This exercise benefits from the government of Indonesia releasing the detailed data of their immunisation programme for COVID-19.
 
--   use lesson 6
+According to a [government website](https://corona.jakarta.go.id/en/artikel/inilah-tahapan-vaksinasi-covid-19-di-jakarta), the whole immunisation programme is conducted in 4 phases, targetting different parts of the population.
 
--   use hot and cold spots
-:::
+- Phase 1: Health professionals
+- Phase 2: Public servants and elderly
+- Phase 3: General public who are vulnerable to Covid-19 (e.g., living in poverty)
+- Phase 4: Rest of the general public
+
+Not much information can be found about when each phase started and ended, except that 
+- the whole programme started in January 2021 in Indonesia,
+- [Phase 3](https://corona.jakarta.go.id/en/artikel/fakta-penting-vaksinasi-covid-19-untuk-18-tahun-ke-atas) started around June 2021, and
+- [Phase 3 and Phase 4](https://setkab.go.id/en/covid-19-vaccination-program-to-be-carried-out-in-four-phases) were planned to be carried out within April 2021 to March 2022. This period coincides with the period of July 2021 to June 2022 that we are looking into.
 
 # R Packages
+
+Below are the packages this exericise will be using.
 
 ```{r}
 pacman::p_load(sf, sfdep, tmap, tidyverse, readxl, spdep, dplyr)
@@ -43,7 +52,17 @@ pacman::p_load(sf, sfdep, tmap, tidyverse, readxl, spdep, dplyr)
 
 # Importing
 
+## Sources
+
+**Aspatial Dataset**
+
+-   [Jakarta Provincial Vaccination Data](https://riwayat-file-vaksinasi-dki-jakarta-jakartagis.hub.arcgis.com/)- Vaccination data of Jakarta dating from 20 June 2021 to 5 September 2022.
+
+-   [DKI Jakarta Administration Boundary 2019](https://www.indonesia-geospasial.com/2020/04/download-shapefile-shp-batas-desa.html) - Shape files of the different provinces in Indonesia.
+
 ## Aspatial Dataset
+
+We will be looking at the data (presented in XLSX files) dating from July 2021 to June 2022. As the Indonesian government provided the data almost daily, we will only be using the data from the last day of the month (else the earliest possible) in order to better understand the trends by month (i.e., last day of February 2022 is provided is 27th).
 
 ::: panel-tabset
 ### Jul 2021
@@ -171,12 +190,12 @@ head(jakarta_boundary, 5)
 
 ## Combine
 
-You may realise that the dataframes from the months March to June in 2022 have 35 columns in total. Whereas the months before have only 28. Note that all dataframes have been added an additional one "date" column stating their month.
-
-Since we will not have any data on these extra 7 columns, we will pick out find the common 28 columns and slice the dataframes before combining all together.
+You may realise that the dataframes from the months March to June in 2022 have 35 columns in total. Whereas the months before have only 28. Note that all dataframes have been added an additional one "date" column stating their month (originally 34 and 27 respectively).
 
 ::: panel-tabset
 ### Combining Months
+
+Since we will not have any data on these extra 7 columns, we will pick out find the common 28 columns and slice the dataframes before combining all together.
 
 ```{r}
 column_name28 <- names(jul2021)
@@ -184,14 +203,19 @@ column_name35 <- names(jun2022)
 overlapped_cols = intersect(column_name28, column_name35)
 ```
 
+
+
 ```{r}
 vaccine_months_list <- list(jul2021, aug2021, sep2021, oct2021, nov2021, dec2021, jan2022, feb2022, mar2022, apr2022, may2022, jun2022)
 
 vaccine_months <- data.frame()
 
+
 for (month in vaccine_months_list) {
   vaccine_months <- rbind(vaccine_months, month[2:nrow(month),overlapped_cols])
 }
+vaccine_months <- vaccine_months %>% 
+  select(1, 4, 5, 6, 28)
 ```
 
 ### Data
@@ -199,41 +223,6 @@ for (month in vaccine_months_list) {
 ```{r}
 head(vaccine_months, 5)
 ```
-:::
-
-Considering that the columns are in Bahasa Indonesia, you may want to check out the translations to better understand the process.
-
-::: {.callout-tip collapse="true"}
-### Translations of Column Names
-
-| Bahasa Indonesia                        |                            English |
-|-------------------------------------|----------------------------------:|
-| Kode Kelurahan                          |                  Sub-district Code |
-| Wilayah Kota                            |                          City Area |
-| Kecamatan                               |                       Sub-district |
-| Sasaran                                 |                             Target |
-| Belum Vaksin                            |               Yet to be Vaccinated |
-| Jumlah Dosis 1                          |                 Number of Dosage 1 |
-| Jumlah Dosis 2                          |                 Number of Dosage 2 |
-| Total Vaksin Diberikan                  |               Total Vaccines Given |
-| Lansia Dosis 1                          |                   Elderly Dosage 1 |
-| Lansia Dosis 2                          |                   Elderly Dosage 2 |
-| Lansia Total Vaksin Diberikan           |        Total Elderly Vaccine Given |
-| Pelayan Publik Dosis 1                  |            Public Servant Dosage 1 |
-| Pelayan Publik Dosis 2                  |            Public Servant Dosage 2 |
-| Pelayan Publik Total Vaksin Diberikan   | Total Public Servant Vaccine Given |
-| Gotong Royong Dosis 1                   |                Mutual Aid Dosage 1 |
-| Gotong Royong Dosis 2                   |                Mutual Aid Dosage 2 |
-| Gotong Royong Total Vaksin Diberikan    |     Total Mutual Aid Vaccine Given |
-| Tenaga Kesehatan Dosis 1                |            Health Workers Dosage 1 |
-| Tenaga Kesehatan Dosis 2                |            Health Workers Dosage 2 |
-| Tenaga Kesehatan Total Vaksin Diberikan | Total Health Workers Vaccine Given |
-| Tahapan 3 Dosis 1                       |                   Stage 3 Dosage 1 |
-| Tahapan 3 Dosis 2                       |                   Stage 3 Dosage 2 |
-| Tahapan 3 Total Vaksin Diberikan        |        Total Stage 3 Vaccine Given |
-| Remaja Dosis 1                          |                  Teenager Dosage 1 |
-| Remaja Dosis 2                          |                  Teenager Dosage 2 |
-| Remaja Total Vaksin Diberikan           |       Total Teenager Vaccine Given |
 :::
 
 ## Create Monthly Vaccination Rate
@@ -252,32 +241,96 @@ nrow(vaccine_months)
 
 ### Calculate Monthly Vaccination Rate
 
-We will need to create a column with the vaccination rates of each village in order to map a choropleth map.
+Continuing, we will need to create a column with the vaccination rates of each village in order to map a choropleth map.
 
-Since *"Sasaran"* is the target number of vaccinations provided and *"Belum Vaksin"* tells of the number of people not yet vaccinated, we can derive vaccination rates of each month.
+Since *"SASARAN"* is the target number of vaccinations provided *and* "BELUM VAKSIN" tells of the number of people not yet vaccinated, we can derive vaccination rates of each month for each village.
 
 ```{r}
 vaccine_months["vaccination rate"] <- (vaccine_months["SASARAN"] - vaccine_months["BELUM VAKSIN"])/vaccine_months["SASARAN"] * 100
 ```
 
+::: {.callout-important collapse="true"}
+#### Regarding the target numbers...
+
+It is important to know that the target numbers did not change over the months, which ensures the measurement is consistent, rather than subjected to change due to population differences.
+
+```{r}
+for (month in vaccine_months_list[c(2:length(vaccine_months_list))]) {
+  if (all.equal(jun2022["SASARAN"], month["SASARAN"]) == TRUE) {
+    print("TRUE")
+  } else {
+    print("False")
+  }
+}
+```
+:::
+
 ## Joining of Geospatial and Aspatial Datasets
 
-As mentioned we want to visualise the vaccination rates on the map Of Jakarta, this will require us to join the two existing dataframes in order to have a complete dataframe for the map.
+As mentioned we want to visualise the vaccination rates on the map of Jakarta, this will require us to join the two existing dataframes in order to have a complete dataframe for the map.
 
-We will join the two dataframes using "KELURAHAN" in *vaccine_months* and "DESA" in *jakarta_boundary*, both meaning village.
+We will join the two dataframes using "KODE KELURAHAN" in *vaccine_months* and "KODE_DESA" in *jakarta_boundary*, both referring to the code of the villages.
 
 ```{r}
 jakarta <- left_join(vaccine_months, jakarta_boundary, by=c("KODE KELURAHAN"="KODE_DESA"))
+```
 
-jakarta <- na.omit(jakarta[jakarta["KAB_KOTA"] != ("KEPULAUAN SERIBU"), ])
+In addition, we are only interested in those kelurahan that are on the Java island. Hence, the Kepulauan Seribu or the Thousand Islands, north of Jakarta's coast, will be removed from the dataset through the column "KAB_KOTA", meaning city region.
+
+```{r}
+jakarta <- na.omit(jakarta[jakarta["KAB_KOTA"] != "KEPULAUAN SERIBU", ]) %>% 
+  select(1:6, 11, 15)
 
 head(jakarta, 5)
 ```
 
-#  Visualisation of Vaccination Rates
-::: {.panel-tabset}
+Considering that the columns are in Bahasa Indonesia, you may want to check out the translations of the selected columns to better understand the data.
 
-## Jul 2021
+::: {.callout-note collapse="true"}
+### Translations of Column Names
+
+| Bahasa Indonesia |              English |
+|------------------|---------------------:|
+| Kode Kelurahan   |    Sub-district Code |
+| Kelurahan        |        Urban village |
+| Sasaran          |               Target |
+| Belum Vaksin     | Yet to be Vaccinated |
+| Kab Kota         |          City region |
+:::
+
+# Visualisation of Vaccination Rates
+
+After deriving the vaccination rates, we want to create choropleth maps of the different villages in Jakarta to map out the distribution of the vaccination take-up rate.
+
+Note that Jakarta is actually split into 5 different administrative cities or regions.
+
+-   Jakarta Utara - North Jakarta
+
+-   Jakarta Barat - West Jakarta
+
+-   Jakarta Selatan - South Jakarta
+
+-   Jakarta Timur - East Jakarta
+
+-   Jakarta Pusat - Central Jakarta
+
+```{r}
+tm_shape(jakarta_boundary) +
+  tm_polygons("KAB_KOTA")
+```
+
+::: callout-tip
+Feel free to switch tabs in the following tabset in order to better examine the distribution change over the months.
+:::
+
+## Entire Province
+
+::: panel-tabset
+```{r echo=FALSE}
+tmap_mode("plot")
+```
+
+### Jul 2021
 
 ```{r}
 jul21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-07-31",])
@@ -291,7 +344,7 @@ tm_shape(jul21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Aug 2021
+### Aug 2021
 
 ```{r}
 aug21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-08-31",])
@@ -305,7 +358,7 @@ tm_shape(aug21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Sep 2021
+### Sep 2021
 
 ```{r}
 sep21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-09-30",])
@@ -319,7 +372,7 @@ tm_shape(sep21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Oct 2021
+### Oct 2021
 
 ```{r}
 oct21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-10-31",])
@@ -333,7 +386,7 @@ tm_shape(oct21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Nov 2021
+### Nov 2021
 
 ```{r}
 nov21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-11-30",])
@@ -347,7 +400,7 @@ tm_shape(nov21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Dec 2021
+### Dec 2021
 
 ```{r}
 dec21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-12-31",])
@@ -361,7 +414,7 @@ tm_shape(dec21_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Jan 2022
+### Jan 2022
 
 ```{r}
 jan22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-01-31",])
@@ -375,7 +428,7 @@ tm_shape(jan22_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Feb 2022
+### Feb 2022
 
 ```{r}
 feb22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-02-27",])
@@ -389,7 +442,7 @@ tm_shape(feb22_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Mar 2022
+### Mar 2022
 
 ```{r}
 mar22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-03-31",])
@@ -403,7 +456,7 @@ tm_shape(mar22_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Apr 2022
+### Apr 2022
 
 ```{r}
 apr22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-04-30",])
@@ -417,7 +470,7 @@ tm_shape(apr22_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## May 2022
+### May 2022
 
 ```{r}
 may22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-05-31",])
@@ -431,10 +484,9 @@ tm_shape(may22_vaccination_rate) +
             main.title.position = "center")
 ```
 
-## Jun 2022
+### Jun 2022
 
 ```{r}
-tmap_mode("view")
 jun22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-06-30",])
 tm_shape(jun22_vaccination_rate) +
   tm_fill("vaccination rate",
@@ -447,56 +499,636 @@ tm_shape(jun22_vaccination_rate) +
 ```
 :::
 
-# Local Gi* Analysis
+## Provincinal Region
+
+::: panel-tabset
+```{r echo=FALSE}
+tmap_mode("plot")
+```
+
+### Jul 2021
 
 ```{r}
-wm_idw <- jun22_vaccination_rate %>%
+jul21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-07-31",])
+tm_shape(jul21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (July 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Aug 2021
+
+```{r}
+aug21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-08-31",])
+tm_shape(aug21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (August 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Sep 2021
+
+```{r}
+sep21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-09-30",])
+tm_shape(sep21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (September 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Oct 2021
+
+```{r}
+oct21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-10-31",])
+tm_shape(oct21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (October 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Nov 2021
+
+```{r}
+nov21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-11-30",])
+tm_shape(nov21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (November 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Dec 2021
+
+```{r}
+dec21_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2021-12-31",])
+tm_shape(dec21_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (December 2021)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Jan 2022
+
+```{r}
+jan22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-01-31",])
+tm_shape(jan22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (January 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Feb 2022
+
+```{r}
+feb22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-02-27",])
+tm_shape(feb22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (February 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Mar 2022
+
+```{r}
+mar22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-03-31",])
+tm_shape(mar22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (March 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### Apr 2022
+
+```{r}
+apr22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-04-30",])
+tm_shape(apr22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (April 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+
+### May 2022
+
+::: panel-tabset
+```{r}
+may22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-05-31",])
+tm_shape(may22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (May 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+:::
+
+### Jun 2022
+
+```{r}
+jun22_vaccination_rate <- st_as_sf(jakarta[jakarta$"Date" == "2022-06-30",])
+tm_shape(jun22_vaccination_rate) +
+  tm_fill("vaccination rate",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Vaccination Rates in Jakarta (June 2022)",
+            main.title.size = 1.10,
+            main.title.position = "center") +
+   tm_facets(by = "KAB_KOTA",
+            free.coords = TRUE, 
+            drop.shapes = TRUE)
+```
+:::
+
+## Observations
+
+As you observed the changes throughout the 12 months, you will quickly notice vaccination rates started higher in the north and shifted towards the south. It is crucial to note that all kelurahan actually increased in vaccination rates as seen in the legends of the maps. This may suggest the shift in programme's focus as time went on. However, much of the middle region remained having moderate to lower rates throughout the period.
+
+The immunisation programme also seemed to slow down starting from November 2021, with the lowest class increasing by less than 3% compared to more than 8% in the past months. Using quantile, one can too observe that certain kelurahan never left certain classes. Take for example, Srengseng Sawah. In spite of the village being located far south, it has always had one of the highest vaccination rates among all villages.
+
+# Local Gi\* Analysis
+
+Here, we are seeking to calculate the Gi\* statistics to find out where the hot and cold spots cluster.
+
+Using `st_inverse_distance`, as the name suggests, we are attempting to get the inverse distance spatial weights of each kelurahan's neighbour. This is based of the idea that the closer an area is to another, the more influence it asserts on it, hence forming a cluster due each region's significance to one another.
+
+Note: We will be removing any result that is insignificant from the maps (i..e, lower than 0.05).
+
+::: panel-tabset
+## Jul 2021
+
+```{r}
+set.seed(42)
+jul21_idw <- jul21_vaccination_rate %>%
   mutate(nb = st_contiguity(geometry),
          wts = st_inverse_distance(nb, geometry,
                                    scale = 1,
                                    alpha = 1),
          .before = 1)
-```
 
-
-```{r}
-HCSA <- wm_idw %>% 
+jul21_HCSA <- jul21_idw %>% 
   mutate(local_Gi = local_gstar_perm(
     `vaccination rate`, nb, wt, nsim = 99),
          .before = 1) %>%
   unnest(local_Gi)
 
-tmap_mode("plot")
-map1 <- tm_shape(HCSA) +
-  tm_fill("gi_star") + 
-  tm_borders(alpha = 0.5) +
-  tm_layout(main.title = "Gi* of GDPPC",
-            main.title.size = 0.8)
-
-map2 <- tm_shape(HCSA) +
-  tm_fill("p_value",
-          breaks = c(0, 0.001, 0.01, 0.05, 1),
-              labels = c("0.001", "0.01", "0.05", "Not sig")) + 
-  tm_borders(alpha = 0.5) +
-  tm_layout(main.title = "p-value of Gi*",
-            main.title.size = 0.8)
-
-tmap_arrange(map1, map2, ncol = 2)
-```
-
-```{r}
-HCSA_sig <- HCSA  %>%
+jul21_HCSA_sig <- jul21_HCSA  %>%
   filter(p_sim < 0.05)
+
 tmap_mode("plot")
-tm_shape(HCSA) +
+tm_shape(jul21_HCSA) +
   tm_polygons() +
   tm_borders(alpha = 0.5) +
-tm_shape(HCSA_sig) +
-  tm_fill("gi_star") + 
-  tm_borders(alpha = 0.4)
+tm_shape(jul21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
 ```
 
-# Emerging Hot Spot Analysis(EHSA)
+## Aug 2021
+
+```{r }
+set.seed(42)
+aug21_idw <- aug21_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+aug21_HCSA <- aug21_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+aug21_HCSA_sig <- aug21_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(aug21_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(aug21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Sep 2021
+
+```{r }
+set.seed(42)
+sep21_idw <- sep21_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+sep21_HCSA <- sep21_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+sep21_HCSA_sig <- sep21_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(sep21_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(sep21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Oct 2021
+
+```{r }
+set.seed(42)
+oct21_idw <- oct21_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+oct21_HCSA <- oct21_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+oct21_HCSA_sig <- oct21_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(oct21_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(oct21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Nov 2021
+
+```{r }
+set.seed(42)
+nov21_idw <- nov21_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+nov21_HCSA <- nov21_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+nov21_HCSA_sig <- nov21_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(nov21_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(nov21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Dec 2021
+
+```{r}
+set.seed(42)
+dec21_idw <- dec21_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+dec21_HCSA <- dec21_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+dec21_HCSA_sig <- dec21_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(dec21_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(dec21_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Jan 2022
+
+```{r}
+set.seed(42)
+jan22_idw <- jan22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+jan22_HCSA <- jan22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+jan22_HCSA_sig <- jan22_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(jan22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(jan22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Feb 2022
+
+```{r}
+set.seed(42)
+feb22_idw <- feb22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+feb22_HCSA <- feb22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+feb22_HCSA_sig <- feb22_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(feb22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(feb22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Mar 2022
+
+```{r}
+set.seed(42)
+mar22_idw <- mar22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+mar22_HCSA <- mar22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+mar22_HCSA_sig <- mar22_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(mar22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(mar22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Apr 2022
+
+```{r}
+set.seed(42)
+apr22_idw <- apr22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+apr22_HCSA <- apr22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+apr22_HCSA_sig <- apr22_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(apr22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(apr22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## May 2022
+
+```{r}
+set.seed(42)
+may22_idw <- may22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+may22_HCSA <- may22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+may22_HCSA_sig <- may22_HCSA  %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(may22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(may22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+
+## Jun 2022
+
+```{r}
+set.seed(42)
+jun22_idw <- jun22_vaccination_rate %>%
+  mutate(nb = st_contiguity(geometry),
+         wts = st_inverse_distance(nb, geometry,
+                                   scale = 1,
+                                   alpha = 1),
+         .before = 1)
+
+jun22_HCSA <- jun22_idw %>% 
+  mutate(local_Gi = local_gstar_perm(
+    `vaccination rate`, nb, wt, nsim = 99),
+         .before = 1) %>%
+  unnest(local_Gi)
+
+jun22_HCSA_sig <- jun22_HCSA %>%
+  filter(p_sim < 0.05)
+tmap_mode("plot")
+
+tm_shape(jun22_HCSA) +
+  tm_polygons() +
+  tm_borders(alpha = 0.5) +
+tm_shape(jun22_HCSA_sig) +
+  tm_fill("gi_star", 
+          palette = "-RdYlGn") + 
+  tm_borders(alpha = 0.4) +
+  tm_layout(main.title = "Gi* of Vaccination Rates",
+            main.title.size = 0.8)
+```
+:::
+
+## Observations
+
+The Gi\* maps confirmed our theory on the shifting geographical regions the vaccination programme focused on. Hot spots clustered in the north region of Jakarta in the early months of July and August 2021. But hots spot clusters mainly appear in the south region starting from September of that year. 
+
+Similarly, cold spots appear in central Jakarta, the densest region of the capital. It is likely one of the first places that is offered vaccination due to being the administrative center of Indonesia. This means that a big part of the population will be public servants, provided by vaccinations by Phase 2, before June 2021.
+
+The i values in the different regions suggest that vaccination take-up might be closely tie to whether vaccination was more available in a particular region (i.e., more centers/vaccinations were located there) or related to the timing people in a region are offered vaccinations (i.e., regions with more elderly/public servants/healthcare workers were offered vaccinations first).
+
+# Emerging Hot Spot Analysis (EHSA)
+
+We can further make use of temporal data in our datasets to allow us to better understand whether hot and cold spot cluster did evolve over time.
+
+## **Creating Time Series Cube**
+
+Using `spacetime()`, we want to create an spatio-temporal cube to include time in our analysis.
+
 ```{r}
 colnames(jakarta_boundary)[colnames(jakarta_boundary) == "KODE_DESA"] ="KODE KELURAHAN"
 
@@ -506,6 +1138,11 @@ jakarta_st <- spacetime(.data=jakarta, .geometry=jakarta_boundary,
 
 is_spacetime_cube(jakarta_st)
 ```
+
+## **Computing Gi\***
+
+Similar to the section on [Local Gi\* Analysis], we want to derive the neighbours and their inverse distance with the subject village.
+
 ```{r}
 jakarta_nb <- jakarta_st %>%
   activate("geometry") %>%
@@ -519,87 +1156,205 @@ jakarta_nb <- jakarta_st %>%
 head(jakarta_nb)
 ```
 
+Grouping by "Date", `local_gstar_perm()` will be calculating the local Gi\* of each kelurahan each month.
+
 ```{r}
 gi_stars <- jakarta_nb %>% 
   group_by(Date) %>% 
   mutate(gi_star = local_gstar_perm(
     `vaccination rate`, nb, wt)) %>% 
   tidyr::unnest(gi_star)
-
-glimpse(jakarta_nb)
 ```
 
+## Mann-Kendall Test
 
-## Man-Kendall Test
+Finally, we will be conducting the Mann-Kendall test to determine the trend of vaccination rates of a village and if they are significant.
+
+### All Kelurahan
+
+We will first examine the overall region.
+
+#### Emerging Hotspot Analysis
+
+We want to observe here whether is temporal trend associated with vaccination rates or are vaccination rates purely situated in the spatial context through `emerging_hotspot_analysis()`.
+
 ```{r}
-cbg <- gi_stars %>% 
+ehsa <- emerging_hotspot_analysis(
+  x = jakarta_st, 
+  .var = "vaccination rate", 
+  k = 1, 
+  nsim = 99
+)
+```
+
+#### Visualisation
+
+##### Distribution of EHSA Classes
+
+The chart below shows an interesting hot and cold spots analysis. The highest bar is *oscilating hotspots*. It is defined by its wavering cluster as it has been also a significant cold spot, even though it's a hot spot at the end of observing time period. This might be referring to much of the south and east Jakarta, where it's has been only cold spots at the start.
+
+The second highest being *sporadic coldspots*, where the areas have been on-again and off-again cold spot. These regions may be those villages in the central part of the maps, which has been sidelined by the drastic difference in vaccination rates between the areas further coastal and further inland throughout our examination. This is
+
+The overall chart shows how much the villages have changed in vaccination rates across the months that little selurahan have remained hot or cold spots throughout..
+
+```{r}
+ggplot(data = ehsa,
+       aes(x = classification)) +
+  geom_bar()
+```
+
+##### EHSA
+
+Joining the EHSA data with the boundaries so we can view the trends in a map.
+
+```{r}
+jakarta_ehsa <- jakarta_boundary %>%
+  left_join(ehsa,
+            by = c("KODE KELURAHAN" = "location"))
+head(jakarta_ehsa, 5)
+```
+
+```{r}
+ehsa_sig <- jakarta_ehsa  %>%
+  filter(p_value < 0.05)
+tmap_mode("view")
+tm_shape(jakarta_ehsa) +
+  tm_polygons(id="DESA") +
+  tm_borders(alpha = 0.5) +
+tm_shape(ehsa_sig) +
+  tm_fill("classification", id="DESA") + 
+  tm_borders(alpha = 0.4) +
+  tm_view(set.zoom.limits = c(8,15),
+          set.view = 11) 
+```
+
+Unlike as expected, oscilating hotspots are more evenly distributed than first thought of as they are not concentrated in any particular region. However clearly, the south and north regions are less dominated by oscilating hotspots, with especially the south having more sporadic coldspots than others.
+
+### Kelurahan
+
+We will now more closely examine 3 kelurahan and understand the trends behind them.
+
+#### Pluit
+
+Pluit is located in north Jakarta, along the coast. This is a village which had higher vaccination rate but slowly overtook by others as the programme expanded..
+
+```{r}
+pluit <- gi_stars %>% 
   ungroup() %>% 
   filter(`KELURAHAN` == "PLUIT") |> 
   select(`KELURAHAN`, `Date`, gi_star)
 ```
 
 ```{r}
-ggplot(data = cbg, 
+ggplot(data = pluit, 
        aes(x = `Date`, 
            y = gi_star)) +
   geom_line() +
   theme_light()
 ```
 
-# Deriving Centroid
+This is quite reflected in this chart, where its Gi\* values have a downward trend.
 
 ```{r}
-# jakarta_clean_boundary <- jakarta_boundary %>%  
-#   na.omit() %>% 
-#   dplyr::filter(KAB_KOTA != "KEPULAUAN SERIBU")
-# 
-# longitude <- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[1]])
-# 
-# latitude <- map_dbl(jakarta_clean_boundary$geometry, ~st_centroid(.x)[[2]])
-# 
-# coords <- cbind(longitude, latitude)
+pluit %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
 ```
 
-## Determine Cut-off Distance
-```{r}
-# k1 <- knn2nb(knearneigh(coords))
-# k1dists <- unlist(nbdists(k1, coords, longlat = TRUE))
-# summary(k1dists)
-```
-The report shows that the furthest first nearest neighbour distance is 2.9152 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
+The p-value or *sl* then indicates that this is a significant trend, implying that time indeed plays a role in influencing the village's vaccination rates.
+
+#### Melawai
+
+Melawai is a spordiac coldspot, locating in south Jakarta.
 
 ```{r}
-# knn <- knn2nb(knearneigh(coords, k=8))
-# knn
-```
-```{r}
-# knn_lw <- nb2listw(knn, style = 'B')
-# summary(knn_lw)
-```
-
-## Computing Gi statistics
-
-### Jun 2022
-```{r}
-# fips <- order(jakarta$KELURAHAN)
-# gi.adaptive <- localG(jun22_vaccination_rate$`vaccination rate`, knn_lw)
-# jun22_vaccination_rate.gi <- cbind(jun22_vaccination_rate, as.matrix(gi.adaptive)) %>%
-#   rename(gstat_adaptive = as.matrix.gi.adaptive.)
+melawai <- gi_stars %>% 
+  ungroup() %>% 
+  filter(`KELURAHAN` == "MELAWAI") |> 
+  select(`KELURAHAN`, `Date`, gi_star)
 ```
 
 ```{r}
-# vaccination_rate_qtm<- qtm(jun22_vaccination_rate, "vaccination rate")
-# 
-# Gimap <- tm_shape(jun22_vaccination_rate.gi) + 
-#   tm_fill(col = "gstat_adaptive", 
-#           style = "pretty", 
-#           palette="-RdBu", 
-#           title = "local Gi") + 
-#   tm_borders(alpha = 0.5)
-# 
-# tmap_arrange(vaccination_rate_qtm, 
-#              Gimap, 
-#              asp=1, 
-#              ncol=2)
+ggplot(data = melawai, 
+       aes(x = `Date`, 
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
 ```
 
+It, like Pluit, has a overall downward trend but it has a spike in October 2021 before continuing downwards.
+
+```{r}
+melawai %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+```
+
+It too has a p-value lower than 0.05, suggesting the downward trend is significant.
+
+#### Srengseng Sawah
+
+Srengseng Sawah is a village we have mentioned in the [Observations] of cholorpleth maps.
+
+```{r}
+srengseng_sawah <- gi_stars %>% 
+  ungroup() %>% 
+  filter(`KELURAHAN` == "SRENGSENG SAWAH") |> 
+  select(`KELURAHAN`, `Date`, gi_star)
+```
+
+```{r}
+ggplot(data = srengseng_sawah, 
+       aes(x = `Date`, 
+           y = gi_star)) +
+  geom_line() +
+  theme_light()
+```
+
+Unlike the two villages above, there is actually an increase trend.
+
+```{r}
+srengseng_sawah %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>% 
+  tidyr::unnest_wider(mk)
+```
+
+The low p-value also shows that the trend is significant.
+
+### Overall
+
+The trends in majority of the villages are significant, regardless of their directions.
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(`KELURAHAN`) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+nrow(ehsa[ehsa$sl < 0.05,])
+nrow(ehsa[ehsa$sl >= 0.05,])
+```
+
+
+
+# Conclusions
+
+We have looked at the different aspects of Jakarta's vaccination programme. The whole programme followed the 4 phases, which we are observing the last 2 phases. I believe the programme can be said to be very successful. Within the 12 months, we see the increasing vaccination rates, with the worst performing villages reaching around at least 78%. 
+
+The increase in vaccination rates is likely related to the when and where the programme is targeting. Areas more densely populated like north and central Jakarta having hot spots at the earlier months. Whereas areas more inland were focused on more, after populated areas were taken care.
+
+However, the statistics from this dataset might missing a key information. It was said that a substantial number of people who vaccinated [did not carry Jakarta IDs](https://en.antaranews.com/news/183630/15-sub-districts-of-jakarta-achieve-100-vaccinations), especially when Jakarta is the first province to open vaccination up to the general public. The hot spots at south Jakarta might be a result of nearby residents visiting the province for vaccinations, instead of actual local residents.
+
+
+# References
+  Tin Seong, K. (2023a). Local Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap10.html#computing-gi-statistics>
+  Tin Seong, K. (2023b). Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap09.html>
+  Tin Seong, K. (2023c, February 21). *IS415 AY2022-23T2 - Lesson 7: Global and Local Measures of Spatial Association*. <https://is415-ay2022-23t2.netlify.app/lesson/lesson07/lesson07-glsa#/39>
+  
