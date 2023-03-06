@@ -12,7 +12,6 @@ execute:
 editor: visual
 date: "13 February 2023"
 date-modified: "`r Sys.Date()`"
-bibliography: references.bib
 ---
 
 ```{css, echo=FALSE}
@@ -26,22 +25,19 @@ bibliography: references.bib
 }
 ```
 
-# Background
+::: callout-warning
+Only import first or last of the month
 
-This exercise examines the vaccination rates of Jakarta, capital of Indonesia. Within the state, there are 267 subdistricts, which vaccination rates are not same as the others. This exercise benefits from the government of Indonesia releasing the detailed data of their immunisation programme for COVID-19.
+A ***rukun tetangga*** (abbrievated **RT**, literally "pillar of neighbours") is an administrative division of a village in [Indonesia](https://en.wikipedia.org/wiki/Indonesia "Indonesia"), under a [*rukun warga*](https://en.wikipedia.org/wiki/Rukun_warga "Rukun warga"). The RT is the lowest administrative division of Indonesia.
 
-According to a [government website](https://corona.jakarta.go.id/en/artikel/inilah-tahapan-vaksinasi-covid-19-di-jakarta), the whole immunisation programme is conducted in 4 phases, targetting different parts of the population.
+-   use lesson 6
 
--   Phase 1: Health professionals
--   Phase 2: Public servants and elderly
--   Phase 3: General public who are vulnerable to Covid-19 (e.g., living in poverty)
--   Phase 4: Rest of the general public
+-   use hot and cold spots
+:::
 
-Not much information can be found about when each phase started and ended, except that
+![](img/Flag_of_Jakarta_(vectorised).svg.png){fig-align="center"}
 
--   the whole programme started in January 2021 in Indonesia,
--   [Phase 3](https://corona.jakarta.go.id/en/artikel/fakta-penting-vaksinasi-covid-19-untuk-18-tahun-ke-atas) started around June 2021, and
--   [Phase 3 and Phase 4](https://setkab.go.id/en/covid-19-vaccination-program-to-be-carried-out-in-four-phases) were planned to be carried out within April 2021 to March 2022. This period coincides with the period of July 2021 to June 2022 that we are looking into.
+This exercise examines the vaccination rate of Jakarta, capital of Indonesia. Within the state, there are 257 subdistricts, which vaccination rates are not same as the others. This exercise benefits from the government of Indonesia releasing the detailed data of their immunisation programme for COVID-19.
 
 # R Packages
 
@@ -147,7 +143,7 @@ apr2022["Date"] <- as.Date("2022-04-30", format = "%Y-%m-%d")
 head(apr2022, 5)
 ```
 
-### Mei 2022
+### May 2022
 
 ```{r}
 may2022 <- read_excel("data/aspatial/Data Vaksinasi Berbasis Kelurahan (31 Mei 2022).xlsx", sheet = "Data Kelurahan")
@@ -242,7 +238,7 @@ nrow(vaccine_months)
 
 Continuing, we will need to create a column with the vaccination rates of each village in order to map a choropleth map.
 
-Since *"SASARAN"* is the target number of vaccinations provided *and* "BELUM VAKSIN" tells of the number of people not yet vaccinated, we can derive vaccination rates of each month for each village.
+Since *"SASARAN" is the target number of vaccinations provided and* "BELUM VAKSIN" tells of the number of people not yet vaccinated, we can derive vaccination rates of each month for each village.
 
 ```{r}
 vaccine_months["vaccination rate"] <- (vaccine_months["SASARAN"] - vaccine_months["BELUM VAKSIN"])/vaccine_months["SASARAN"] * 100
@@ -301,6 +297,10 @@ Considering that the columns are in Bahasa Indonesia, you may want to check out 
 
 After deriving the vaccination rates, we want to create choropleth maps of the different villages in Jakarta to map out the distribution of the vaccination take-up rate.
 
+::: callout-tip
+Feel free to switch tabs in the following tabset in order to better examine the distribution change over the months.
+:::
+
 Note that Jakarta is actually split into 5 different administrative cities or regions.
 
 -   Jakarta Utara - North Jakarta
@@ -317,10 +317,6 @@ Note that Jakarta is actually split into 5 different administrative cities or re
 tm_shape(jakarta_boundary) +
   tm_polygons("KAB_KOTA")
 ```
-
-::: callout-tip
-Feel free to switch tabs in the following tabset in order to better examine the distribution change over the months.
-:::
 
 ## Entire Province
 
@@ -716,7 +712,7 @@ tm_shape(jun22_vaccination_rate) +
 
 As you observed the changes throughout the 12 months, you will quickly notice vaccination rates started higher in the north and shifted towards the south. It is crucial to note that all kelurahan actually increased in vaccination rates as seen in the legends of the maps. This may suggest the shift in programme's focus as time went on. However, much of the middle region remained having moderate to lower rates throughout the period.
 
-The immunisation programme also seemed to slow down starting from November 2021, with the lowest class increasing by less than 3% compared to more than 8% in the past months. Using quantile, one can too observe that certain kelurahan never left certain classes. Take for example, Srengseng Sawah. In spite of the village being located far south, it has always had one of the highest vaccination rates among all villages.
+The immunisation programme also seemed to slow down starting from November 2021, with the lowest class increasing by less than 3% compared to more than 8% in the past months. Using quantile, one can too observe that certain kelurahan never left certain classes. Take for example, Srengseng Sawah. In spite of the village being located far south, it has always had one of the highest vaccination rates, likely due to the higher number of universities in and surrounding it.
 
 # Local Gi\* Analysis
 
@@ -724,7 +720,7 @@ Here, we are seeking to calculate the Gi\* statistics to find out where the hot 
 
 Using `st_inverse_distance`, as the name suggests, we are attempting to get the inverse distance spatial weights of each kelurahan's neighbour. This is based of the idea that the closer an area is to another, the more influence it asserts on it, hence forming a cluster due each region's significance to one another.
 
-Note: We will be removing any result that is insignificant from the maps (i..e, lower than 0.05).
+Note: We will be removing any result that is insignificant (i..e, lower than 0.05).
 
 ::: panel-tabset
 ## Jul 2021
@@ -1112,17 +1108,13 @@ tm_shape(jun22_HCSA_sig) +
 ```
 :::
 
-## Observations {#observations-1}
+## Observations
 
-The Gi\* maps confirmed our theory on the shifting geographical regions the vaccination programme focused on. Hot spots clustered in the north region of Jakarta in the early months of July and August 2021. But hots spot clusters mainly appear in the south region starting from September of that year.
-
-Similarly, cold spots appear in central Jakarta, the densest region of the capital. It is likely one of the first places that is offered vaccination due to being the administrative center of Indonesia. This means that a big part of the population will be public servants, provided by vaccinations by Phase 2, before June 2021.
-
-The i values in the different regions suggest that vaccination take-up might be closely tie to whether vaccination was more available in a particular region (i.e., more centers/vaccinations were located there) or related to the timing people in a region are offered vaccinations (i.e., regions with more elderly/public servants/healthcare workers were offered vaccinations first).
+The Gi\* maps confirmed our theory on the shifting geographical regions the vaccination programme focused on. Hot spots clustered in the north region of Jakarta in the early months of July and August 2021. But hots spot clusters mainly appear in the south region starting from September of that year. The higher i values in the south at the later months suggest that vaccination take-up might be closely tie to whether vaccination was available in the particular region.
 
 # Emerging Hot Spot Analysis (EHSA)
 
-We can further make use of temporal data in our datasets to allow us to better understand whether hot and cold spot cluster did evolve over time.
+In spite of earliest analysis, our data ultimately provides temporal data to allow us to further understand whether hot and cold spot cluster did evolve over time.
 
 ## **Creating Time Series Cube**
 
@@ -1140,7 +1132,7 @@ is_spacetime_cube(jakarta_st)
 
 ## **Computing Gi\***
 
-Similar to the section on [Local Gi\* Analysis], we want to derive the neighbours and their inverse distance with the subject village.
+Similar to the section on [Local Gi\* Analysis], we want to derive the neighbours and their inverse distance with the subject.
 
 ```{r}
 jakarta_nb <- jakarta_st %>%
@@ -1165,9 +1157,9 @@ gi_stars <- jakarta_nb %>%
   tidyr::unnest(gi_star)
 ```
 
-## Mann-Kendall Test
+## Man-Kendall Test
 
-Finally, we will be conducting the Mann-Kendall test to determine the trend of vaccination rates of a village and if they are significant.
+Finally, we will be conducting the Man-Kendall test to determine the trend of vaccination rates of a village and if they are significant.
 
 ### All Kelurahan
 
@@ -1192,9 +1184,9 @@ ehsa <- emerging_hotspot_analysis(
 
 The chart below shows an interesting hot and cold spots analysis. The highest bar is *oscilating hotspots*. It is defined by its wavering cluster as it has been also a significant cold spot, even though it's a hot spot at the end of observing time period. This might be referring to much of the south and east Jakarta, where it's has been only cold spots at the start.
 
-The second highest being *sporadic coldspots*, where the areas have been on-again and off-again cold spot. These regions may be those villages in the central part of the maps, which has been sidelined by the drastic difference in vaccination rates between the areas further coastal and further inland throughout our examination. This is
+The second highest being *sporadic coldspots*, where the areas have been on-again and off-again cold spot. These regions may be those villages in the central part of the maps, which has been sidelined by the drastic difference in vaccination rates between the areas further coastal and further inland throughout our examination.
 
-The overall chart shows how much the villages have changed in vaccination rates across the months that little selurahan have remained hot or cold spots throughout..
+The overall chart shows how much the villages have in vaccination rates across the months that little selurahan have remained hot or cold spots throughout..
 
 ```{r}
 ggplot(data = ehsa,
@@ -1213,6 +1205,8 @@ jakarta_ehsa <- jakarta_boundary %>%
 head(jakarta_ehsa, 5)
 ```
 
+Unlike as expected, oscilating hotspots are more evenly distributed than first thought of as they are not concentrated in any particular region. However clearly, the south and north regions are less dominated by oscilating hotspots, with especially the south having more sporadic coldspots than others.
+
 ```{r}
 ehsa_sig <- jakarta_ehsa  %>%
   filter(p_value < 0.05)
@@ -1223,15 +1217,31 @@ tm_shape(jakarta_ehsa) +
 tm_shape(ehsa_sig) +
   tm_fill("classification", id="DESA") + 
   tm_borders(alpha = 0.4) +
-  tm_view(set.zoom.limits = c(8,15),
-          set.view = 11) 
+  tm_view(set.zoom.limits = c(5,25),
+          set.view = 9) 
 ```
-
-Unlike as expected, oscilating hotspots are more evenly distributed than first thought of as they are not concentrated in any particular region. However clearly, the south and north regions are less dominated by oscilating hotspots, with especially the south having more sporadic coldspots than others.
 
 ### Kelurahan
 
 We will now more closely examine 3 kelurahan and understand the trends behind them.
+
+The below code chunk shows us using
+
+```{r}
+ehsa <- gi_stars %>%
+  group_by(`KELURAHAN`) %>%
+  summarise(mk = list(
+    unclass(
+      Kendall::MannKendall(gi_star)))) %>%
+  tidyr::unnest_wider(mk)
+```
+
+```{r}
+emerging <- ehsa %>% 
+  arrange(sl, abs(tau)) %>% 
+  slice(1:5)
+emerging
+```
 
 #### Pluit
 
@@ -1264,7 +1274,7 @@ pluit %>%
 
 The p-value or *sl* then indicates that this is a significant trend, implying that time indeed plays a role in influencing the village's vaccination rates.
 
-#### Melawai
+### Melawai
 
 Melawai is a spordiac coldspot, locating in south Jakarta.
 
@@ -1295,9 +1305,9 @@ melawai %>%
 
 It too has a p-value lower than 0.05, suggesting the downward trend is significant.
 
-#### Srengseng Sawah
+### Srengseng Sawah
 
-Srengseng Sawah is a village we have mentioned in the [Observations](#observations-1) of cholorpleth maps.
+Srengseng Sawah is a village we have mentioned in the
 
 ```{r}
 srengseng_sawah <- gi_stars %>% 
@@ -1314,8 +1324,6 @@ ggplot(data = srengseng_sawah,
   theme_light()
 ```
 
-Unlike the two villages above, there is actually an increase trend.
-
 ```{r}
 srengseng_sawah %>%
   summarise(mk = list(
@@ -1323,32 +1331,3 @@ srengseng_sawah %>%
       Kendall::MannKendall(gi_star)))) %>% 
   tidyr::unnest_wider(mk)
 ```
-
-The low p-value also shows that the trend is significant.
-
-### Overall
-
-The trends in majority of the villages are significant, regardless of their directions.
-
-```{r}
-ehsa <- gi_stars %>%
-  group_by(`KELURAHAN`) %>%
-  summarise(mk = list(
-    unclass(
-      Kendall::MannKendall(gi_star)))) %>%
-  tidyr::unnest_wider(mk)
-nrow(ehsa[ehsa$sl < 0.05,])
-nrow(ehsa[ehsa$sl >= 0.05,])
-```
-
-# Conclusions
-
-We have looked at the different aspects of Jakarta's vaccination programme. The whole programme followed the 4 phases, which we are observing the last 2 phases. I believe the programme can be said to be very successful. Within the 12 months, we see the increasing vaccination rates, with the worst performing villages reaching around at least 78%.
-
-The increase in vaccination rates is likely related to the when and where the programme is targeting. Areas more densely populated like north and central Jakarta having hot spots at the earlier months. Whereas areas more inland were focused on more, after populated areas were taken care.
-
-However, the statistics from this dataset might missing a key information. It was said that a substantial number of people who vaccinated [did not carry Jakarta IDs](https://en.antaranews.com/news/183630/15-sub-districts-of-jakarta-achieve-100-vaccinations), especially when Jakarta is the first province to open vaccination up to the general public. The hot spots at south Jakarta might be a result of nearby residents visiting the province for vaccinations, instead of actual local residents.
-
-# References
-
-Tin Seong, K. (2023a). Local Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap10.html#computing-gi-statistics> Tin Seong, K. (2023b). Measures of Spatial Autocorrelation. In *R for Geospatial Data Science and Analytics*. <https://r4gdsa.netlify.app/chap09.html> Tin Seong, K. (2023c, February 21). *IS415 AY2022-23T2 - Lesson 7: Global and Local Measures of Spatial Association*. <https://is415-ay2022-23t2.netlify.app/lesson/lesson07/lesson07-glsa#/39>

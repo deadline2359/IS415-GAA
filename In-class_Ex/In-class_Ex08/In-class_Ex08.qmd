@@ -1,0 +1,139 @@
+---
+title: "In-class Exercise 8"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "6 March 2023"
+date-modified: "`r Sys.Date()`"
+---
+
+# Install R Packages
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, getsummary)
+```
+
+# Import
+
+## Geospatial Data
+
+::: panel-tabset
+## Importing
+
+```{r}
+mpsz = st_read(dsn = "data/geospatial",
+               layer = "MP14_SUBZONE_WEB_PL") %>% 
+  st_transform(crs = 3414)
+```
+
+## Data
+
+```{r}
+head(mpsz)
+```
+:::
+
+## Aspatial Data
+
+::: panel-tabset
+## Importing
+
+```{r}
+condo_resale = read_csv("data/aspatial/Condo_resale_2015.csv")
+```
+
+## Data
+
+```{r}
+head(condo_resale)
+```
+
+### Data Structure
+
+```{r}
+glimpse(condo_resale)
+```
+
+### Longitude
+
+```{r}
+head(condo_resale$LONGITUDE)
+```
+
+### Latitude
+
+```{r}
+head(condo_resale$LATITUDE)
+```
+
+### Summary
+
+```{r}
+summary(condo_resale)
+```
+:::
+
+::: callout-warning
+### Check the summary...
+
+If a column has too many zeros or has the same statistics throughout the measurements, the column may not be suitable for using.
+:::
+
+### Converting Aspatial DataFrame into a sf object
+
+::: panel-tabset
+## Code
+
+```{r}
+condo_resale.sf <- st_as_sf(condo_resale,
+                            coords = c("LONGITUDE", "LATITUDE"),
+                            crs=4326) %>%
+  st_transform(crs=3414)
+```
+
+## Data
+
+```{r}
+head(condo_resale.sf)
+```
+:::
+
+# Exploratory Data Analysis (EDA)
+
+## EDA using statistical graphics
+
+The below code chunk plots the distribution of the selling price.
+
+```{r}
+ggplot(data=condo_resale.sf, aes(x=`SELLING_PRICE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+The figure above tells us that selling price is skewed right. This means that more condominiums are transacted at a [**relatively lower price**]{.underline}.
+
+Moving on, we can normalised the skewed distribution using log transformation.
+
+Below shows us deriving a new variable called "LOG_SELLING_PRICE" by using a log transformation on the variable "SELLING_PRICE*"*. It is performed using `mutate()` of **dplyr** package.
+
+```{r}
+condo_resale.sf <- condo_resale.sf %>%
+  mutate(`LOG_SELLING_PRICE` = log(SELLING_PRICE))
+```
+
+We will now plot the new column.
+
+```{r}
+ggplot(data=condo_resale.sf, aes(x=`LOG_SELLING_PRICE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+```
+
+The distribution is definitely less skewed now.
+
+## Multiple Histogram Plots distribution of variables
