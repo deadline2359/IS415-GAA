@@ -17,7 +17,7 @@ date-modified: "`r Sys.Date()`"
 # Install R Packages
 
 ```{r}
-pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, getsummary)
+pacman::p_load(olsrr, corrplot, ggpubr, sf, spdep, GWmodel, tmap, tidyverse, gtsummary)
 ```
 
 # Import
@@ -28,7 +28,7 @@ pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, getsummary)
 ## Importing
 
 ```{r}
-mpsz = st_read(dsn = "data/geospatial",
+mpsz_svy21 = st_read(dsn = "data/geospatial",
                layer = "MP14_SUBZONE_WEB_PL") %>% 
   st_transform(crs = 3414)
 ```
@@ -36,7 +36,7 @@ mpsz = st_read(dsn = "data/geospatial",
 ## Data
 
 ```{r}
-head(mpsz)
+head(mpsz_svy21)
 ```
 :::
 
@@ -58,7 +58,7 @@ head(condo_resale)
 ### Data Structure
 
 ```{r}
-glimpse(condo_resale)
+dplyr::glimpse(condo_resale)
 ```
 
 ### Longitude
@@ -124,7 +124,7 @@ Below shows us deriving a new variable called "LOG_SELLING_PRICE" by using a log
 
 ```{r}
 condo_resale.sf <- condo_resale.sf %>%
-  mutate(`LOG_SELLING_PRICE` = log(SELLING_PRICE))
+  dplyr::mutate(`LOG_SELLING_PRICE` = log(SELLING_PRICE))
 ```
 
 We will now plot the new column.
@@ -136,4 +136,234 @@ ggplot(data=condo_resale.sf, aes(x=`LOG_SELLING_PRICE`)) +
 
 The distribution is definitely less skewed now.
 
-## Multiple Histogram Plots distribution of variables
+## Multiple Histogram Plots Distribution of Variables
+
+Using `ggarrange()` of [**ggpubr**](https://cran.r-project.org/web/packages/ggpubr/) package, we can draw multiple histograms.
+
+```{r}
+AREA_SQM <- ggplot(data=condo_resale.sf, aes(x= `AREA_SQM`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+AGE <- ggplot(data=condo_resale.sf, aes(x= `AGE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_CBD <- ggplot(data=condo_resale.sf, aes(x= `PROX_CBD`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_CHILDCARE <- ggplot(data=condo_resale.sf, aes(x= `PROX_CHILDCARE`)) + 
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_ELDERLYCARE <- ggplot(data=condo_resale.sf, aes(x= `PROX_ELDERLYCARE`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_URA_GROWTH_AREA <- ggplot(data=condo_resale.sf, 
+                               aes(x= `PROX_URA_GROWTH_AREA`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_HAWKER_MARKET <- ggplot(data=condo_resale.sf, aes(x= `PROX_HAWKER_MARKET`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_KINDERGARTEN <- ggplot(data=condo_resale.sf, aes(x= `PROX_KINDERGARTEN`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_MRT <- ggplot(data=condo_resale.sf, aes(x= `PROX_MRT`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_PARK <- ggplot(data=condo_resale.sf, aes(x= `PROX_PARK`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_PRIMARY_SCH <- ggplot(data=condo_resale.sf, aes(x= `PROX_PRIMARY_SCH`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+PROX_TOP_PRIMARY_SCH <- ggplot(data=condo_resale.sf, 
+                               aes(x= `PROX_TOP_PRIMARY_SCH`)) +
+  geom_histogram(bins=20, color="black", fill="light blue")
+
+ggpubr::ggarrange(AREA_SQM, AGE, PROX_CBD, PROX_CHILDCARE, PROX_ELDERLYCARE, 
+          PROX_URA_GROWTH_AREA, PROX_HAWKER_MARKET, PROX_KINDERGARTEN, PROX_MRT,
+          PROX_PARK, PROX_PRIMARY_SCH, PROX_TOP_PRIMARY_SCH,  
+          ncol = 3, nrow = 4)
+```
+
+## Drawing Statistical Point Map
+
+Lastly, we want to reveal the geospatial distribution condominium resale prices in Singapore. The map will be prepared by using tmap package.
+
+```{r}
+tmap_mode("view")
+tmap_options(check.and.fix = TRUE)
+tm_shape(mpsz_svy21)+
+  tm_polygons() +
+tm_shape(condo_resale.sf) +  
+  tm_dots(col = "SELLING_PRICE",
+          alpha = 0.6,
+          style="quantile") +
+  tm_view(set.zoom.limits = c(11,14))
+tmap_mode("plot")
+```
+
+# Hedonic Pricing Modelling in R
+
+Here, we will be building hedonic pricing models for condominium resale units using `lm()` of R base.
+
+## Simple Linear Regression Method
+
+First, a simple linear regression model will be built by using *SELLING_PRICE* as the dependent variable and *AREA_SQM* as the independent variable.
+
+```{r}
+condo.slr <- lm(formula=SELLING_PRICE ~ AREA_SQM, data = condo_resale.sf)
+```
+
+`lm()` returns an object of class "lm" or for multiple responses of class c("mlm", "lm").
+
+The functions `summary()` and `anova()` can be used to obtain and print a summary and analysis of variance table of the results. The generic accessor functions coefficients, effects, fitted.values and residuals extract various useful features of the value returned by lm.
+
+```{r}
+summary(condo.slr)
+```
+
+The output report reveals that the SELLING_PRICE can be explained by using the formula:
+
+      *y = -258121.1 + 14719x1*
+      
+
+The R-squared of 0.4518 reveals that the simple regression model built is able to explain about 45% of the resale prices.
+
+Since p-value is much smaller than 0.0001, we will *reject* the null hypothesis that mean is a good estimator of SELLING_PRICE. This will allow us to infer that *simple linear regression model above is a good estimator of SELLING_PRICE*.
+
+The Coefficients: section of the report reveals that the p-values of both the estimates of the Intercept and ARA_SQM are smaller than 0.001. In view of this, the null hypothesis of the B0 and B1 are equal to 0 will be rejected. As a results, we will be able to infer that the B0 and B1 are good parameter estimates.
+
+To visualise the best fit curve on a scatterplot, `lm()` can be incorporated as a method function in ggplot's geometry as shown in the code chunk below.
+
+```{r}
+ggplot(data=condo_resale.sf,  
+       aes(x=`AREA_SQM`, y=`SELLING_PRICE`)) +
+  geom_point() +
+  geom_smooth(method = lm)
+```
+
+Figure above reveals that there are a few statistical outliers with relatively high selling prices.
+
+## Multiple Linear Regression Method
+
+### Visualising the relationships of the independent variables
+
+::: callout-warning
+Before building a multiple regression model, *make sure that the independent variables used are not highly correlated* to each other.
+
+If these highly correlated independent variables are used in building a regression model by mistake, the quality of the model will be compromised. This phenomenon is known as *multicollinearity* in statistics.
+:::
+
+Correlation matrix is commonly used to visualise the relationships between the independent variables.In this section, the *corrplot* package will be used. Beside the `pairs()` of R, there are many packages support the display of a correlation matrix.
+
+The code chunk below is used to plot a scatterplot matrix of the relationship between the independent variables in condo_resale data.frame.
+
+```{r}
+corrplot(cor(condo_resale[, 5:23]), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+```
+
+***Matrix reorder*** is very important for mining the hidden structure and patter in the matrix.
+
+There are four methods in corrplot (parameter order), named "AOE", "FPC", "hclust", "alphabet".
+
+In the code chunk above, AOE order is used. It orders the variables by using the angular order of the eigenvectors method suggested by Michael Friendly.
+
+From the scatterplot matrix, it is clear that **Freehold is highly correlated to LEASE_99YEAR**. In view of this, it is wise to **only include either one** of them in the subsequent model building. As a result, LEASE_99YEAR is excluded in the subsequent model building.
+
+## Building Hedonic Prici ng Model using Multiple Linear Regression method
+
+The code chunk below using `lm()` to calibrate the multiple linear regression model.
+
+```{r}
+condo.mlr <- lm(formula = SELLING_PRICE ~ AREA_SQM + AGE    + 
+                  PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                  PROX_URA_GROWTH_AREA + PROX_HAWKER_MARKET + PROX_KINDERGARTEN + 
+                  PROX_MRT  + PROX_PARK + PROX_PRIMARY_SCH + 
+                  PROX_TOP_PRIMARY_SCH + PROX_SHOPPING_MALL + PROX_SUPERMARKET + 
+                  PROX_BUS_STOP + NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD, 
+                data=condo_resale.sf)
+summary(condo.mlr)
+```
+
+## Preparing Publication Quality Table: olsrr method
+
+With reference to the report above, it is clear that **not all the independent variables are statistically significant**. The model will be revised by removing those variables which are not statistically significant.
+
+Now, the revised model will be ready for calibration using the code chunk below.
+
+```{r}
+condo.mlr1 <- lm(formula = SELLING_PRICE ~ AREA_SQM + AGE + 
+                   PROX_CBD + PROX_CHILDCARE + PROX_ELDERLYCARE +
+                   PROX_URA_GROWTH_AREA + PROX_MRT  + PROX_PARK + 
+                   PROX_PRIMARY_SCH + PROX_SHOPPING_MALL    + PROX_BUS_STOP + 
+                   NO_Of_UNITS + FAMILY_FRIENDLY + FREEHOLD,
+                 data=condo_resale.sf)
+ols_regress(condo.mlr1)
+```
+
+## Preparing Publication Quality Table: gtsummary method
+
+The [**gtsummary**](https://www.danieldsjoberg.com/gtsummary/) package provides an elegant and flexible way to create publication-ready summary tables in R.
+
+In the code chunk below, [`tbl_regression()`](https://www.danieldsjoberg.com/gtsummary/reference/tbl_regression.html) is used to create a well formatted regression report.
+
+```{r}
+tbl_regression(condo.mlr1, intercept = TRUE)
+```
+
+With **gtsummary** package, model statistics can be included in the report by either appending them to the report table by using [`add_glance_table()`](https://www.danieldsjoberg.com/gtsummary/reference/add_glance.html) or adding as a table source note by using [`add_glance_source_note()`](https://www.danieldsjoberg.com/gtsummary/reference/add_glance.html) as shown in the code chunk below.
+
+```{r}
+tbl_regression(condo.mlr1, 
+               intercept = TRUE) %>% 
+  add_glance_source_note(
+    label = list(sigma ~ "\U03C3"),
+    include = c(r.squared, adj.r.squared, 
+                AIC, statistic,
+                p.value, sigma))
+```
+
+### Checking for Multicolinearity
+
+In this section, a fantastic R package specially programmed for performing OLS regression can be used. It is called [**olsrr**](https://olsrr.rsquaredacademy.com/). It provides a collection of very useful methods for building better multiple linear regression models:
+
+-   comprehensive regression output
+
+-   residual diagnostics
+
+-   measures of influence
+
+-   heteroskedasticity tests
+
+-   collinearity diagnostics
+
+-   model fit assessment
+
+-   variable contribution assessment
+
+-   variable selection procedures
+
+In the code chunk below, the [`ols_vif_tol()`](https://olsrr.rsquaredacademy.com/reference/ols_coll_diag.html) of **olsrr** package is used to test if there are sign of multicollinearity.
+
+```{r}
+ols_vif_tol(condo.mlr1)
+```
+
+Since the VIF of the independent variables are **less than 10**, it can safely conclude that there are no sign of multicollinearity among the independent variables.
+
+### Test for Non-Linearity
+
+In multiple linear regression, it is important to test the assumption that linearity and additivity of the relationship between dependent and independent variables.
+
+In the code chunk below, the [`ols_plot_resid_fit()`](https://olsrr.rsquaredacademy.com/reference/ols_plot_resid_fit.html) of **olsrr** package is used to perform linearity assumption test.
+
+```{r}
+ols_plot_resid_fit(condo.mlr1)
+```
+
+The figure above reveals that most of the data poitns are scattered around the 0 line, hence we can safely conclude that the relationships between the dependent variable and independent variables are linear.
+
+#### 13.8.5.3 Test for Normality Assumption
+
+Lastly, the code chunk below uses [`ols_plot_resid_hist()`](https://olsrr.rsquaredacademy.com/reference/ols_plot_resid_hist.html) of *olsrr* package to perform normality assumption test.
