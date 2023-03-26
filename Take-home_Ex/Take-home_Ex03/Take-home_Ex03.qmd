@@ -256,9 +256,7 @@ supermarkets_sf <- st_read(dsn="data/geospatial/supermarkets", layer="SUPERMARKE
 ### Aspatial Data
 
 ::: panel-tabset
-#### Primary Schools and Ranking
-
-there are 181 schools so when merged, some rows disappeared
+#### Primary Schools
 
 ```{r}
 primarySch <- fromJSON("data/geospatial/primaryschools/primaryschools.json")[["SearchResults"]][-1,c(2:5, 7, 13:14)]
@@ -394,31 +392,33 @@ primarySch_ranking_sf <- st_as_sf(primarySch_ranking_df) %>% st_transform(crs = 
 ```
 
 ## Masterplan Subzone 2019
-::: panel-tabset
 
 Looking at the subzone dataset, it seems that there are invalid geometries in it.
 
 ```{r}
 length(which(st_is_valid(subzone_sf) == FALSE))
 ```
-
+Thus, we will be using `st_make_valid()` to correct them.
 ```{r}
 subzone_sf <- st_make_valid(subzone_sf)
 length(which(st_is_valid(subzone_sf) == FALSE))
 ```
-:::
+
 
 ## MRT
+
+Similarly for MRT, there are invalid geometries as well.
 
 ```{r}
 length(which(st_is_valid(mrt_sf) == FALSE))
 ```
 
+
 ```{r}
 mrt_sf[st_is_valid(mrt_sf) == FALSE,]
 ```
 
-cannot fix using st_make_valid so
+However, some geometries have less than 4 polygons, which `st_make_valid()` does not resolve. Thus we will be excluding them from our exercise. 
 
 ```{r}
 mrt_sf <- mrt_sf[st_is_valid(mrt_sf) == TRUE,]
@@ -426,7 +426,9 @@ mrt_sf <- mrt_sf[!st_is_empty(mrt_sf),,drop=FALSE]
 length(which(st_is_valid(mrt_sf) == FALSE))
 ```
 
-## Get Coordinates for HDB
+## HDB
+
+The sf DataFrame we are acquired from Data.gov.sg does not have any geospatial data. But it has the block and streetname that we can derived the data from, through OpenMapSG API.
 
 ```{r}
 library(httr)
@@ -449,6 +451,10 @@ geocode <- function(block, streetname="") {
 }
 ```
 
+:::{.panel-tabset}
+
+### Get Coordinates
+
 ```{r eval=FALSE}
 resale_prices_total$LATITUDE <- 0
 resale_prices_total$LONGITUDE <- 0
@@ -461,18 +467,30 @@ for (i in 1:nrow(resale_prices_total)){
 }
 ```
 
+### Write to SHP
+
 ```{r eval=FALSE}
 resale_prices_sf <- st_as_sf(resale_prices_total, coords=c("LONGITUDE", "LATITUDE"), crs=4326)
 st_write(resale_prices_sf, "data/geospatial/resale_prices/resale_prices.shp")
 ```
 
+### Read SHP
+
 ```{r}
 resale_prices_sf <- st_read(dsn="data/geospatial/resale_prices", layer="resale_prices") %>% st_transform(crs = 3414)
 ```
 
+:::
+
 ### Merge with HDB Status
 
-#### HIP
+We also have data on the upgrades done on these buildings. It will be good to separate the both two types of upgrades.
+
+Note that MUP is actually then the precessor of HIP before 2007. Differentiating the upgrades then ables us to see if the timing of upgrades has an impact on the resell prices.
+
+#### Home Improvement Programme (HIP)
+
+HIP is described as HDB's programme to "resolve common maintenance problems of ageing flats".
 
 ```{r}
 hdb_hip <- hdb_upgrades %>% filter(TYPE == "HIP")
@@ -483,7 +501,9 @@ colnames(hdb_hip)[3] ="HIP"
 resale_prices_upgrade_sf <- merge(resale_prices_sf, hdb_hip, by.x=c("block", "strt_nm"), by.y=c("BLK", "STREET"), all.x = TRUE)
 ```
 
-#### MUP
+#### Main Upgrading Programme (MUP)
+
+Before 2007, MUP was dedicated to do the same things.
 
 ```{r}
 hdb_mup <- hdb_upgrades %>% filter(TYPE == "MUP")
@@ -495,6 +515,12 @@ resale_prices_upgrade_sf <- merge(resale_prices_upgrade_sf, hdb_mup, by.x=c("blo
 ```
 
 ## Malls
+
+Finally, we have the mall's data from Wikipedia. Similar to the HDB flats, we don't have geospatial data. But thankfully, we can do the same thing using OneMapSG to get the coordinates.
+
+::: {.panel-tabset}
+
+### Get Coordinates
 
 ```{r eval=FALSE}
 malls$LATITUDE <- 0
@@ -508,24 +534,38 @@ for (i in 1:nrow(malls)){
 }
 ```
 
+### Write to SHP
+
 ```{r eval=FALSE}
 malls_sf <- st_as_sf(malls, coords=c("LONGITUDE", "LATITUDE"), crs=4326)
 st_write(malls_sf, "data/geospatial/malls/malls.shp")
 ```
 
+### Read SHP
+
 ```{r}
 malls_sf <- st_read(dsn="data/geospatial/malls", layer="malls") %>% st_transform(crs = 3414)
 ```
+:::
 
-## Top 20 Primary Schools
+## Top Primary Schools
+
+It is difficult to really determine what is the appropriate number of top schools to filter for, since schools can very much have their own specialties and histories (like alumni communities) that can affect the data, outside of the ones used by the website we scrapped the ranking data from.
+
+Hence top 20 is admittedly derived after I looked through the dataset and judged that the top 20 schools are really known to be some of the best primary schools, which sentiments I believe will be similar among the general Singapore population.
 
 ```{r}
 top_primarySch_ranking_sf <- primarySch_ranking_sf %>% filter(rank <= 20)
 ```
 
-# Acquire Proximity
 
-Function to acquire proximity
+# Proximity
+
+There are two parts to proximity. One being the distance from specific locations and another being the number of such locations within its proximity.
+
+## Proximity - Distance 
+
+Below is the function that enables us to attain the distance between a HDB apartment and specific facilities.
 
 ```{r eval=FALSE}
 proximity_calculator <- function(original_sf, derived_sf, column_name) {
@@ -551,7 +591,9 @@ resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, d
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = top_primarySch_ranking_sf, column_name = "PROX_TOPSCH")
 ```
 
-## Within radius
+## Proximity - Number
+
+Below is then the function that enables us to attain the number of such facilities within specific distances of a HDB apartment.
 
 ```{r eval=FALSE}
 library(units)
@@ -572,15 +614,30 @@ resale_proximity_sf <- radius_calculator(resale_proximity_sf, primarySch_ranking
 resale_proximity_sf <- radius_calculator(resale_proximity_sf, top_primarySch_ranking_sf, "NUM_TOPSCH", 1000)
 ```
 
+## Save to SHP
+
+::: {.panel-tabset}
+
+### Save to SHP
 ```{r eval=FALSE}
 st_write(resale_proximity_sf, "data/geospatial/resale_proximity/resale_proximity.shp")
 ```
+
+### Read SHP
 
 ```{r}
 resale_proximity_sf <- st_read(dsn="data/geospatial/resale_proximity", layer="resale_proximity")
 ```
 
-# Get Proximity Locational Factors
+:::
+
+# Encoding Data
+
+To perform machine learning techniques in many circumstances requires us to encode the data so that the algorithms can understand and process the data for predictions.
+
+In the below tabs, they represent the columns that have data in non-numeric datatypes.
+
+::: {.panel-tabset}
 
 ## Floor Level
 
@@ -645,6 +702,8 @@ resale_upgrade_loc_sf <- resale_age_loc_sf
 resale_upgrade_loc_sf$HIP <- ifelse(is.na(resale_upgrade_loc_sf$HIP), 0, 1)
 resale_upgrade_loc_sf$MUP <- ifelse(is.na(resale_upgrade_loc_sf$MUP), 0, 1)
 ```
+
+:::
 
 ```{r eval=FALSE}
 st_write(resale_remaining_lease_loc_sf, "data/geospatial/resale_upgrade_loc_sf/resale_upgrade_loc_sf.shp")
