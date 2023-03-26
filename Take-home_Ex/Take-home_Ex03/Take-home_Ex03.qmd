@@ -41,18 +41,20 @@ In spite of the ever increasing resale prices, [increasing 8.7% YoY](https://www
 
 With how expensive these apartments are, you better bet that people will be choosing where to place their money more carefully.
 
+With 3-room flats having a more diverse demographics of buyers, I would like to focus on this particular flat type in this exercise.
+
 # Import Packages
 
 Below the packages that we will be using in this exercise:
 
 ```{r}
-pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, SpatialML, tidymodels, jsonlite, readxl, Rfast, corrplot, gtsummary, spdep, Metrics) 
+pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, SpatialML, tidymodels, jsonlite, readxl, Rfast, corrplot, gtsummary, spdep, Metrics, ggplot) 
 ```
 
 # Import Data
 
 | Dataset                          | Source                                                                                       |
-|------------------------|------------------------------------------------|
+|-------------------------|------------------------------------------------|
 | HDB Resale Flat Prices           | [Data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices)                                |
 | Masterplan 2019 Subzone Boundary | Professor Kam Tin Seong                                                                      |
 | Hawker Centres                   | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
@@ -374,10 +376,10 @@ schools
 
 So... we need to look through all the current situations of all 6 schools and determine, which one is the one in OneMapSG's geospatial data.
 
-- **Pioneer Primary School** merged in **Juying Primary School** in 2021. In addition, the merged school is moving to a new location in 2026, hence not opening from its Primary 1 Registration from 2021 to 2024
-- **Stamford Primary School** has merged with Farrer Park Primary School in 2023.
-- **Eunos Primary School** has merged with Telok Kurau Primary School.
-- **Guangyang Primary School** has merged with Townsville Primary School.
+-   **Pioneer Primary School** merged in **Juying Primary School** in 2021. In addition, the merged school is moving to a new location in 2026, hence not opening from its Primary 1 Registration from 2021 to 2024
+-   **Stamford Primary School** has merged with Farrer Park Primary School in 2023.
+-   **Eunos Primary School** has merged with Telok Kurau Primary School.
+-   **Guangyang Primary School** has merged with Townsville Primary School.
 
 With that, **Angsana Primary School** is the row that has its postal code different.
 
@@ -398,12 +400,13 @@ Looking at the subzone dataset, it seems that there are invalid geometries in it
 ```{r}
 length(which(st_is_valid(subzone_sf) == FALSE))
 ```
+
 Thus, we will be using `st_make_valid()` to correct them.
+
 ```{r}
 subzone_sf <- st_make_valid(subzone_sf)
 length(which(st_is_valid(subzone_sf) == FALSE))
 ```
-
 
 ## MRT
 
@@ -413,12 +416,11 @@ Similarly for MRT, there are invalid geometries as well.
 length(which(st_is_valid(mrt_sf) == FALSE))
 ```
 
-
 ```{r}
 mrt_sf[st_is_valid(mrt_sf) == FALSE,]
 ```
 
-However, some geometries have less than 4 polygons, which `st_make_valid()` does not resolve. Thus we will be excluding them from our exercise. 
+However, some geometries have less than 4 polygons, which `st_make_valid()` does not resolve. Thus we will be excluding them from our exercise.
 
 ```{r}
 mrt_sf <- mrt_sf[st_is_valid(mrt_sf) == TRUE,]
@@ -451,8 +453,7 @@ geocode <- function(block, streetname="") {
 }
 ```
 
-:::{.panel-tabset}
-
+::: panel-tabset
 ### Get Coordinates
 
 ```{r eval=FALSE}
@@ -479,7 +480,6 @@ st_write(resale_prices_sf, "data/geospatial/resale_prices/resale_prices.shp")
 ```{r}
 resale_prices_sf <- st_read(dsn="data/geospatial/resale_prices", layer="resale_prices") %>% st_transform(crs = 3414)
 ```
-
 :::
 
 ### Merge with HDB Status
@@ -518,8 +518,7 @@ resale_prices_upgrade_sf <- merge(resale_prices_upgrade_sf, hdb_mup, by.x=c("blo
 
 Finally, we have the mall's data from Wikipedia. Similar to the HDB flats, we don't have geospatial data. But thankfully, we can do the same thing using OneMapSG to get the coordinates.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ### Get Coordinates
 
 ```{r eval=FALSE}
@@ -558,12 +557,11 @@ Hence top 20 is admittedly derived after I looked through the dataset and judged
 top_primarySch_ranking_sf <- primarySch_ranking_sf %>% filter(rank <= 20)
 ```
 
-
 # Proximity
 
 There are two parts to proximity. One being the distance from specific locations and another being the number of such locations within its proximity.
 
-## Proximity - Distance 
+## Proximity - Distance
 
 Below is the function that enables us to attain the distance between a HDB apartment and specific facilities.
 
@@ -580,7 +578,7 @@ resale_proximity_sf <- resale_prices_upgrade_sf
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = cbd_sf, column_name = "PROX_CBD")
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = hawkercentre_sf, column_name="PROX_HAWKER")
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = eldercare_sf, column_name = "PROX_ELDERCARE")
-proximity_calculator(original_sf = resale_proximity_sf, derived_sf = parks_sf, column_name="PROX_PARK")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = parks_sf, column_name="PROX_PARK")
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = kindergartens_sf, column_name = "PROX_KINDERGARTEN")
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = childcare_sf, column_name = "PROX_CHILDCARE")
 resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = busstop_sf, column_name = "PROX_BUSSTOP")
@@ -616,9 +614,9 @@ resale_proximity_sf <- radius_calculator(resale_proximity_sf, top_primarySch_ran
 
 ## Save to SHP
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ### Save to SHP
+
 ```{r eval=FALSE}
 st_write(resale_proximity_sf, "data/geospatial/resale_proximity/resale_proximity.shp")
 ```
@@ -628,7 +626,6 @@ st_write(resale_proximity_sf, "data/geospatial/resale_proximity/resale_proximity
 ```{r}
 resale_proximity_sf <- st_read(dsn="data/geospatial/resale_proximity", layer="resale_proximity")
 ```
-
 :::
 
 # Encoding Data
@@ -637,8 +634,7 @@ To perform machine learning techniques in many circumstances requires us to enco
 
 In the below tabs, they represent the columns that have data in non-numeric datatypes.
 
-::: {.panel-tabset}
-
+::: panel-tabset
 ## Floor Level
 
 ```{r}
@@ -694,6 +690,9 @@ resale_age_loc_sf <- resale_remaining_lease_loc_sf
 
 ## Upgrades
 
+::: panel-tab
+### Encoding
+
 ```{r}
 resale_upgrade_loc_sf <- resale_age_loc_sf
 ```
@@ -703,15 +702,18 @@ resale_upgrade_loc_sf$HIP <- ifelse(is.na(resale_upgrade_loc_sf$HIP), 0, 1)
 resale_upgrade_loc_sf$MUP <- ifelse(is.na(resale_upgrade_loc_sf$MUP), 0, 1)
 ```
 
-:::
+### Write to SHP
 
 ```{r eval=FALSE}
 st_write(resale_remaining_lease_loc_sf, "data/geospatial/resale_upgrade_loc_sf/resale_upgrade_loc_sf.shp")
 ```
 
+### Read SHP
+
 ```{r}
 resale_proximity_sf <- st_read(dsn="data/geospatial/resale_upgrade_loc_sf", layer="resale_upgrade_loc_sf")
 ```
+:::
 
 ## HDB Types
 
@@ -725,7 +727,10 @@ resale_type_loc_sf <- resale_upgrade_loc_sf %>% filter(resale_upgrade_loc_sf$flt
 resale_type_loc_sf
 ```
 
-## save
+## Save to RDS
+
+::: panel-tabset
+### Rename Columns
 
 ```{r}
 final_resale_prices <- resale_type_loc_sf
@@ -756,284 +761,71 @@ final_resale_prices <- final_resale_prices %>%
 names(final_resale_prices)
 ```
 
+### Write to RDS
+
 ```{r eval=FALSE}
 write_rds(final_resale_prices, "data/model/final_resale_prices.rds")
 ```
 
+### Read RDS
+
 ```{r}
 final_resale_prices <- read_rds("data/model/final_resale_prices.rds")
 ```
+:::
 
-# Exploratory Data Analysis
+:::
+
+# Exploratory Data Analysis (EDA)
+
+Here, we want to view and understand the data as it is before proceeding with modelling.
+
+::: callout-note
+The data below used are for those transactions within January 2021 to February 2023, and for only 3-room apartment.
+:::
 
 ## Statistical Graphics
 
-### Central Business District
-
-::: panel-tabset
-#### Map
+## Distribution of Resale Prices
 
 ```{r}
-tm_shape(cbd_sf) +
-  tm_fill("SUBZONE_N") +
-  tm_borders(alpha = 0.5) +
-  tm_layout(main.title = "Central Business District Map",
-            main.title.size = 1.10,
-            main.title.position = "center",
-            legend.outside = TRUE,
-            legend.outside.position = "left")
+library(patchwork)
+price_3rm <- ggplot(data=final_resale_prices, aes(x=`resale_price`)) +
+  geom_histogram(bins=20, color="black", fill="orange")
+
+price_all <- ggplot(data=resale_prices_sf, aes(x=`rsl_prc`)) +
+  geom_histogram(bins=20, color="black", fill="lightblue")
+
+price_3rm + price_all
 ```
 
-#### Data
+We can see that 3-room HDB flats lean to the right, like all flats. But noticeably, the prices are definitely lower than other sorts of flats, usually with more actual rooms.
+
+## Distribution of Resale Prices
+
+Looks like 4-room apartments have the most transactions. Whereas 5-room and 3-room flats come second and third respectively. There could be more interest in these sort of flats, but can also be due to most flats are 3 to 5 room flats, which limits options available.
 
 ```{r}
-head(cbd_sf, 5)
-```
-:::
-
-### Hawker Centres
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(hawkercentre_sf) + 
-  tm_dots(size = 0.15,
-          shape = 22,
-          col = "#4287f5") +
-  tm_layout(main.title = "Supermarkets",
-            main.title.size = 1.10,
-            main.title.position = "center",)
+ggplot(resale_prices_sf, aes(flt_typ)) +
+  geom_bar(fill="orange")
 ```
 
-#### Data
 
-```{r}
-head(hawkercentre_sf, 5)
-```
-:::
+# Preparation for Modelling
 
-### Eldercare Centres
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(eldercare_sf) + 
-  tm_dots(size = 0.15,
-          shape = 24,
-          col = "#fcba03") +
-  tm_layout(main.title = "Eldercare Centres",
-            main.title.size = 1.10,
-            main.title.position = "center",)
-```
-
-#### Data
-
-```{r}
-head(eldercare_sf, 5)
-```
-:::
-
-### Parks
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(parks_sf) + 
-  tm_dots(size = 0.15,
-          shape = 23,
-          col = "#32a852") +
-  tm_layout(main.title = "Parks",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(eldercare_sf, 5)
-```
-:::
-
-### Kindergartens
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(kindergartens_sf) + 
-  tm_dots(size = 0.15,
-          shape = 21,
-          col = "#DE60B5") +
-  tm_layout(main.title = "Kindergartens",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(kindergartens_sf, 5)
-```
-:::
-
-### Childcare Centres
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(childcare_sf) + 
-  tm_dots(size = 0.15,
-          shape = 25,
-          col = "#AB66C6") +
-  tm_layout(main.title = "Childcare Centres",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(childcare_sf, 5)
-```
-:::
-
-### Bus Stops
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(busstop_sf) + 
-  tm_dots(size = 0.15,
-          shape = 21,
-          col = "#CABE3E") +
-  tm_layout(main.title = "Bus Stops",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(busstop_sf, 5)
-```
-:::
-
-### MRT Stations
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(mrt_sf) + 
-  tm_dots(size = 0.15,
-          shape = 22,
-          col = "#FE9C1D") +
-  tm_layout(main.title = "MRT Stations",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(mrt_sf, 5)
-```
-:::
-
-### Primary Schools
-
-::: panel-tabset
-#### Map
-
-```{r echo=FALSE}
-primarySch_ranking_sf <- st_as_sf(primarySch_ranking_sf)
-```
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(primarySch_ranking_sf) + 
-  tm_dots(size = 0.15,
-          shape = 23,
-          col = "#BFBD9C") +
-  tm_layout(main.title = "Primary Schools",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(primarySch_ranking_sf, 5)
-```
-:::
-
-### Supermarkets
-
-::: panel-tabset
-#### Map
-
-```{r}
-tm_shape(subzone_sf) +
-  tm_fill() +
-  tm_polygons(alpha = 0.5) +
-  tm_borders(alpha = 0.5) +
-tm_shape(supermarkets_sf) + 
-  tm_dots(size = 0.15,
-          shape = 24,
-          col = "#37F7C5") +
-  tm_layout(main.title = "Supermarkets",
-            main.title.size = 1.10,
-            main.title.position = "center")
-```
-
-#### Data
-
-```{r}
-head(supermarkets_sf, 5)
-```
-:::
-
-# OLS Multiple Linear Regression Model
+We will now move on to model preparation.
 
 ## Filtering
 
 ### Train
+
+Sadly due to my laptop's limited computation power, I have filtered the training data to be only from June 2022 to December 2022 :(
+
+We will also filter for the columns that are of interest to us, as shown below.
+
+```{r}
+names(final_resale_prices)[c(7, 11, 13, 15, 17:34, 36)]
+```
 
 ```{r}
 train_resale_prices <- final_resale_prices %>% filter(between(date, as.Date('2022-06-01'), as.Date('2022-12-01')))
@@ -1042,77 +834,104 @@ train_resale_prices <- train_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
 
 ### Test
 
+The test data is then this year's transactions, being in January and February 2023.
+
 ```{r}
 test_resale_prices <- final_resale_prices %>% filter(between(date, as.Date('2023-01-01'), as.Date('2023-02-01')))
 test_resale_prices <- test_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
 ```
+
+## Visualising the relationships of the independent variables
+
+We will want to check for **multicollinearity**, in that whether any of the variables is highly correlated with one another. If not removed, the models may not be wholy representative of the different variables and the predicted hence then be wrong.
+
+Correlation matrix is what we will be using in this section.
 
 ```{r}
 total_resale_prices <- final_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
 st_geometry(total_resale_prices) <- NULL
 ```
 
-## Visualising the relationships of the independent variables
-
 ```{r}
 corrplot(cor(total_resale_prices), diag = FALSE, order = "AOE",
          tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
 ```
 
-Looks like age of the HDB flats and remaining lease are practically inversely correlated, which makes sense. So one will be removed, age will be removed.
+Looks like age of the HDB flats and remaining lease are practically inversely correlated, having a correlation of more than +/-0.8. So one will be removed, age will be removed.
 
-```{r eval=FALSE}
-set.seed(1234)
+Similarly, proximity of schools will be removed in favour of top schools.
+
+# OLS Multiple Linear Regression (MLR) Model
+
+`lm()` is applied to calibrate our MLR model.
+
+```{r}
 resale_price.mlr <- lm(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_BUSSTOP + PROX_MRT +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_TOPSCH, data = train_resale_prices)
-ols_regress(resale_price.mlr)
+summary(resale_price.mlr)
 ```
 
-```{r eval=FALSE}
-set.seed(1234)
-resale_price.mlr <- lm(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_CHILDCARE + PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE  + NUM_SCH + NUM_TOPSCH, data = train_resale_prices)
-ols_regress(resale_price.mlr)
+## Preparation of Publication Quality Table
+
+Using `tbl_regression()`, we want to find out which variables are not significant significant enough to retain in the model.
+
+```{r}
+tbl_regression(resale_price.mlr, intercept = TRUE)
 ```
+
+With PROX_ELDERCARE, PROX_KINDERGARTEN, PROX_CHILDCARE, PROX_MRT and NUM_BUSSTOP having a p-value above 0.01, we will subsequently remove them to improve our model.
+
+::: panel-tabset
+## Version 1: Create New MLR
+
+```{r}
+resale_price.mlr <- lm(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  + PROX_BUSSTOP +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_TOPSCH, data = train_resale_prices)
+```
+
+## Check for Significance
+
+```{r}
+tbl_regression(resale_price.mlr, intercept = TRUE)
+```
+:::
+
+## Save to RDS
 
 ```{r eval=FALSE}
 write_rds(resale_price.mlr, "data/model/resale_price.mlr.rds")
 ```
+
+## Read RDS
 
 ```{r}
 resale_price.mlr <- read_rds("data/model/resale_price.mlr.rds")
 summary(resale_price.mlr)
 ```
 
-## Preparing Publication Quality Table: gtsummary method
+:::
 
-```{r}
-tbl_regression(resale_price.mlr, intercept = TRUE)
-```
+Yes! Now, there are no more insignificant variables. Let's move on.
 
-```{r}
-tbl_regression(resale_price.mlr, 
-               intercept = TRUE) %>% 
-  add_glance_source_note(
-    label = list(sigma ~ "\U03C3"),
-    include = c(r.squared, adj.r.squared, 
-                AIC, statistic,
-                p.value, sigma))
-```
+## Checking for Non-Linearity
 
-## Checking for multicolinearity
-
-```{r}
-ols_vif_tol(resale_price.mlr)
-```
+With most datapoints scatter on and around the 0 line, we can determine the relationship is linear.
 
 ```{r}
 ols_plot_resid_fit(resale_price.mlr)
 ```
 
+## Checking for Normality Assumption
+
+The model is also normal in distribution.
+
 ```{r}
 ols_plot_resid_hist(resale_price.mlr)
 ```
 
-## Testing for Spatial Autocorrelation
+## Checking for Spatial Autocorrelation
+
+With this test, we then check for the spatial variation in resell prices using the residuals from our MLR model.
+
+Because we need the geospatial polygons to map our residuals and that **spdep** package only processes sp datatype, we will first convert *resale_price.mlr* to a DataFrame, then to a sf DataFrame, finally a sp DataFrame.
 
 ```{r}
 resale_price.mlr.output <- as.data.frame(resale_price.mlr$residuals)
@@ -1122,7 +941,7 @@ final_resale_price.mlr.sp <- as_Spatial(final_resale_price.mlr.sf)
 final_resale_price.mlr.sp
 ```
 
-### Map
+### Visualisation
 
 ```{r}
 tmap_mode("view")
@@ -1137,61 +956,84 @@ tm_shape(final_resale_price.mlr.sf) +
 tmap_mode("plot")
 ```
 
-```{r eval=FALSE}
-nb <- dnearneigh(coordinates(final_resale_price.mlr.sp), 0, 1500, longlat = FALSE)
-nb_lw <- nb2listw(nb, style = 'W')
-lm.morantest(resale_price.mlr, nb_lw)
-```
+From the visualisation, we can determine that there are signs of spatial autocorrelation.
+
+## Prediction
+
+Finally, we come to prediction.
+
+::: panel-tabset
+### Code
 
 ```{r}
 mlr_pred <- predict.lm(resale_price.mlr, test_resale_prices)
 ```
 
+### Write to RDS
+
 ```{r}
 write_rds(mlr_pred, "data/model/mlr_pred.rds")
 ```
 
+### Read RDS
+
 ```{r}
 mlr_pred <- read_rds("data/model/mlr_pred.rds")
 ```
+:::
 
 ```{r}
 mlr_pred_df <- as.data.frame(mlr_pred)
-test_data_p_mlr <- cbind(test_resale_prices, mlr_pred_df)
+test_data_mlr <- cbind(test_resale_prices, mlr_pred_df)
 ```
 
+Using Root Mean Square Error (RMSE), we can observe the difference between the predicted values and the actual values, which enables us to determine whether the model fares well in predicting.
+
 ```{r}
-Metrics::rmse(test_data_p_mlr$resale_price, 
-     test_data_p_mlr$mlr_pred)
+Metrics::rmse(test_data_mlr$resale_price, 
+     test_data_mlr$mlr_pred)
 ```
 
+### Visualisation
 
 ```{r}
-OLS_scatterplot <- ggplot(data = test_data_p_mlr,
+ols_scatterplot <- ggplot(data = test_data_mlr,
        aes(x = mlr_pred,
            y = resale_price)) +
-  geom_point()
+  geom_point() +
+  geom_abline(col = "Red")
 
-OLS_scatterplot
+ols_scatterplot
 ```
 
+Although there is a visible trend in how the datapoints are structured (i.e., a line), you can see that most datapoints fall out this line. This suggests that the model is probably decent, but has way more areas for improvements in order to accurately predict future transactional prices.
 
-# Building Hedonic Pricing Models using GWmodel
+# Geographical Random Forest Model (GRFW)
+
+In this section, we are seeking to create a GRFM through an adaptive bandwidth approach
+
+Since conducting the Random Forest model will require us to drop the coordinates, we will first save them.
 
 ```{r}
-total_resale_prices <- final_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
-coords <- st_coordinates(total_resale_prices)
 coords_train <- st_coordinates(train_resale_prices)
 coords_test <- st_coordinates(test_resale_prices)
 ```
 
-## Building Fixed Bandwidth GWR Model
+```{r}
+train_resale_prices <- train_resale_prices %>% 
+  st_drop_geometry()
 
-### Computing fixed bandwith
+train_resale_prices <- train_resale_prices %>% 
+  st_drop_geometry()
+```
 
 ```{r eval=FALSE}
 resale_price.sp <- as_Spatial(train_resale_prices)
 ```
+
+## Optimal Bandwidth
+
+Since we are creating an adaptive model, we will use `bw.gwr()` from **GWmodel** package to determine the optimal bandwidth.
 
 ```{r eval=FALSE}
 set.seed(1234)
@@ -1207,22 +1049,12 @@ bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PRO
 
 As you can see from above, the most suitable bandwidth is 208.
 
-```{r eval=FALSE}
-train_resale_prices <- train_resale_prices %>% 
-  st_drop_geometry()
-```
+## Calibration of Geographical Random Forest Model (GRFM)
 
-```{r eval=FALSE}
-train_resale_prices <- train_resale_prices %>% 
-  st_drop_geometry()
-```
+Using the **SpatialML** package, we calibrate our Random Forest model from there.
 
-```{r eval=FALSE}
-set.seed(1234)
-rf <- ranger(resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_BUSSTOP + PROX_MRT +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_TOPSCH,
-             data=train_resale_prices)
-print(rf)
-```
+::: panel-tabset
+### Calibration
 
 ```{r eval=FALSE}
 set.seed(1234)
@@ -1234,18 +1066,34 @@ grf_adaptive <- grf(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_C
                       ntree = 30)
 ```
 
+### Save to RDS
+
 ```{r eval=FALSE}
 write_rds(grf_adaptive, "data/model/grf_adaptive.rds")
 ```
 
+### Read RDS
+
 ```{r}
 grf_adaptive <- read_rds("data/model/grf_adaptive.rds")
 ```
+:::
+
+## Prediction
+
+### Preparation
+
+Now, we can combine the test data and coordinates together.
 
 ```{r}
 test_data <- cbind(test_resale_prices, coords_test) %>%
   st_drop_geometry()
 ```
+
+And onwards to our prediction using `predict.grf()` using the above variable.
+
+::: panel-tabset
+### Prediction
 
 ```{r}
 gwRF_pred <- predict.grf(grf_adaptive, 
@@ -1256,36 +1104,51 @@ gwRF_pred <- predict.grf(grf_adaptive,
                            global.w=0)
 ```
 
+### Write to rDS
+
 ```{r}
 gwRF_pred <- write_rds(gwRF_pred, "data/model/gwRF_pred.rds")
 ```
+
+### Read RDS
 
 ```{r}
 gwRF_pred <- read_rds("data/model/gwRF_pred.rds")
 gwRF_pred_df <- as.data.frame(gwRF_pred)
 ```
+:::
+
+#### Visualisation
+
+Like in the OLS model above, we will use calculate the RMSE to determine the accuracy of our new model.
 
 ```{r}
-test_data_p <- cbind(test_data, gwRF_pred)
+test_data_plot <- cbind(test_data, gwRF_pred)
 ```
 
 ```{r}
-write_rds(test_data_p, "data/model/test_data_p.rds")
+Metrics::rmse(test_data_plot$resale_price, 
+     test_data_plot$gwRF_pred)
 ```
 
 ```{r}
-test_data_p <- read_rds("data/model/test_data_p.rds")
-test_data_p <- as.data.frame(test_data_p)
-```
-
-```{r}
-Metrics::rmse(test_data_p$resale_price, 
-     test_data_p$gwRF_pred)
-```
-
-```{r}
-ggplot(data = test_data_p,
+ggplot(data = test_data_plot,
        aes(x = gwRF_pred,
            y = resale_price)) +
-  geom_point()
+  geom_point() +
+  geom_abline(col = "Red")
 ```
+
+The chart showcases the datapoints scattered relatively straight across a line, suggesting predicted resale prices and actual resale prices are quite close together.
+
+# Conclusion
+
+In comparing the two different models, the Geographical Random Forest model perform way better than Linear Regression using OSL method, in predicting resell prices for 3-room flats. This is in line with what we know with how Linear Regression fails to take into account with some geospatial conditions like spatial autocorrelation.
+
+Interesting, we eliminated childcare centres, kindergartens and proxity to MRT due to them not being significant enough to be included in the Multi-Linear Regression model, which is shocking personally. In the context of this exercise, it is not known whether there is a difference in significant variables among different flat types (e.g., 2-room). Personally, I may suspect that this is due to the diverse demographics (particularly singles) that purchase this sort of flat type, in contrast with other types.
+
+# Acknowledges
+
+[Megan Sim's Take-Home Exercise 3](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/)
+
+Professor Kam Tin Seong's Exercises: - [In-class Exercise 9](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml#calibrating-geographical-random-forest-model) - [R for Geospatial Data Science and Analytics Chapter 13](https://r4gdsa.netlify.app/chap13.html#building-adaptive-bandwidth-gwr-model)
