@@ -63,7 +63,7 @@ eldercare <- eldercare %>%
 ```
 
 ```{r}
-hexagon <- hexagons %>%
+hexagons <- hexagons %>%
   select(fid) %>%
   rename(origin_id = fid) %>% 
   mutate(demand = 100)
@@ -91,7 +91,7 @@ distmat_km <- as.matrix(distmat/1000) # from meters to km
 # Computing Distance Matrix
 ```{r}
 eldercare_coord <- st_coordinates(eldercare)
-hexagon_coord <- st_coordinates(hexagon)
+hexagon_coord <- st_coordinates(hexagons)
 
 EucMatrix <- SpatialAcc::distance(hexagon_coord,
                                   eldercare_coord,
@@ -136,7 +136,7 @@ hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
 ## Computing Distance Matrix
 ```{r}
 eldercare_coord <- st_coordinates(eldercare)
-hexagon_coord <- st_coordinates(hexagon)
+hexagon_coord <- st_coordinates(hexagons)
 
 EucMatrix <- SpatialAcc::distance(hexagon_coord,
                                   eldercare_coord,
@@ -152,7 +152,7 @@ EucMatrix_km <- as.matrix(EucMatrix/1000)
 ### Extracting map extend
 Retrieve the extend of the map area
 ```{r}
-mapex <- st_bbox(hexagon)
+mapex <- st_bbox(hexagons)
 ```
 
 Then use for mapping purposes.
