@@ -1151,4 +1151,6 @@ Interesting, we eliminated childcare centres, kindergartens and proxity to MRT d
 
 [Megan Sim's Take-Home Exercise 3](https://is415-msty.netlify.app/posts/2021-10-25-take-home-exercise-3/)
 
-Professor Kam Tin Seong's Exercises: - [In-class Exercise 9](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml#calibrating-geographical-random-forest-model) - [R for Geospatial Data Science and Analytics Chapter 13](https://r4gdsa.netlify.app/chap13.html#building-adaptive-bandwidth-gwr-model)
+Professor Kam Tin Seong's Exercises: 
+- [In-class Exercise 9](https://is415-gaa-tskam.netlify.app/in-class_ex/in-class_ex09/in-class_ex09_gwml#calibrating-geographical-random-forest-model) 
+- [R for Geospatial Data Science and Analytics Chapter 13](https://r4gdsa.netlify.app/chap13.html#building-adaptive-bandwidth-gwr-model)
