@@ -1,0 +1,1232 @@
+---
+title: "Take-home Exercise 3"
+format: 
+  html:
+    code-line-numbers: true
+    number-sections: true
+    highlight-style: github
+execute:
+  warning: false
+  echo: true  
+  eval: true
+editor: visual
+date: "18 March 2023"
+date-modified: "26 March 2023"
+---
+
+```{css, echo=FALSE}
+.panel-tabset .nav-link {
+  background-color: #a3d2e3;
+  box-shadow: 8px 5px 5px darkgrey;
+}
+
+.panel-tabset .tab-content{
+  box-shadow: 8px 5px 5px darkgrey;
+}
+```
+
+# Introduction
+
+Around 77.9% of dwellings in Singapore are made up of Housing and Development Board (HDB) flats, public housing many residents are familiar with and take pride in.
+
+Though the number of households living in HDB apartments continues to increase, there is a steady fall in number of Singaporeans actually living in these flats. One [argument](https://www.straitstimes.com/singapore/singapore-resident-population-in-hdb-flats-falls-to-304m-with-smaller-households-spread) provided is that more Singaporeans are selling their flats and "upgrading" to private housings, like condominium and private landed properties. Among those upgrading, selling their current house to afford for a better HDB apartments is not uncommon too.
+
+On the flip side, there is the demand and there are many reasons for residents to buy resale flats.
+
+1.  Families may not be keen to wait approximately [2 to 5.9 years](https://www.straitstimes.com/singapore/housing/how-are-bto-flats-built-and-why-do-waiting-times-vary-so-much) for an apartment under the Build-to-Order exercise.
+2.  Couples, being [both Permanent Residents](https://www.propertyguru.com.sg/property-guides/how-do-singapore-permanent-residents-buy-a-hdb-flat-9914), can only access the resale market, if they want to buy a HDB flat.
+3.  [Single citizens](https://www.hdb.gov.sg/residential/buying-a-flat/flat-and-grant-eligibility/singles) similarly are only allowed to purchase resale flats.
+
+In spite of the ever increasing resale prices, [increasing 8.7% YoY](https://www.straitstimes.com/singapore/housing/hdb-resale-prices-rise-for-31st-straight-month-in-jan-sales-volume-rebounds-after-property-curbs#:~:text=Prices%20were%20up%208.7%20per,up%20by%205.4%20per%20cent.), and much more expensive than a BTO flat, resale flats continue to be in the cards for residents to buy their dream homes.
+
+With how expensive these apartments are, you better bet that people will be choosing where to place their money more carefully.
+
+# Import Packages
+
+Below the packages that we will be using in this exercise:
+
+```{r}
+pacman::p_load(sf, tmap, sfdep, tidyverse, olsrr, ggpubr, GWmodel, SpatialML, tidymodels, jsonlite, readxl, Rfast, corrplot, gtsummary, spdep, Metrics) 
+```
+
+# Import Data
+
+| Dataset                          | Source                                                                                       |
+|------------------------|------------------------------------------------|
+| HDB Resale Flat Prices           | [Data.gov.sg](https://data.gov.sg/dataset/resale-flat-prices)                                |
+| Masterplan 2019 Subzone Boundary | Professor Kam Tin Seong                                                                      |
+| Hawker Centres                   | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Elderly Centres                  | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Parks                            | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Kindergartens                    | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Childcare Centres                | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Bus Stops                        | [LTA DataMall](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)             |
+| MRT Stations                     | [LTA DataMall](https://datamall.lta.gov.sg/content/datamall/en/static-data.html)             |
+| Primary Schools                  | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Supermarkets                     | [OpenMapSG](https://www.onemap.gov.sg/main/v2/)                                              |
+| Malls                            | [Wikipedia](https://en.wikipedia.org/wiki/List_of_shopping_malls_in_Singapore)               |
+| HDB MUP/HIP Status               | [Housing Development Board](https://services2.hdb.gov.sg/webapp/BB33RESLSTATUS/BB33SEnquiry) |
+
+## Import HDB Resale Flat Prices
+
+::: panel-tabset
+### Code
+
+```{r}
+resale_prices <- read_csv("data/aspatial/resale-flat-prices-based-on-registration-date-from-jan-2017-onwards.csv")
+```
+
+### Data
+
+```{r}
+head(resale_prices, 5)
+```
+:::
+
+#### Convert "Month" to DataTime Format
+
+As we want to have the abilities to filter the data according to its dates, it's best for us to convert the *date* column to a DateTime format.
+
+::: panel-tabset
+##### Code
+
+```{r}
+resale_prices$date <- zoo::as.Date(zoo::as.yearmon(resale_prices$month))
+```
+
+##### Data
+
+```{r}
+head(resale_prices$date, 5)
+```
+:::
+
+##### Data - Filter Jan 2021 to Feb 2023
+
+Here, we will filter the data so we will only be working with those from January 2021 to February 2023.
+
+::: panel-tabset
+##### Code
+
+```{r}
+resale_prices_total <- resale_prices %>% filter(date >= as.Date('2021-01-01')) %>% filter(date <= as.Date('2023-02-01'))
+```
+
+##### Data
+
+```{r}
+head(resale_prices_total, 5)
+```
+:::
+
+## Import Subzone Data
+
+::: panel-tabset
+### Code
+
+```{r}
+subzone_sf <- st_read(dsn="data/geospatial/MPSZ-2019", layer="MPSZ-2019") %>% st_transform(crs = 3414)
+```
+
+### Data
+
+```{r}
+head(subzone_sf)
+```
+:::
+
+## Import Independent Variables
+
+With any creation of a predictive model, comes the independent variables that the predictions will rely on.
+
+### Geospatial Datasets
+
+Since this project is pertain to Singapore, OpenMapSG will be helpful for us to get these geospatial datasets with ease.
+
+As you can see below, we will be using a package called *onemapsgapi* that wraps OpenMapSG API.
+
+Using it is relatively simple:
+
+1.  One will need to register an account with OpenMapSG
+2.  Get a token using `get_token()`
+3.  Search for datasets they want in `search_themes()`
+4.  Optionally, look up on the status on desired dataset through `get_theme_status()`
+5.  And finally get your data from `get_theme()`!
+
+```{r eval=FALSE}
+library(onemapsgapi)
+token <- get_token("Your Email", "Your Password")
+search_themes(token, "searchval")
+get_theme_status(token, "themename")
+themetibble <- get_theme(token, "themename")
+```
+
+```{r, eval=FALSE, echo=FALSE}
+token <- get_token("Your Email", "Your Password")
+
+search_themes(token)
+get_theme_status(token, "polyclinic")
+getAllThemesInfo(token)
+```
+
+::: callout-note
+I will have already performed the above steps to acquire my datasets. In our case, I will directly read the geospatial data I have downloaded using `st_read()`.
+:::
+
+::: panel-tabset
+#### Hawker Centres
+
+```{r eval=FALSE, echo=FALSE}
+hawkercentre_tibble <- onemapsgapi::get_theme(token, "hawkercentre")
+hawkercentre_sf <- st_as_sf(hawkercentre_tibble, coords=c("Lng", "Lat"), crs=4326) 
+st_write(hawkercentre_sf, "data/geospatial/hawkercentre/hawkercentre.shp")
+```
+
+```{r}
+hawkercentre_sf <- st_read(dsn="data/geospatial/hawkercentre", layer="hawkercentre") %>% st_transform(crs = 3414)
+```
+
+#### Eldercare Centres
+
+```{r eval=FALSE, echo=FALSE}
+eldercare_tibble <- onemapsgapi::get_theme(token, "eldercare")
+eldercare_sf <- st_as_sf(eldercare_tibble, coords=c("Lng", "Lat"), crs=4326)
+st_write(eldercare_sf, "data/geospatial/eldercare.shp")
+```
+
+```{r}
+eldercare_sf <- st_read(dsn="data/geospatial/eldercare", layer="eldercare") %>% st_transform(crs = 3414)
+```
+
+#### Parks
+
+```{r eval=FALSE, echo=FALSE}
+parks_tibble <- onemapsgapi::get_theme(token, "nationalparks")
+parks_sf <- st_as_sf(parks_tibble, coords=c("Lng", "Lat"), crs=4326)
+st_write(parks_sf, "data/geospatial/nationalparks.shp")
+```
+
+```{r}
+parks_sf <- st_read(dsn="data/geospatial/nationalparks", layer="nationalparks") %>% st_transform(crs = 3414)
+```
+
+#### Kindergartens
+
+```{r eval=FALSE, echo=FALSE}
+kindergartens_tibble <- onemapsgapi::get_theme(token, "kindergartens")
+kindergartens_sf <- st_as_sf(kindergartens_tibble, coords=c("Lng", "Lat"), crs=4326)
+st_write(kindergartens_sf, "data/geospatial/kindergartens.shp")
+```
+
+```{r}
+kindergartens_sf <- st_read(dsn="data/geospatial/kindergartens", layer="kindergartens") %>% st_transform(crs = 3414)
+```
+
+#### Childcare Centres
+
+```{r eval=FALSE, echo=FALSE}
+childcare_tibble <- onemapsgapi::get_theme(token, "childcare")
+childcare_sf <- st_as_sf(childcare_tibble, coords=c("Lng", "Lat"), crs=4326)
+st_write(childcare_sf, "data/geospatial/childcare.shp")
+```
+
+```{r}
+childcare_sf <- st_read(dsn="data/geospatial/childcare", layer="childcare") %>% st_transform(crs = 3414)
+```
+
+#### Bus Stop
+
+```{r}
+busstop_sf <- st_read(dsn="data/geospatial/BusStop_Feb2023", layer="BusStop") %>% st_transform(crs = 3414)
+```
+
+#### MRT Stations
+
+```{r}
+mrt_sf <- st_read(dsn="data/geospatial/TrainStation_Feb2023", layer="RapidTransitSystemStation") %>% st_transform(crs = 3414)
+```
+
+#### Supermarkets
+
+```{r}
+supermarkets_sf <- st_read(dsn="data/geospatial/supermarkets", layer="SUPERMARKETS") %>% st_transform(crs = 3414)
+```
+:::
+
+### Aspatial Data
+
+::: panel-tabset
+#### Primary Schools and Ranking
+
+there are 181 schools so when merged, some rows disappeared
+
+```{r}
+primarySch <- fromJSON("data/geospatial/primaryschools/primaryschools.json")[["SearchResults"]][-1,c(2:5, 7, 13:14)]
+primarySch_sf <- st_as_sf(primarySch, coords=c("LONGITUDE", "LATITUDE"), crs=4326) %>% st_transform(crs = 3414)
+```
+
+#### Malls
+
+```{r}
+malls <- read_xlsx("data/aspatial/malls-20230320.xlsx")
+```
+
+#### HDB Upgrades
+
+```{r}
+hdb_upgrades <- read_xlsx("data/aspatial/HDB_HIP-MUP-20230312.xlsx")
+```
+:::
+
+# Data Wrangling
+
+## Central Business District
+
+```{r}
+cbd_sf <- subzone_sf %>% filter(subzone_sf$PLN_AREA_N == "DOWNTOWN CORE")
+```
+
+## Primary Schools
+
+### Scraping of Ranking Data
+
+To make full use of primary schools as an independent variable, we need to merge the ranking we get from [Schlah's Primary School Rankings](https://schlah.com/primary-schools). It provides substantial data in how it derived its ranking, which offers a more objective rank.
+
+We then scraped this data from the website.
+
+::: panel-tabset
+#### Code
+
+```{r}
+primarySch_ranking <- fromJSON("data/geospatial/primaryschools/primaryschools_rankings.json")[["props"]][["pageProps"]][["sortedSchools"]]
+```
+
+#### Data
+
+```{r}
+head(primarySch_ranking, 5)
+```
+:::
+
+### Wrangle Dataset on Primary Schools' Rankings
+
+You may realise from above that **primarySch_ranking** that the there are quite a few columns prefixed with "schoolInfo\$", which mean that these columns are actually under the column **schoolInfo** in **primarySch_ranking**. Using `unnest()`, the columns inside **schoolInfo** will be expanded so that we can more easily access schools' informations like names, addresses.
+
+::: panel-tabset
+#### Code
+
+```{r}
+primarySch_ranking = unnest(primarySch_ranking, schoolInfo)[,c(1, 5, 9, 14:16, 22, 28:32)] 
+```
+
+#### Data
+
+```{r}
+head(primarySch_ranking)
+```
+:::
+
+### Merging Geospatial and Aspatial Data of Primary Schools
+
+Using postal codes, we will merge them together!
+
+::: panel-tabset
+#### Code
+
+```{r}
+primarySch_ranking_sf = merge(primarySch_ranking, primarySch_sf, by.x='postalCode', by.y="SCH_POSTAL_CODE")
+```
+
+#### Data
+
+```{r}
+head(primarySch_ranking_sf, 5)
+```
+:::
+
+But sadly the merged sf has 180 rows while the original geospatial dataset has 181 rows, meaning there is a school with mismatch data.
+
+##### Finding Mismatched Row
+
+We will first order **primarySch_ranking_sf** according to their ranking.
+
+```{r}
+primarySch__order_ranking_sf = primarySch_ranking_sf[order(primarySch_ranking_sf$rank),]
+```
+
+We then loop through the **primarySch_ranking**, the original DataFrame, to find the schools not in the merged sf.
+
+Note that there are actually 186 rows in **primarySch_ranking**, meaning there is a difference of 6 rows.
+
+```{r}
+schools_dont_exist = list()
+for (i in 1:nrow(primarySch_ranking)){
+  if (i %in% primarySch__order_ranking_sf$rank == FALSE){
+    schools_dont_exist <- append(schools_dont_exist, i)
+  }
+}
+
+schools <- data.frame()
+
+for (sch in schools_dont_exist){
+  schools = rbind(schools, primarySch_ranking[primarySch_ranking$rank == sch,])
+}
+schools
+```
+
+So... we need to look through all the current situations of all 6 schools and determine, which one is the one in OneMapSG's geospatial data.
+
+- **Pioneer Primary School** merged in **Juying Primary School** in 2021. In addition, the merged school is moving to a new location in 2026, hence not opening from its Primary 1 Registration from 2021 to 2024
+- **Stamford Primary School** has merged with Farrer Park Primary School in 2023.
+- **Eunos Primary School** has merged with Telok Kurau Primary School.
+- **Guangyang Primary School** has merged with Townsville Primary School.
+
+With that, **Angsana Primary School** is the row that has its postal code different.
+
+Checking the school's website, **Angsana Primary School**'s postal code is actually 528565. Hence we need to change **primarySch_ranking**'s postal code to facilitate merging.
+
+```{r}
+primarySch_ranking[primarySch_ranking$schoolName == "Angsana Primary School","postalCode"] = '528565'
+
+primarySch_ranking_df = merge(primarySch_ranking, primarySch_sf, by.x='postalCode', by.y="SCH_POSTAL_CODE")
+nrow(primarySch_ranking_df)
+primarySch_ranking_sf <- st_as_sf(primarySch_ranking_df) %>% st_transform(crs = 3414)
+```
+
+## Masterplan Subzone 2019
+::: panel-tabset
+
+Looking at the subzone dataset, it seems that there are invalid geometries in it.
+
+```{r}
+length(which(st_is_valid(subzone_sf) == FALSE))
+```
+
+```{r}
+subzone_sf <- st_make_valid(subzone_sf)
+length(which(st_is_valid(subzone_sf) == FALSE))
+```
+:::
+
+## MRT
+
+```{r}
+length(which(st_is_valid(mrt_sf) == FALSE))
+```
+
+```{r}
+mrt_sf[st_is_valid(mrt_sf) == FALSE,]
+```
+
+cannot fix using st_make_valid so
+
+```{r}
+mrt_sf <- mrt_sf[st_is_valid(mrt_sf) == TRUE,]
+mrt_sf <- mrt_sf[!st_is_empty(mrt_sf),,drop=FALSE]
+length(which(st_is_valid(mrt_sf) == FALSE))
+```
+
+## Get Coordinates for HDB
+
+```{r}
+library(httr)
+geocode <- function(block, streetname="") {
+  base_url <- "https://developers.onemap.sg/commonapi/search"
+  address <- paste(block, streetname, sep = " ")
+  query <- list("searchVal" = address, 
+                "returnGeom" = "Y",
+                "getAddrDetails" = "N",
+                "pageNum" = "1")
+  
+  res <- GET(base_url, query = query)
+  restext<-content(res, as="text")
+  
+  output <- fromJSON(restext)  %>% 
+    as.data.frame %>%
+    select(results.LATITUDE, results.LONGITUDE)
+
+  return(output)
+}
+```
+
+```{r eval=FALSE}
+resale_prices_total$LATITUDE <- 0
+resale_prices_total$LONGITUDE <- 0
+
+for (i in 1:nrow(resale_prices_total)){
+  temp_output <- geocode(resale_prices_total[i, 4], resale_prices_total[i, 5])
+  
+  resale_prices_total$LATITUDE[i] <- temp_output$results.LATITUDE
+  resale_prices_total$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r eval=FALSE}
+resale_prices_sf <- st_as_sf(resale_prices_total, coords=c("LONGITUDE", "LATITUDE"), crs=4326)
+st_write(resale_prices_sf, "data/geospatial/resale_prices/resale_prices.shp")
+```
+
+```{r}
+resale_prices_sf <- st_read(dsn="data/geospatial/resale_prices", layer="resale_prices") %>% st_transform(crs = 3414)
+```
+
+### Merge with HDB Status
+
+#### HIP
+
+```{r}
+hdb_hip <- hdb_upgrades %>% filter(TYPE == "HIP")
+colnames(hdb_hip)[3] ="HIP"
+```
+
+```{r}
+resale_prices_upgrade_sf <- merge(resale_prices_sf, hdb_hip, by.x=c("block", "strt_nm"), by.y=c("BLK", "STREET"), all.x = TRUE)
+```
+
+#### MUP
+
+```{r}
+hdb_mup <- hdb_upgrades %>% filter(TYPE == "MUP")
+colnames(hdb_mup)[3] ="MUP"
+```
+
+```{r}
+resale_prices_upgrade_sf <- merge(resale_prices_upgrade_sf, hdb_mup, by.x=c("block", "strt_nm"), by.y=c("BLK", "STREET"), all.x = TRUE)
+```
+
+## Malls
+
+```{r eval=FALSE}
+malls$LATITUDE <- 0
+malls$LONGITUDE <- 0
+
+for (i in 1:nrow(malls)){
+  temp_output <- geocode(malls[i, 1], )
+  
+  malls$LATITUDE[i] <- temp_output$results.LATITUDE
+  malls$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r eval=FALSE}
+malls_sf <- st_as_sf(malls, coords=c("LONGITUDE", "LATITUDE"), crs=4326)
+st_write(malls_sf, "data/geospatial/malls/malls.shp")
+```
+
+```{r}
+malls_sf <- st_read(dsn="data/geospatial/malls", layer="malls") %>% st_transform(crs = 3414)
+```
+
+## Top 20 Primary Schools
+
+```{r}
+top_primarySch_ranking_sf <- primarySch_ranking_sf %>% filter(rank <= 20)
+```
+
+# Acquire Proximity
+
+Function to acquire proximity
+
+```{r eval=FALSE}
+proximity_calculator <- function(original_sf, derived_sf, column_name) {
+  dist_matrix <- st_distance(original_sf, derived_sf)
+  original_sf[, column_name] <- rowMins(dist_matrix) / 1000
+  return(original_sf)
+}
+```
+
+```{r eval=FALSE}
+resale_proximity_sf <- resale_prices_upgrade_sf 
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = cbd_sf, column_name = "PROX_CBD")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = hawkercentre_sf, column_name="PROX_HAWKER")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = eldercare_sf, column_name = "PROX_ELDERCARE")
+proximity_calculator(original_sf = resale_proximity_sf, derived_sf = parks_sf, column_name="PROX_PARK")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = kindergartens_sf, column_name = "PROX_KINDERGARTEN")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = childcare_sf, column_name = "PROX_CHILDCARE")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = busstop_sf, column_name = "PROX_BUSSTOP")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = mrt_sf, column_name = "PROX_MRT")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = primarySch_ranking_sf, column_name = "PROX_SCH")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = supermarkets_sf, column_name="PROX_SUPERMARKET")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = malls_sf, column_name = "PROX_MALL")
+resale_proximity_sf <- proximity_calculator(original_sf = resale_proximity_sf, derived_sf = top_primarySch_ranking_sf, column_name = "PROX_TOPSCH")
+```
+
+## Within radius
+
+```{r eval=FALSE}
+library(units)
+radius_calculator <- function(original_sf, derived_sf, column_name, radius) {
+  dist_matrix <- st_distance(original_sf, derived_sf) %>%
+    drop_units() %>%
+    as.data.frame()
+  original_sf[,column_name] <- rowSums(dist_matrix <= radius)
+  return(original_sf)
+}
+```
+
+```{r eval=FALSE}
+resale_proximity_sf <- radius_calculator(resale_proximity_sf, kindergartens_sf, "NUM_KINDERGARTEN", 350)
+resale_proximity_sf <- radius_calculator(resale_proximity_sf, childcare_sf, "NUM_CHILDCARE", 350)
+resale_proximity_sf <- radius_calculator(resale_proximity_sf, busstop_sf, "NUM_BUSSTOP", 350)
+resale_proximity_sf <- radius_calculator(resale_proximity_sf, primarySch_ranking_sf, "NUM_SCH", 1000)
+resale_proximity_sf <- radius_calculator(resale_proximity_sf, top_primarySch_ranking_sf, "NUM_TOPSCH", 1000)
+```
+
+```{r eval=FALSE}
+st_write(resale_proximity_sf, "data/geospatial/resale_proximity/resale_proximity.shp")
+```
+
+```{r}
+resale_proximity_sf <- st_read(dsn="data/geospatial/resale_proximity", layer="resale_proximity")
+```
+
+# Get Proximity Locational Factors
+
+## Floor Level
+
+```{r}
+storey_category <- unique(resale_proximity_sf$stry_rn)
+storey_category
+```
+
+```{r}
+storey_names <- 1:length(storey_category)
+storey_order <- data.frame(storey_category, storey_names)
+storey_order
+```
+
+```{r}
+resale_level_loc_sf <- merge(resale_proximity_sf, storey_order, by.x = "stry_rn", by.y = "storey_category", all.x=TRUE)
+resale_level_loc_sf
+```
+
+## Remaining Lease
+
+```{r eval=FALSE}
+str_list <- str_split(resale_level_loc_sf$rmnng_l, " ")
+
+for (i in 1:length(str_list)) {
+  if (length(unlist(str_list[i])) > 2) {
+      year <- as.numeric(unlist(str_list[i])[1])
+      month <- as.numeric(unlist(str_list[i])[3])
+      resale_level_loc_sf[i, "remaining_lease"] <- (year * 12) + month
+  }
+  else {
+    year <- as.numeric(unlist(str_list[i])[1])
+    resale_level_loc_sf[i, "remaining_lease"] <- (year * 12)
+  }
+}
+resale_remaining_lease_loc_sf <- resale_level_loc_sf
+```
+
+```{r eval=FALSE}
+st_write(resale_remaining_lease_loc_sf, "data/geospatial/resale_proximity/resale_proximity.shp")
+```
+
+```{r}
+resale_remaining_lease_loc_sf <- st_read(dsn="data/geospatial/resale_proximity", layer="resale_proximity") %>% st_transform(crs = 3414)
+```
+
+## Age of Unit
+
+```{r}
+resale_remaining_lease_loc_sf$year <- zoo::as.Date(zoo::as.yearmon(resale_remaining_lease_loc_sf$ls_cmm_))
+resale_remaining_lease_loc_sf$age = round(interval(resale_remaining_lease_loc_sf$year, resale_remaining_lease_loc_sf$date)/ years(1))
+resale_age_loc_sf <- resale_remaining_lease_loc_sf
+```
+
+## Upgrades
+
+```{r}
+resale_upgrade_loc_sf <- resale_age_loc_sf
+```
+
+```{r eval=FALSE}
+resale_upgrade_loc_sf$HIP <- ifelse(is.na(resale_upgrade_loc_sf$HIP), 0, 1)
+resale_upgrade_loc_sf$MUP <- ifelse(is.na(resale_upgrade_loc_sf$MUP), 0, 1)
+```
+
+```{r eval=FALSE}
+st_write(resale_remaining_lease_loc_sf, "data/geospatial/resale_upgrade_loc_sf/resale_upgrade_loc_sf.shp")
+```
+
+```{r}
+resale_proximity_sf <- st_read(dsn="data/geospatial/resale_upgrade_loc_sf", layer="resale_upgrade_loc_sf")
+```
+
+## HDB Types
+
+```{r}
+hdb_types <- unique(resale_upgrade_loc_sf$flt_typ)
+hdb_types
+```
+
+```{r}
+resale_type_loc_sf <- resale_upgrade_loc_sf %>% filter(resale_upgrade_loc_sf$flt_typ == "3 ROOM")
+resale_type_loc_sf
+```
+
+## save
+
+```{r}
+final_resale_prices <- resale_type_loc_sf
+final_resale_prices <- final_resale_prices %>% 
+        rename("storey_range" = "stry_rn",
+               "street_name" = "strt_nm",
+               "flat_type" = "flt_typ",
+               "floor_area_sqm" = "flr_r_s",
+               "flat_model" = "flt_mdl",
+               "lease_commence_date" = "ls_cmm_",
+               "remaining_lease_original" = "rmnng_l",
+               "resale_price" = "rsl_prc",
+               "PROX_CBD" = "PROX_CB",
+               "PROX_HAWKER" = "PROX_HA",
+               "PROX_ELDERCARE" = "PROX_EL",
+               "PROX_KINDERGARTEN" = "PROX_KI",
+               "PROX_CHILDCARE" = "PROX_CH",
+               "PROX_BUSSTOP" = "PROX_BU",
+               "PROX_MRT" = "PROX_MR",
+               "PROX_SCH" = "PROX_SC",
+               "PROX_TOPSCH" = "PROX_TO",
+               "PROX_SUPERMARKET" = "PROX_SU",
+               "PROX_MALL" = "PROX_MA",
+               "NUM_KINDERGARTEN" = "NUM_KIN",
+               "NUM_CHILDCARE" = "NUM_CHI",
+               "NUM_BUSSTOP" = "NUM_BUS",
+               "NUM_TOPSCH" = "NUM_TOP")
+names(final_resale_prices)
+```
+
+```{r eval=FALSE}
+write_rds(final_resale_prices, "data/model/final_resale_prices.rds")
+```
+
+```{r}
+final_resale_prices <- read_rds("data/model/final_resale_prices.rds")
+```
+
+# Exploratory Data Analysis
+
+## Statistical Graphics
+
+### Central Business District
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(cbd_sf) +
+  tm_fill("SUBZONE_N") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Central Business District Map",
+            main.title.size = 1.10,
+            main.title.position = "center",
+            legend.outside = TRUE,
+            legend.outside.position = "left")
+```
+
+#### Data
+
+```{r}
+head(cbd_sf, 5)
+```
+:::
+
+### Hawker Centres
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(hawkercentre_sf) + 
+  tm_dots(size = 0.15,
+          shape = 22,
+          col = "#4287f5") +
+  tm_layout(main.title = "Supermarkets",
+            main.title.size = 1.10,
+            main.title.position = "center",)
+```
+
+#### Data
+
+```{r}
+head(hawkercentre_sf, 5)
+```
+:::
+
+### Eldercare Centres
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(eldercare_sf) + 
+  tm_dots(size = 0.15,
+          shape = 24,
+          col = "#fcba03") +
+  tm_layout(main.title = "Eldercare Centres",
+            main.title.size = 1.10,
+            main.title.position = "center",)
+```
+
+#### Data
+
+```{r}
+head(eldercare_sf, 5)
+```
+:::
+
+### Parks
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(parks_sf) + 
+  tm_dots(size = 0.15,
+          shape = 23,
+          col = "#32a852") +
+  tm_layout(main.title = "Parks",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(eldercare_sf, 5)
+```
+:::
+
+### Kindergartens
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(kindergartens_sf) + 
+  tm_dots(size = 0.15,
+          shape = 21,
+          col = "#DE60B5") +
+  tm_layout(main.title = "Kindergartens",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(kindergartens_sf, 5)
+```
+:::
+
+### Childcare Centres
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(childcare_sf) + 
+  tm_dots(size = 0.15,
+          shape = 25,
+          col = "#AB66C6") +
+  tm_layout(main.title = "Childcare Centres",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(childcare_sf, 5)
+```
+:::
+
+### Bus Stops
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(busstop_sf) + 
+  tm_dots(size = 0.15,
+          shape = 21,
+          col = "#CABE3E") +
+  tm_layout(main.title = "Bus Stops",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(busstop_sf, 5)
+```
+:::
+
+### MRT Stations
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(mrt_sf) + 
+  tm_dots(size = 0.15,
+          shape = 22,
+          col = "#FE9C1D") +
+  tm_layout(main.title = "MRT Stations",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(mrt_sf, 5)
+```
+:::
+
+### Primary Schools
+
+::: panel-tabset
+#### Map
+
+```{r echo=FALSE}
+primarySch_ranking_sf <- st_as_sf(primarySch_ranking_sf)
+```
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(primarySch_ranking_sf) + 
+  tm_dots(size = 0.15,
+          shape = 23,
+          col = "#BFBD9C") +
+  tm_layout(main.title = "Primary Schools",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(primarySch_ranking_sf, 5)
+```
+:::
+
+### Supermarkets
+
+::: panel-tabset
+#### Map
+
+```{r}
+tm_shape(subzone_sf) +
+  tm_fill() +
+  tm_polygons(alpha = 0.5) +
+  tm_borders(alpha = 0.5) +
+tm_shape(supermarkets_sf) + 
+  tm_dots(size = 0.15,
+          shape = 24,
+          col = "#37F7C5") +
+  tm_layout(main.title = "Supermarkets",
+            main.title.size = 1.10,
+            main.title.position = "center")
+```
+
+#### Data
+
+```{r}
+head(supermarkets_sf, 5)
+```
+:::
+
+# OLS Multiple Linear Regression Model
+
+## Filtering
+
+### Train
+
+```{r}
+train_resale_prices <- final_resale_prices %>% filter(between(date, as.Date('2022-06-01'), as.Date('2022-12-01')))
+train_resale_prices <- train_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
+```
+
+### Test
+
+```{r}
+test_resale_prices <- final_resale_prices %>% filter(between(date, as.Date('2023-01-01'), as.Date('2023-02-01')))
+test_resale_prices <- test_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
+```
+
+```{r}
+total_resale_prices <- final_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
+st_geometry(total_resale_prices) <- NULL
+```
+
+## Visualising the relationships of the independent variables
+
+```{r}
+corrplot(cor(total_resale_prices), diag = FALSE, order = "AOE",
+         tl.pos = "td", tl.cex = 0.5, method = "number", type = "upper")
+```
+
+Looks like age of the HDB flats and remaining lease are practically inversely correlated, which makes sense. So one will be removed, age will be removed.
+
+```{r eval=FALSE}
+set.seed(1234)
+resale_price.mlr <- lm(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_BUSSTOP + PROX_MRT +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_TOPSCH, data = train_resale_prices)
+ols_regress(resale_price.mlr)
+```
+
+```{r eval=FALSE}
+set.seed(1234)
+resale_price.mlr <- lm(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_CHILDCARE + PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE  + NUM_SCH + NUM_TOPSCH, data = train_resale_prices)
+ols_regress(resale_price.mlr)
+```
+
+```{r eval=FALSE}
+write_rds(resale_price.mlr, "data/model/resale_price.mlr.rds")
+```
+
+```{r}
+resale_price.mlr <- read_rds("data/model/resale_price.mlr.rds")
+summary(resale_price.mlr)
+```
+
+## Preparing Publication Quality Table: gtsummary method
+
+```{r}
+tbl_regression(resale_price.mlr, intercept = TRUE)
+```
+
+```{r}
+tbl_regression(resale_price.mlr, 
+               intercept = TRUE) %>% 
+  add_glance_source_note(
+    label = list(sigma ~ "\U03C3"),
+    include = c(r.squared, adj.r.squared, 
+                AIC, statistic,
+                p.value, sigma))
+```
+
+## Checking for multicolinearity
+
+```{r}
+ols_vif_tol(resale_price.mlr)
+```
+
+```{r}
+ols_plot_resid_fit(resale_price.mlr)
+```
+
+```{r}
+ols_plot_resid_hist(resale_price.mlr)
+```
+
+## Testing for Spatial Autocorrelation
+
+```{r}
+resale_price.mlr.output <- as.data.frame(resale_price.mlr$residuals)
+final_resale_price.mlr.sf <- cbind(train_resale_prices, resale_price.mlr.output) %>%
+  rename(`MLR_RES` = `resale_price.mlr.residuals`)
+final_resale_price.mlr.sp <- as_Spatial(final_resale_price.mlr.sf)
+final_resale_price.mlr.sp
+```
+
+### Map
+
+```{r}
+tmap_mode("view")
+tm_shape(subzone_sf)+
+  tmap_options(check.and.fix = TRUE) +
+  tm_polygons(alpha = 0.4) +
+tm_shape(final_resale_price.mlr.sf) +  
+  tm_dots(col = "MLR_RES",
+          alpha = 0.6,
+          style="quantile") +
+  tm_view(set.zoom.limits = c(11,14))
+tmap_mode("plot")
+```
+
+```{r eval=FALSE}
+nb <- dnearneigh(coordinates(final_resale_price.mlr.sp), 0, 1500, longlat = FALSE)
+nb_lw <- nb2listw(nb, style = 'W')
+lm.morantest(resale_price.mlr, nb_lw)
+```
+
+```{r}
+mlr_pred <- predict.lm(resale_price.mlr, test_resale_prices)
+```
+
+```{r}
+write_rds(mlr_pred, "data/model/mlr_pred.rds")
+```
+
+```{r}
+mlr_pred <- read_rds("data/model/mlr_pred.rds")
+```
+
+```{r}
+mlr_pred_df <- as.data.frame(mlr_pred)
+test_data_p_mlr <- cbind(test_resale_prices, mlr_pred_df)
+```
+
+```{r}
+Metrics::rmse(test_data_p_mlr$resale_price, 
+     test_data_p_mlr$mlr_pred)
+```
+
+
+```{r}
+OLS_scatterplot <- ggplot(data = test_data_p_mlr,
+       aes(x = mlr_pred,
+           y = resale_price)) +
+  geom_point()
+
+OLS_scatterplot
+```
+
+
+# Building Hedonic Pricing Models using GWmodel
+
+```{r}
+total_resale_prices <- final_resale_prices[, c(7, 11, 13, 15, 17:34, 36)]
+coords <- st_coordinates(total_resale_prices)
+coords_train <- st_coordinates(train_resale_prices)
+coords_test <- st_coordinates(test_resale_prices)
+```
+
+## Building Fixed Bandwidth GWR Model
+
+### Computing fixed bandwith
+
+```{r eval=FALSE}
+resale_price.sp <- as_Spatial(train_resale_prices)
+```
+
+```{r eval=FALSE}
+set.seed(1234)
+bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_BUSSTOP + PROX_MRT +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_TOPSCH, 
+                      data=resale_price.sp, 
+                      approach="CV", 
+                      kernel="gaussian", 
+                      adaptive=TRUE, 
+                      longlat=FALSE)
+```
+
+![](data/img/bw_gwr.jpg){width="617"}
+
+As you can see from above, the most suitable bandwidth is 208.
+
+```{r eval=FALSE}
+train_resale_prices <- train_resale_prices %>% 
+  st_drop_geometry()
+```
+
+```{r eval=FALSE}
+train_resale_prices <- train_resale_prices %>% 
+  st_drop_geometry()
+```
+
+```{r eval=FALSE}
+set.seed(1234)
+rf <- ranger(resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_BUSSTOP + PROX_MRT +  PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_TOPSCH,
+             data=train_resale_prices)
+print(rf)
+```
+
+```{r eval=FALSE}
+set.seed(1234)
+grf_adaptive <- grf(formula = resale_price ~ floor_area_sqm + HIP + MUP + PROX_CBD + PROX_HAWKER +  PROX_ELDERCARE + PROX_KINDERGARTEN + PROX_CHILDCARE + PROX_SUPERMARKET + PROX_MALL + PROX_TOPSCH + NUM_KINDERGARTEN + NUM_CHILDCARE + NUM_BUSSTOP + NUM_SCH + NUM_TOPSCH, 
+                     dframe=train_resale_prices,
+                     bw=bw_adaptive,
+                     kernel="adaptive",
+                     coords=coords_train,
+                      ntree = 30)
+```
+
+```{r eval=FALSE}
+write_rds(grf_adaptive, "data/model/grf_adaptive.rds")
+```
+
+```{r}
+grf_adaptive <- read_rds("data/model/grf_adaptive.rds")
+```
+
+```{r}
+test_data <- cbind(test_resale_prices, coords_test) %>%
+  st_drop_geometry()
+```
+
+```{r}
+gwRF_pred <- predict.grf(grf_adaptive, 
+                           test_data, 
+                           x.var.name="X",
+                           y.var.name="Y", 
+                           local.w=1,
+                           global.w=0)
+```
+
+```{r}
+gwRF_pred <- write_rds(gwRF_pred, "data/model/gwRF_pred.rds")
+```
+
+```{r}
+gwRF_pred <- read_rds("data/model/gwRF_pred.rds")
+gwRF_pred_df <- as.data.frame(gwRF_pred)
+```
+
+```{r}
+test_data_p <- cbind(test_data, gwRF_pred)
+```
+
+```{r}
+write_rds(test_data_p, "data/model/test_data_p.rds")
+```
+
+```{r}
+test_data_p <- read_rds("data/model/test_data_p.rds")
+test_data_p <- as.data.frame(test_data_p)
+```
+
+```{r}
+Metrics::rmse(test_data_p$resale_price, 
+     test_data_p$gwRF_pred)
+```
+
+```{r}
+ggplot(data = test_data_p,
+       aes(x = gwRF_pred,
+           y = resale_price)) +
+  geom_point()
+```
