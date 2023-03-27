@@ -14,9 +14,8 @@ date: "20 March 2023"
 date-modified: "`r Sys.Date()`"
 ---
 
-::: {.callout-tip}
-OD_Matrix: dont use road network (takes too long)
-- osmr - r packages to use the same thing
+::: callout-tip
+OD_Matrix: dont use road network (takes too long) - osmr - r packages to use the same thing
 
 SpatialAcc packages for accessibility models (assumes that row is origin, column is destination)
 
@@ -24,12 +23,15 @@ FCA packages for accessibility models (assumes that column is origin, row is des
 :::
 
 # Import Packages
+
 ```{r}
 pacman::p_load(tmap, SpatialAcc, sf, ggstatsplot, reshape2, tidyverse, fca)
 ```
 
 # Geospatial Data Wrangling
+
 ## Import Datasets
+
 ```{r}
 mpsz <- st_read(dsn = "data/geospatial", layer = "MP14_SUBZONE_NO_SEA_PL")
 ```
@@ -43,6 +45,7 @@ eldercare <- st_read(dsn = "data/geospatial", layer = "ELDERCARE")
 ```
 
 ## Update CRS Information
+
 ```{r}
 mpsz <- st_transform(mpsz, 3414)
 eldercare <- st_transform(eldercare, 3414)
@@ -54,6 +57,7 @@ st_crs(mpsz)
 ```
 
 ## Cleaning
+
 ```{r}
 eldercare <- eldercare %>%
   select(fid, ADDRESSPOS) %>%
@@ -70,12 +74,12 @@ hexagons <- hexagons %>%
 ```
 
 # Aspatial Data Wrangling
+
 ```{r}
 ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", skip = 0)
 ```
 
-::: {.callout-warning}
-
+::: callout-warning
 spread() is out of date. use pivot_wider() instead.
 :::
 
@@ -87,8 +91,8 @@ distmat <- ODMatrix %>%
 distmat_km <- as.matrix(distmat/1000) # from meters to km
 ```
 
-
 # Computing Distance Matrix
+
 ```{r}
 eldercare_coord <- st_coordinates(eldercare)
 hexagon_coord <- st_coordinates(hexagons)
@@ -99,6 +103,7 @@ EucMatrix <- SpatialAcc::distance(hexagon_coord,
 ```
 
 # Modelling and Visualising Accessibility using Hansen Method
+
 ```{r}
 acc_Hansen <- data.frame(ac(hexagons$demand,
                             eldercare$capacity,
@@ -134,6 +139,7 @@ hexagon_Hansen <- bind_cols(hexagons, acc_Hansen)
 ```
 
 ## Computing Distance Matrix
+
 ```{r}
 eldercare_coord <- st_coordinates(eldercare)
 hexagon_coord <- st_coordinates(hexagons)
@@ -147,15 +153,18 @@ EucMatrix <- SpatialAcc::distance(hexagon_coord,
 EucMatrix_km <- as.matrix(EucMatrix/1000)
 ```
 
+## Visualising Hansen's accessibility
 
-## Visualising Hansen’s accessibility
 ### Extracting map extend
+
 Retrieve the extend of the map area
+
 ```{r}
 mapex <- st_bbox(hexagons)
 ```
 
 Then use for mapping purposes.
+
 ```{r}
 tmap_mode("plot")
 tm_shape(hexagon_Hansen,
@@ -182,6 +191,7 @@ tm_shape(eldercare) +
 ```
 
 ## Statistical graphic visualisation
+
 ```{r}
 hexagon_Hansen <- st_join(hexagon_Hansen, mpsz, 
                           join = st_intersects)
@@ -199,7 +209,9 @@ ggplot(data=hexagon_Hansen,
 ```
 
 # Modelling and Visualising Accessibility using KD2SFCA Method
-## Computing KD2SFCA’s accessibility
+
+## Computing KD2SFCA's accessibility
+
 ```{r}
 acc_KD2SFCA <- data.frame(ac(hexagons$demand,
                             eldercare$capacity,
@@ -213,7 +225,8 @@ acc_KD2SFCA <- tbl_df(acc_KD2SFCA)
 hexagon_KD2SFCA <- bind_cols(hexagons, acc_KD2SFCA)
 ```
 
-## Visualising KD2SFCA’s accessibility
+## Visualising KD2SFCA's accessibility
+
 ```{r}
 tmap_mode("plot")
 tm_shape(hexagon_KD2SFCA,
@@ -240,6 +253,7 @@ tm_shape(eldercare) +
 ```
 
 ## Statistical graphic visualisation
+
 ```{r}
 hexagon_KD2SFCA <- st_join(hexagon_KD2SFCA, mpsz, 
                           join = st_intersects)
@@ -257,7 +271,9 @@ ggplot(data=hexagon_KD2SFCA,
 ```
 
 # Modelling and Visualising Accessibility using Spatial Accessibility Measure (SAM) Method
+
 ## Computing SAM accessibility
+
 ```{r}
 acc_SAM <- data.frame(ac(hexagons$demand,
                          eldercare$capacity,
@@ -271,7 +287,8 @@ acc_SAM <- tbl_df(acc_SAM)
 hexagon_SAM <- bind_cols(hexagons, acc_SAM)
 ```
 
-## Visualising SAM’s accessibility
+## Visualising SAM's accessibility
+
 ```{r}
 tmap_mode("plot")
 tm_shape(hexagon_SAM,
@@ -298,6 +315,7 @@ tm_shape(eldercare) +
 ```
 
 ## Statistical graphic visualisation
+
 ```{r}
 hexagon_SAM <- st_join(hexagon_SAM, mpsz, 
                        join = st_intersects)
@@ -313,4 +331,3 @@ ggplot(data=hexagon_SAM,
              colour ="red", 
              size=2)
 ```
-
