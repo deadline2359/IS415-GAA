@@ -239,6 +239,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex11/In-class_Ex11.html">
  <span class="dropdown-text">In-class Exercise 11</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex12/In-class_Ex12.html">
+ <span class="dropdown-text">In-class Exercise 12</span></a>
+  </li>  
     </ul>
   </li>
   <li class="nav-item dropdown ">
@@ -324,7 +328,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">March 6, 2023</p>
+      <p class="date-modified">April 3, 2023</p>
     </div>
   </div>
     
@@ -473,16 +477,16 @@ First 10 features:
 <pre><code># A tibble: 332 × 7
    PA         SZ                     YOUNG `ECONOMY ACTIVE`  AGED TOTAL DEPEND…¹
    &lt;chr&gt;      &lt;chr&gt;                  &lt;dbl&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
- 1 Ang Mo Kio Ang Mo Kio Town Centre  1290             2760   760  4810    0.743
- 2 Ang Mo Kio Cheng San               5640            16460  6050 28150    0.710
- 3 Ang Mo Kio Chong Boon              5100            15000  6470 26570    0.771
- 4 Ang Mo Kio Kebun Bahru             4620            13010  5120 22750    0.749
- 5 Ang Mo Kio Sembawang Hills         1880             3630  1310  6820    0.879
- 6 Ang Mo Kio Shangri-La              3330             9050  3610 15990    0.767
- 7 Ang Mo Kio Tagore                  1940             4480  1530  7950    0.775
- 8 Ang Mo Kio Townsville              4190            11950  5100 21240    0.777
+ 1 Ang Mo Kio Ang Mo Kio Town Centre  1440             2610   760  4810    0.843
+ 2 Ang Mo Kio Cheng San               6640            15460  6050 28150    0.821
+ 3 Ang Mo Kio Chong Boon              6150            13950  6470 26570    0.905
+ 4 Ang Mo Kio Kebun Bahru             5540            12090  5120 22750    0.882
+ 5 Ang Mo Kio Sembawang Hills         2100             3410  1310  6820    1    
+ 6 Ang Mo Kio Shangri-La              3960             8420  3610 15990    0.899
+ 7 Ang Mo Kio Tagore                  2220             4200  1530  7950    0.893
+ 8 Ang Mo Kio Townsville              4690            11450  5100 21240    0.855
  9 Ang Mo Kio Yio Chu Kang               0                0     0     0  NaN    
-10 Ang Mo Kio Yio Chu Kang East       1110             2410   750  4270    0.772
+10 Ang Mo Kio Yio Chu Kang East       1220             2300   750  4270    0.857
 # … with 322 more rows, and abbreviated variable name ¹​DEPENDENCY</code></pre>
 </div>
 </div>
@@ -500,16 +504,16 @@ First 10 features:
 <pre><code># A tibble: 234 × 7
    PA         SZ                     YOUNG `ECONOMY ACTIVE`  AGED TOTAL DEPEND…¹
    &lt;chr&gt;      &lt;chr&gt;                  &lt;dbl&gt;            &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;    &lt;dbl&gt;
- 1 ANG MO KIO ANG MO KIO TOWN CENTRE  1290             2760   760  4810    0.743
- 2 ANG MO KIO CHENG SAN               5640            16460  6050 28150    0.710
- 3 ANG MO KIO CHONG BOON              5100            15000  6470 26570    0.771
- 4 ANG MO KIO KEBUN BAHRU             4620            13010  5120 22750    0.749
- 5 ANG MO KIO SEMBAWANG HILLS         1880             3630  1310  6820    0.879
- 6 ANG MO KIO SHANGRI-LA              3330             9050  3610 15990    0.767
- 7 ANG MO KIO TAGORE                  1940             4480  1530  7950    0.775
- 8 ANG MO KIO TOWNSVILLE              4190            11950  5100 21240    0.777
- 9 ANG MO KIO YIO CHU KANG EAST       1110             2410   750  4270    0.772
-10 ANG MO KIO YIO CHU KANG WEST       5690            13750  4680 24120    0.754
+ 1 ANG MO KIO ANG MO KIO TOWN CENTRE  1440             2610   760  4810    0.843
+ 2 ANG MO KIO CHENG SAN               6640            15460  6050 28150    0.821
+ 3 ANG MO KIO CHONG BOON              6150            13950  6470 26570    0.905
+ 4 ANG MO KIO KEBUN BAHRU             5540            12090  5120 22750    0.882
+ 5 ANG MO KIO SEMBAWANG HILLS         2100             3410  1310  6820    1    
+ 6 ANG MO KIO SHANGRI-LA              3960             8420  3610 15990    0.899
+ 7 ANG MO KIO TAGORE                  2220             4200  1530  7950    0.893
+ 8 ANG MO KIO TOWNSVILLE              4690            11450  5100 21240    0.855
+ 9 ANG MO KIO YIO CHU KANG EAST       1220             2300   750  4270    0.857
+10 ANG MO KIO YIO CHU KANG WEST       6590            12850  4680 24120    0.877
 # … with 224 more rows, and abbreviated variable name ¹​DEPENDENCY</code></pre>
 </div>
 </div>
@@ -549,26 +553,26 @@ First 10 features:
 10         QT CENTRAL REGION       CR 3580D2AFFBEE914C 2014-12-05 24168.31
      Y_ADDR SHAPE_Leng SHAPE_Area              PA YOUNG ECONOMY ACTIVE AGED
 1  29220.19   5267.381  1630379.3            &lt;NA&gt;    NA             NA   NA
-2  29782.05   3506.107   559816.2          OUTRAM   930           3130 2120
+2  29782.05   3506.107   559816.2          OUTRAM  1200           2860 2120
 3  29974.66   1740.926   160807.5 SINGAPORE RIVER     0             40   10
-4  29933.77   3313.625   595428.9     BUKIT MERAH  2600           7450 3320
-5  30005.70   2825.594   387429.4     BUKIT MERAH  2760           6160 1740
-6  29991.38   4428.913  1030378.8     BUKIT MERAH  2800           7340 3420
-7  30230.86   3275.312   551732.0     BUKIT MERAH  2750           8080 3610
+4  29933.77   3313.625   595428.9     BUKIT MERAH  3150           6900 3320
+5  30005.70   2825.594   387429.4     BUKIT MERAH  2900           6020 1740
+6  29991.38   4428.913  1030378.8     BUKIT MERAH  3340           6800 3420
+7  30230.86   3275.312   551732.0     BUKIT MERAH  3130           7700 3610
 8  30222.86   2208.619   290184.7 SINGAPORE RIVER     0             50   10
-9  29893.78   6571.323  1084792.3      QUEENSTOWN  1120           2770  610
-10 30104.18   3454.239   631644.3      QUEENSTOWN    30            160   60
+9  29893.78   6571.323  1084792.3      QUEENSTOWN  1290           2600  610
+10 30104.18   3454.239   631644.3      QUEENSTOWN    50            140   60
    TOTAL DEPENDENCY                       geometry
 1     NA         NA MULTIPOLYGON (((31495.56 30...
-2   6180  0.9744409 MULTIPOLYGON (((29092.28 30...
+2   6180  1.1608392 MULTIPOLYGON (((29092.28 30...
 3     50  0.2500000 MULTIPOLYGON (((29932.33 29...
-4  13370  0.7946309 MULTIPOLYGON (((27131.28 30...
-5  10660  0.7305195 MULTIPOLYGON (((26451.03 30...
-6  13560  0.8474114 MULTIPOLYGON (((25899.7 297...
-7  14440  0.7871287 MULTIPOLYGON (((27746.95 30...
+4  13370  0.9376812 MULTIPOLYGON (((27131.28 30...
+5  10660  0.7707641 MULTIPOLYGON (((26451.03 30...
+6  13560  0.9941176 MULTIPOLYGON (((25899.7 297...
+7  14440  0.8753247 MULTIPOLYGON (((27746.95 30...
 8     60  0.2000000 MULTIPOLYGON (((29351.26 29...
-9   4500  0.6245487 MULTIPOLYGON (((20996.49 30...
-10   250  0.5625000 MULTIPOLYGON (((24472.11 29...</code></pre>
+9   4500  0.7307692 MULTIPOLYGON (((20996.49 30...
+10   250  0.7857143 MULTIPOLYGON (((24472.11 29...</code></pre>
 </div>
 </div>
 <div class="callout-tip callout callout-style-default callout-captioned">
@@ -933,7 +937,7 @@ Tip
 <div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="fu">summary</span>(mpsz_pop2020<span class="sc">$</span>DEPENDENCY)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA's 
- 0.0000  0.6519  0.7025  0.7742  0.7645 19.0000      92 </code></pre>
+ 0.1111  0.7147  0.7866  0.8585  0.8763 19.0000      92 </code></pre>
 </div>
 </div>
 <p>With reference to the results above, break points will be set to 0.60, 0.70, 0.80, and 0.90. As mentioned, a minimum and a maximum need to be stated, which are set as 0 and 1 here. The <em>breaks</em> vector is thus c(0, 0.60, 0.70, 0.80, 0.90, 1.00).</p>
