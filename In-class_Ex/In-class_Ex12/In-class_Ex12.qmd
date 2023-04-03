@@ -95,8 +95,6 @@ SIM_data$ORIGIN_AGE25_64 <- ifelse(
 summary(SIM_data)
 ```
 
-# 
-
 **Unconstrained Spatial Interaction Model**
 
 Calibrate an unconstrained spatial interaction model by using `glm()` of **Base Stats**
@@ -113,8 +111,6 @@ uncSIM <- glm(formula = TRIPS ~
               na.action = na.exclude)
 uncSIM
 ```
-
-# 
 
 **R-squared function**
 
@@ -306,5 +302,3 @@ ggarrange(unc_p, orc_p, dec_p, dbc_p,
           ncol = 2,
           nrow = 2)
 ```
-
-## 

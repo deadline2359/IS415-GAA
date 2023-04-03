@@ -1494,22 +1494,22 @@
     "objectID": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#origin-constrained-sim",
     "href": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#origin-constrained-sim",
     "title": "In-class Exercise 12: Calibrating Spatial Interaction Models",
-    "section": "9.1 Origin constrained SIM",
-    "text": "9.1 Origin constrained SIM\n\ndf <- as.data.frame(orcSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(orcTRIPS = \"orcSIM$fitted.values\")"
+    "section": "7.1 Origin constrained SIM",
+    "text": "7.1 Origin constrained SIM\n\ndf <- as.data.frame(orcSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(orcTRIPS = \"orcSIM$fitted.values\")"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#destination-constrained-sim",
     "href": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#destination-constrained-sim",
     "title": "In-class Exercise 12: Calibrating Spatial Interaction Models",
-    "section": "9.2 Destination Constrained SIM",
-    "text": "9.2 Destination Constrained SIM\n\ndf <- as.data.frame(decSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(decTRIPS = \"decSIM$fitted.values\")"
+    "section": "7.2 Destination Constrained SIM",
+    "text": "7.2 Destination Constrained SIM\n\ndf <- as.data.frame(decSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(decTRIPS = \"decSIM$fitted.values\")"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#doubly-constrained-sim",
     "href": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#doubly-constrained-sim",
     "title": "In-class Exercise 12: Calibrating Spatial Interaction Models",
-    "section": "9.3 Doubly Constrained SIM",
-    "text": "9.3 Doubly Constrained SIM\n\ndf <- as.data.frame(dbcSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(dbcTRIPS = \"dbcSIM$fitted.values\")\n\n\nunc_p <- ggplot(data = SIM_data,\n                aes(x = uncTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\norc_p <- ggplot(data = SIM_data,\n                aes(x = orcTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\ndec_p <- ggplot(data = SIM_data,\n                aes(x = decTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\ndbc_p <- ggplot(data = SIM_data,\n                aes(x = dbcTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\nggarrange(unc_p, orc_p, dec_p, dbc_p,\n          ncol = 2,\n          nrow = 2)"
+    "section": "7.3 Doubly Constrained SIM",
+    "text": "7.3 Doubly Constrained SIM\n\ndf <- as.data.frame(dbcSIM$fitted.values) %>%\n  round(digits = 0)\n\n\nSIM_data <- SIM_data %>%\n  cbind(df) %>%\n  rename(dbcTRIPS = \"dbcSIM$fitted.values\")\n\n\nunc_p <- ggplot(data = SIM_data,\n                aes(x = uncTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\norc_p <- ggplot(data = SIM_data,\n                aes(x = orcTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\ndec_p <- ggplot(data = SIM_data,\n                aes(x = decTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\ndbc_p <- ggplot(data = SIM_data,\n                aes(x = dbcTRIPS,\n                    y = TRIPS)) +\n  geom_point() +\n  geom_smooth(method = lm)\n\nggarrange(unc_p, orc_p, dec_p, dbc_p,\n          ncol = 2,\n          nrow = 2)"
   },
   {
     "objectID": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#section-2",
@@ -1517,5 +1517,12 @@
     "title": "In-class Exercise 12: Calibrating Spatial Interaction Models",
     "section": "9.4 ",
     "text": "9.4"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#section",
+    "href": "In-class_Ex/In-class_Ex12/In-class_Ex12.html#section",
+    "title": "In-class Exercise 12: Calibrating Spatial Interaction Models",
+    "section": "7.4 ",
+    "text": "7.4"
   }
 ]
